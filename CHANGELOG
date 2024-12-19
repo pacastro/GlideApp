@@ -1,0 +1,10 @@
+* 1.0:
+  Changes from My Vario Lite:
+  - New Glider app icon 
+  - Added first page view with Heart Rate and Oxgen Saturation (SpO2) monitoring
+  - Added Oxygen Saturation (SpO2) to FIT fields recording
+  - Added wind direction and speed to the Vario Plot view
+  - Added Elapsed Time display in footer for 10 seconds when next page is selected
+  - Added Vario Plot zoom range settings (1000m/px to 1m/px)
+  - Modified some default settings for glider flight use-case
+  - Direction unit setup separated for Wind and Heading (in degrees, or as direction sector such as NW)
