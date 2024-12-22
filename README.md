@@ -63,7 +63,7 @@ USAGE:
 You really, really want to go through the Manual before first use, and test the
 application at home! See below USAGE manual.
 
-https://github.com/ydutertre/myvario/blob/main/USAGE
+[https://github.com/ydutertre/myvario/blob/main/USAGE](https://github.com/pacastro/GlideApp/blob/main/USAGE)
 
 
 ## Usage
@@ -72,10 +72,10 @@ Please refer to the USAGE file.
 
 ## Supported watches
 
-I am using variable frequencytones for the vario, which are only supported for
-SDK 3.1.0 and above. This restricts the watches I can support. The GlideApp Lite
+I am using variable frequencytones for the vario and sensor readings of Blood Oxygen Saturation, which are only supported for
+SDK 3.2.0 and above. This restricts the watches I can support. The GlideApp
 Application however has had memory optimized to support watches that provie 124kb
-of memory to applications (Fenix 5, Fenix 6, Forerunner 645, Forerunner 935, etc.)
+of memory to applications (Fenix 6, Forerunner 245, Forerunner 945, etc.)
 
 ## Not a programmer
 
