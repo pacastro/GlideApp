@@ -63,7 +63,7 @@ USAGE:
 You really, really want to go through the Manual before first use, and test the
 application at home! See below USAGE manual.
 
-[https://github.com/ydutertre/myvario/blob/main/USAGE](https://github.com/pacastro/GlideApp/blob/main/USAGE)
+https://github.com/pacastro/GlideApp/blob/main/USAGE
 
 
 ## Usage
