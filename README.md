@@ -5,11 +5,11 @@
 
 ## Overview
 
-This free and open-source application provides Variometer functions adapted
-to free flight activities. It is based on My Vario Lite by Yannick Dutertre and the excellent open-source Garmin IQ
-GliderSK application by Cedric Dufour (licensed under GPL v3.0, just like My
-Vario is), dropping a lot of features for a simpler/leaner experience, while
-adding many improvements for free flight activities.
+This free and open-source application provides Variometer functions adapted to free 
+flight activities. It is based on My Vario Lite by Yannick Dutertre and the excellent 
+open-source Garmin IQ GliderSK application by Cedric Dufour (licensed under GPL v3.0, 
+just like My Vario is), dropping a lot of features for a simpler/leaner experience, 
+while adding many improvements for free flight activities.
 
 GlideApp is a BACKUP source of information and should ALWAYS be paired with
 specialized variometer equipment! Watch sensors are simply not precise enough
@@ -19,10 +19,11 @@ and THIS APP SHOULD NOT BE USED AS A PRIMARY FLIGHT INSTRUMENT!
 
 Multiple views/dashboards are available.
 
-- a Global view, displaying all flight data in a single pane: altitude, ground
-and vertical speeds, finesse, heading, wind direction and speed estimate, if
-available (wind direction and speed are computed on the fly based on groundspeeds
-when circling)
+- a Global view, displaying all flight data in a single pane: altitude, ground and
+vertical speeds, finesse, heading, heart rate, blood oxygen saturation (SpO2) readings,
+wind direction and speed estimate, if available (wind direction and speed are computed
+on the fly based on groundspeeds when circling, blood oxygen saturation can be hard to
+get with a moving watch hand)
 
 - a Variometer view, where the vertical speed can be visually seen
 
