@@ -1,0 +1,384 @@
+GlideApp (Garmin ConnectIQ) App
+===============================
+Usage instructions
+
+
+   !!! WARNING !!! DISCLAIMER !!! WARNING !!! DISCLAIMER !!! WARNING !!!
+
+   THIS APPLICATION IS NOT TO BE USED AS A MEAN TO INSURE FLIGHT SAFETY.
+
+  Always follow official or recommended procedures to insure flight safety,
+         *independently* from the help this application can offer.
+
+  In particular, this application relies on barometric pressure to derive
+  the altitude and MUST NOT BE USED IN A PRESSURIZED AIRCRAFT.
+
+  WARNING: This app is intended only as an in-flight aid and should not be
+  used as a primary information source. This app contains a barometric
+  altimeter, it will not function in a pressurized aircraft and should
+  not be used in a pressurized aircraft.
+
+  WARNING: Blood Oxygen Saturation readings (SpO2) is intended only as an 
+  in-flight aid, smartwatch sensors still have shortcomings that can limit
+  the accuracy of the reading.
+
+   !!! WARNING !!! DISCLAIMER !!! WARNING !!! DISCLAIMER !!! WARNING !!!
+
+
+Getting Started
+---------
+
+Upon launch, the application automatically calibrates its raw pressure reading
+to match the altitude detected by the watch. As such, if your watch supports maps,
+it is a good idea to do a DEM Calibration at takeoff, prior to launching the app.
+This is done outside of the app in the watch Settings -> Sensors and Accessories
+-> Altimeter -> Calibrate -> Use DEM.
+
+Otherwise, you will need to manually calibrate the altitude after launching GlideApp,
+as detailed in the Settings section.
+
+After launching the app, if you're confused that the app is not displaying any
+data, don't fret! You just need to get a GPS fix :) Go to a window or go outside,
+and all will become clear.
+
+Next is navigation. The app is geared towards watches that can be used without
+a touch interface, such as Forerunner or Fenix series.
+
+Up button (middle left) and Down button (bottom left) can be used to go from one
+view to another. Swiping up and down on a touchscreen also does the trick.
+
+Long pressing the Up button will bring up the menu (except in the Varioplot view!
+See the rest of this doc to learn more). You can navigate the menu and its various
+settings with the Up, Down, Select (top right button) and Back (bottom right)
+buttons. Swipes and taps also work. Check the settings and set them to what you like!
+
+The Select button can be used to start and stop the activity recording, and Back can
+be used to exit the app.
+
+Foreword
+--------
+
+GlideApp relies on your device's raw barometric sensor to compute the altitude,
+using the ad-hoc International Civil Aviation Organization (ICAO) formulas and
+according to the International Standard Atmosphere (ISA).
+
+Upon startup, the application will read the watch altitude (if available) and
+calibrate its barometer based on that. If the watch altitude was correct, then
+everything is fine, and no further calibration is needed.
+
+If, however you are unsure that your watch altitude is correct, or you know the
+exact altitude of takeoff better than the watch does, you should calibrate My
+Vario internal altimeter - using either the known QNH or elevation (see Settings
+below) - to obtain an accurate altitude reading (besides the initial automated
+calibration, the device's "native" altimeter/barometer settings are ignored).
+
+GlideApp is based on My Vario Lite by Yannick Dutertre and the excellent
+GliderSK by Cedric Dufour. If you like this application, you should consider
+donating to him (see DONATE file or below).
+
+http://cedric.dufour.name/software/donate.html
+
+If you want to also donate something to me, you can do so directly to my Paypal account:
+
+https://paypal.me/pc1111pp
+
+A lot of this USAGE text is also verbatim from Cedric's manual.
+
+General Views
+-------------
+
+The GlideApp General view displays all the flight data in a single view, without
+any further bells or whistles:
+
+General View 1
+ - Top-Left:
+   heart rate reading
+ - Top-Right:
+   - Blood Oxygen Saturation reading (when available, it may take same time to get a reading)
+   - age of last SpO2 reading (readings are taken when age is over 5 minutes)
+   - color indicaction for SpO2 levels: >=95 green, 90-95 yellow, <=90 red, 
+     readings less than 6 minutos old: green, 6-20 minutes old: yeloow, over 20 minutes: red.
+ - Left:
+   your current altitude
+ - Center:
+   your current finesse
+ - Right:
+   your current (GPS) heading
+ - Bottom-Left:
+   your current vertical speed
+ - Bottom-Right:
+   your current ground speed
+
+General View 2
+ - Top-Left:
+   estimated wind direction (when available)
+ - Top-Center:
+   wind arrow in heading up mode, displays where wind is coming from relative to our 
+   forward vector (once wind dir is computed)
+ - Top-Right:
+   estimated wind speed (when available)
+ - Left:
+   your current altitude
+ - Center:
+   your current finesse
+ - Right:
+   your current (GPS) heading
+ - Bottom-Left:
+   your current vertical speed
+ - Bottom-Right:
+   your current ground speed
+
+Variometer View
+---------------
+
+The GlideApp Variometer displays your current ascent/descent rate both textu-
+ally and graphically, using visually appealing colors:
+ - GREEN for ascent
+ - RED for descent
+
+
+Varioplot / Thermal Assistant View
+--------------
+
+The GlideApp Varioplot / Thermal Assistant graphically displays you ascent/descent
+rate along your flight path, using visually appealing colors ranging from:
+ - (Bright) GREEN for maximum ascent rate
+ - (Bright) RED for maximum descent rate
+
+Unless configured otherwise, the screen will automatically switch to this view
+when circling is detected, and switch back to previous view once circling is no
+longer detected.
+
+In addition, the following values will be displayed in the corner of the plot:
+ - Top-Left:
+   your current altitude. The color of this number indicates how much altitude
+   has been gained (or lost) within the last 20 seconds: green for gains, red
+   for loss, grey for (relatively) unchanged. This can be very useful in weak
+   thermals. If circling is detected, it will show current circling duration
+   and height gain (or loss).
+ - Center-Top:
+   compass north arrow in heading up orientation
+ - Top-Right:
+   your current vertical speed
+ - Left:
+   wind direction and speed (when available)
+ - Bottom-Left:
+   your current ground speed
+ - Bottom-Right:
+   your current finesse and plot scale
+
+If turned on, the current thermal detected core will be displayed as a blue circle.
+See "About Thermal Detection" for more details.
+
+The App calculates wind direction and speed using the displacement of multiple circles when 
+circling, the calculated values can be affected when a pilot tries to center a thermal and 
+intentionally modifies the circling patern.
+
+Varioplot can be configured in settings to be show as north up or heading up.
+
+By pressing the MENU button (long-pressing the UP button), you will enter the
+Zoom mode, where short pressing the Up & Down buttons will result in zoom in and out.
+
+By pressing the MENU button (long-pressing the UP button) a second time, you
+will enter the Settings menu.
+
+Timers View
+-----------
+
+The GlideApp Timers view displays the start and elapsed times, distance, ascent measures
+since:
+ - the (last) activity recording was started (see Activity Recording below)
+
+
+Log View
+--------
+
+GlideApp Log view keeps track of your last recorded activities (global session
+details; see Activity Recording below).
+
+Use the SELECT and BACK buttons to browse through the last 100 saved entries.
+
+The Log view is not available in flight (while recording) can only be accesed after 
+starting the App or after saving an activity.
+
+
+Activity Recording
+------------------
+
+Controlling your activity recording status (start, pause, resume, save, discard)
+is achieved by pressing the SELECT button.
+
+GlideApp adds custom fields to the recorded FIT file:
+ - Blood Oxygen Saturation (SpO2, 0 value when no valid reading)
+ - Barometric Altitude
+ - Vertical Speed
+ - Acceleration (g)
+ - Rate of Turn
+(which will be plotted in Garmin Connect IF your installed the application
+ through the Garmin ConnectIQ store)
+
+For the entire recording session, Garmin Connect will also show the following details:
+ - Distance: non-thermalling distance
+ - Ascent: cumulative altitude gain and elapsed time spent ascending
+ - Minimum Altitude: value and time
+ - Maximum Altitude: value and time
+
+
+!!!! ABOUT ALTITUDE RECORDING !!!!
+
+Note that Garmin doesn't allow applications to overwrite default FIT fields, and as such
+there will be two Altitude fields in the generated activity log: the Garmin "official"
+altitude, and our (better) barometric altitude field. By default, Garmin watches
+attribute pressure changes to either weather or altitude changes. This can cause the
+official altitude field to be wildly incorrect compared to our barometric altitude field.
+
+If exporting your log to gpx format and uploading to Ayvri, the Garmin altitude field will
+be used (unfortunately), and this can lead to some funky issues. It is thus better to set
+the altimeter to Altimeter only in the watch settings before using the application.
+
+This can be done in Settings -> Sensors & Accessories -> Altimeter -> Sensor Mode ->
+Altimeter Only.
+
+Settings
+--------
+
+Unless explicitely stated otherwise for a given view, you may enter the Settings
+menu by pressing the MENU button (long-pressing the UP button).
+
+The application allows you to specify the following settings:
+
+* Altimeter
+  > Calibration
+    - QNH:
+      calibrate the altimeter using the current known QNH
+    - Elevation:
+      calibrate the altimeter using the current known elevation
+      (QNH shall be adjusted accordingly)
+
+* Variometer
+  - Range:
+    the range used for the variometer display (3.0, 6.0 or 9.0 m/s) and varioplot
+    color range
+  - Auto Thermal:
+    whether the app will switch to Varioplot view automatically when circling is
+    detected, and switch back once circling is no longer detected
+  - Thermal Detect (EXPERIMENTAL):
+    whether the app will try to detect and map a thermal in the Varioplot view
+    see "About thermal detection" for more information
+  - Smoothing:
+    the amount of smoothing to apply to the variometer reading (determines the standard
+    deviation of altitude applied to the Kalman Filter: 0.2, 0.5, 0.7, or 1.0)
+  - Plot Range:
+    the time range (in minutes) for plotting the variometer-vs-location history
+  - Plot Zoom:
+    the zoom setting for plotting the variometer-vs-location history, also settable directly
+    in the VarioPlot page
+  - Plot Orientation:
+    the orientation of the plot, either "North up" (default) or "Heading up"
+
+* Sounds
+  - Variometer Tones:
+    whether to play variometer tones
+  - Vario Vibrations:
+    whether to use variometer vibrations
+  - Min. Climb:
+    the minimum vertical speed required to play variometer tones and/or
+    vibrations
+  - Min. Sink:
+    the minimum sink speed required to play variometer sink tone (no vibration)
+    the tone will be triggered once, each time the sink is escaped and then entered again
+
+* Activity
+  - Auto Start
+    whether to automatically start the activity recording
+    throughout the flight (takeoff)
+  - Start Speed
+    speed above which the activity automatically starts/resumes
+    (must be greater than the Stop Speed; ignored if set to zero)
+
+* General
+  - Background Color:
+    the background color (black or white)
+  - Clear logs:
+    delete all logs
+
+* Units
+  - Distance:
+    preferred units for displaying distance (and horizontal speed) values
+  - Elevation:
+    preferred units for displaying elevation (and vertical speed) values
+  - Pressure:
+    preferred units for displaying pressure values
+  - Rate of Turn:
+    preferred units for displaying rate of turn values
+  - Wind speed:
+    show estimated wind speed as kph, mph, knots or m/s
+  - Wind Direction:
+    whether to show Wind direction as an angle (247, 62, etc.) or as text (NW, SE, N, etc.)
+  - Heading:
+    whether to show Heading as an angle (247, 62, etc.) or as text (NW, SE, N, etc.)
+  - Timezone:
+    display Local Time (LT) or Universal Time Coordinates (UTC/Z)
+
+
+About Data Filtering
+--------------------
+
+GlideApp uses a Kalman Filter for Altitude and Vertical Speed. The filter
+was derived from implementations in the SkyDrop vario and Arduino Open Vario.
+
+Other values are not filtered.
+
+The filter currently doesn't use data from the accelerometer, as gyroscope data 
+is not yet available from the Garmin SDK. I am planning on adding this for System 5
+devices, once SDK 4.1.0 comes out of Beta.
+
+In general, filtered values are used.
+
+Smoothing relies on the standard deviation of the Altitude (which depends on the
+barometric sensor). This can be changed via the Variometer Smoothing setting.
+Higher values of smoothing induce more lag - however, this still seems to be to
+provide better reactivity for the same amount of smoothing as the original
+simple moving average of GliderSK.
+
+Note that the Minimum Climb setting can be used to compensate for weaker smoothing,
+if using GlideApp as an audio/vibration variometer.
+
+However, the Activity Recorded (FIT) data are always instantaneous rather than smoothed.
+
+About Thermal Detection
+-----------------------
+
+Thermal detection can be enabled in the settings menu, under Variometer. This performs the
+following across the last 60 seconds of location and variometer data:
+- It assigns a weight to each location. The stronger the climb at that location the higher
+  the weight. However, it also decreases the weight the further that point is from the current
+  altitude. The older the data point, the lower its weight as well.
+- Locations with a climb rate of less than the Min. Climb setting are ignored
+- It computes the weighted average of the coordinates and uses that as the thermal center
+- It computes at the same time the weighted standard deviation of the coordinates and uses
+  that as the radius of the thermal
+- It then draws the thermal as a circle in blue on the varioplot
+
+This feature is experimental, and could be completely useless. Use at your own risk.
+If you have a better algo in mind, please let me know!!
+
+WARNING!!! GOTCHAS!!!
+---------------------
+
+When using GPS devices, you should be aware that:
+ - GPS is very accurate for location (latitude/longitude) information;
+   even more so when coupled with GLONASS (at the cost of battery usage).
+ - (Garmin) UltraTrac feature is very cool to save battery but does NOT
+   refresh location information frequently enough for GlideApp purpose.
+
+      !!! DO NOT USE ULTRATRAC WITH GlideApp !!!
+
+The ConnectIQ framework does NOT allow applications - like GlideApp - to
+control the location source (GPS, GLONASS and/or UltraTrac). The only way
+to circumvent that limitation is to
+
+      !!! USE A NATIVE GARMIN APPLICATION BEFOREHANDS !!!
+
+The ConnectIQ application launched afterwards will then retain those settings.
+

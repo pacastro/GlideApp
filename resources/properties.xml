@@ -1,0 +1,34 @@
+<!-- -*- mode:xml; tab-width:2; c-basic-offset:2; intent-tabs-mode:nil; -*- ex: set tabstop=2 expandtab: -->
+<properties>
+  <!-- User preferences -->
+  <!-- ... altimeter -->
+  <property id="userAltimeterCalibrationQNH" type="float">101325.0</property>
+  <!-- ... variometer -->
+  <property id="userVariometerRange" type="number">0</property>
+  <property id="userVariometerAutoThermal" type="boolean">true</property>
+  <property id="userVariometerThermalDetect" type="boolean">true</property>
+  <property id="userVariometerSmoothing" type="number">1</property> 
+  <property id="userVariometerPlotRange" type="number">2</property>
+  <property id="userVariometerPlotZoom" type="number">6</property>
+  <property id="userVariometerPlotOrientation" type="number">0</property>
+  <!-- ... sounds -->
+  <property id="userSoundsVariometerTones" type="boolean">false</property>
+  <property id="userVariometerVibrations" type="boolean">false</property>
+  <property id="userMinimumClimb" type="number">2</property> 
+  <property id="userMinimumSink" type="number">1</property> 
+  <!-- ... activity -->
+  <property id="userActivityAutoStart" type="boolean">true</property>
+  <property id="userActivityAutoSpeedStart" type="float">5.56</property>
+  <!-- ... general -->
+  <property id="userGeneralBackgroundColor" type="number">0</property>
+  <!-- ... units -->
+  <property id="userUnitDistance" type="number">-1</property>
+  <property id="userUnitElevation" type="number">-1</property>
+  <property id="userUnitPressure" type="number">-1</property>
+  <property id="userUnitRateOfTurn" type="number">0</property>
+  <property id="userUnitDirection" type="number">1</property>
+  <property id="userUnitHeading" type="number">0</property>
+  <property id="userUnitTimeUTC" type="boolean">false</property>
+  <property id="userUnitWindSpeed" type="number">-1</property>
+  <!-- ... storage -->
+</properties>

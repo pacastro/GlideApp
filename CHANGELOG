@@ -1,0 +1,29 @@
+* 1.2:
+  - Added Timers and Log pages GenOx->Gen->Vario->VarioPlot->Timers->(Log only when not recording)
+  - Added Acceleration (g) and rate of turn to FIT fields recording
+  - VarioPlot enhancements (code from Yannick Dutertre My Vario APP, contributed by Lenart Kos):
+    - Ability to set heading up or north up (default behavior)
+    - Display compass/direction of North if heading up
+    - Added Thermalling statistics computed and displayed in VarioPlot (time in thermal, altitude gain)
+    - Added Wind arrow to wind info
+  - Added Wind arrow to General view, in heading up mode (once wind direction is computed)
+  - Added Wind Speed settable unit
+  - Increaased maximun posible time history for Varioplot to 5 minutes
+  - Updated for MARQ (Gen 2) watches
+  - Fixed minor bugs
+
+* 1.1:
+  - Added Zoom scale to Vario Plot view (code from Yannick Dutertre My Vario APP)
+  - Updated for Fenix 8 lineup, Fenix E, Enduro 3, Forerunner 165, 265 & 965
+  - Fixed minor bugs
+
+* 1.0:
+  Changes from My Vario Lite:
+  - New Glider app icon 
+  - Added first page view with Heart Rate and Oxgen Saturation (SpO2) monitoring
+  - Added Oxygen Saturation (SpO2) to FIT fields recording
+  - Added wind direction and speed to the Vario Plot view
+  - Added Elapsed Time display in footer for 10 seconds when view page is changed
+  - Added Vario Plot zoom range settings (1000m/px to 1m/px)
+  - Modified some default settings for glider flight use-case
+  - Direction unit setup separated for Wind and Heading (in degrees, or as direction sector such as NW)

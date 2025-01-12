@@ -1,0 +1,85 @@
+<!-- -*- mode:xml; tab-width:2; c-basic-offset:2; intent-tabs-mode:nil; -*- ex: set tabstop=2 expandtab: -->
+<fitContributions>
+
+  <!-- record -->
+  <fitField id="0"
+            displayInChart="true"
+            sortOrder="0"
+            precision="0"
+            chartTitle="@Strings.titleSpO2"
+            dataLabel="@Strings.labelSpO2"
+            unitLabel="@Strings.unitSpO2"
+            fillColor="#a3ffb4" />
+  <fitField id="1"
+            displayInChart="true"
+            sortOrder="1"
+            precision="0"
+            chartTitle="@Strings.titleAltitude"
+            dataLabel="@Strings.labelAltitude"
+            unitLabel="@Strings.unitAltitude"
+            fillColor="#26bfbf" />
+  <fitField id="2"
+            displayInChart="true"
+            sortOrder="2"
+            precision="1"
+            chartTitle="@Strings.titleVerticalSpeed"
+            dataLabel="@Strings.labelVerticalSpeed"
+            unitLabel="@Strings.unitVerticalSpeed"
+            fillColor="#FF0000" />
+  <fitField id="3"
+            displayInChart="true"
+            sortOrder="3"
+            precision="1"
+            chartTitle="@Strings.titleAcceleration"
+            dataLabel="@Strings.labelAcceleration"
+            unitLabel="@Strings.unitAcceleration"
+            fillColor="#959fff" />
+  <fitField id="4"
+            displayInChart="true"
+            sortOrder="4"
+            precision="1"
+            chartTitle="@Strings.titleRateOfTurn"
+            dataLabel="@Strings.labelRateOfTurn"
+            unitLabel="@Strings.unitRateOfTurn"
+            fillColor="#fff256" />
+  
+  
+            
+  <!-- session -->
+  <fitField id="80"
+            displayInActivitySummary="true"
+            sortOrder="80"
+            dataLabel="@Strings.titleDistance"
+            unitLabel="@Strings.unitDistance" />
+  <fitField id="81"
+            displayInActivitySummary="true"
+            sortOrder="81"
+            dataLabel="@Strings.titleAscent"
+            unitLabel="@Strings.unitAltitude" />
+  <fitField id="82"
+            displayInActivitySummary="true"
+            sortOrder="82"
+            dataLabel="@Strings.titleAscent"
+            unitLabel="@Strings.unitTime" />
+  <fitField id="83"
+            displayInActivitySummary="true"
+            sortOrder="83"
+            dataLabel="@Strings.titleAltitudeMin"
+            unitLabel="@Strings.unitAltitude" />
+  <fitField id="84"
+            displayInActivitySummary="true"
+            sortOrder="84"
+            dataLabel="@Strings.titleAltitudeMin"
+            unitLabel="@Strings.unitTime" />
+  <fitField id="85"
+            displayInActivitySummary="true"
+            sortOrder="85"
+            dataLabel="@Strings.titleAltitudeMax"
+            unitLabel="@Strings.unitAltitude" />
+  <fitField id="86"
+            displayInActivitySummary="true"
+            sortOrder="86"
+            dataLabel="@Strings.titleAltitudeMax"
+            unitLabel="@Strings.unitTime" />
+
+</fitContributions>
