@@ -1,6 +1,6 @@
 <!-- -*- mode:xml; tab-width:2; c-basic-offset:2; intent-tabs-mode:nil; -*- ex: set tabstop=2 expandtab: -->
 <drawables>
-  <bitmap id="AppIcon" filename="../resources/drawables/launcher-40x40.png" />
+  <bitmap id="AppIcon" filename="../resources/drawables/launcher-60x60.png" />
   <drawable-list id="drawHeaderAccuracy1" x="192" y="30" width="6" height="12" >
     <shape type="rectangle" x="0" y="0" width="fill" height="fill" />
   </drawable-list>
