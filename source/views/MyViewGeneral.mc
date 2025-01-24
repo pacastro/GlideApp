@@ -156,15 +156,15 @@ class MyViewGeneral extends MyViewGlobal {
     // Colors
     if($.oMyProcessing.iAccuracy == Pos.QUALITY_NOT_AVAILABLE) {
       (self.oRezDrawableGlobal as MyDrawableGlobal).setColorFieldsBackground(self.iColorBG);
-      (self.oRezValueTopLeft as Ui.Text).setColor(Gfx.COLOR_LT_GRAY);
+      (self.oRezValueTopLeft as Ui.Text).setColor(self.iColorTextGr);
       (self.oRezValueTopLeft as Ui.Text).setText($.MY_NOVALUE_LEN3);
-      (self.oRezValueTopRight as Ui.Text).setColor(Gfx.COLOR_LT_GRAY);
+      (self.oRezValueTopRight as Ui.Text).setColor(self.iColorTextGr);
       (self.oRezValueTopRight as Ui.Text).setText($.MY_NOVALUE_LEN3);
-      (self.oRezValueCenter as Ui.Text).setColor(Gfx.COLOR_LT_GRAY);
+      (self.oRezValueCenter as Ui.Text).setColor(self.iColorTextGr);
       (self.oRezValueCenter as Ui.Text).setText($.MY_NOVALUE_LEN2);
-      (self.oRezValueRight as Ui.Text).setColor(Gfx.COLOR_LT_GRAY);
+      (self.oRezValueRight as Ui.Text).setColor(self.iColorTextGr);
       (self.oRezValueRight as Ui.Text).setText($.MY_NOVALUE_LEN3);
-      (self.oRezValueBottomRight as Ui.Text).setColor(Gfx.COLOR_LT_GRAY);
+      (self.oRezValueBottomRight as Ui.Text).setColor(self.iColorTextGr);
       (self.oRezValueBottomRight as Ui.Text).setText($.MY_NOVALUE_LEN3);
       return;
     }
