@@ -83,6 +83,8 @@ class MyViewLog extends MyViewGlobal {
   //
 
   function initialize() {
+    //Populate last view
+    $.oMyProcessing.bIsPrevious = 5;
     MyViewGlobal.initialize();
 
     // Current view/log index
@@ -245,6 +247,7 @@ class MyViewLog extends MyViewGlobal {
     // Validate/textualize log entry
     var oTimeStart = null;
     var oTimeStop = null;
+    var oTimePauseTot = null;
     var fValue;
     // ... time: start (and date)
     if(d.get("timeStart") != null) {
@@ -264,7 +267,8 @@ class MyViewLog extends MyViewGlobal {
     }
     // ... elapsed
     if(oTimeStart != null and oTimeStop != null) {
-      d["elapsed"] = LangUtils.formatElapsedTime(oTimeStart, oTimeStop, false);
+      oTimePauseTot = new Time.Duration((d.get("timePause") != null)?(d["timePause"] as Number):0);
+      d["elapsed"] = LangUtils.formatElapsedTime(oTimeStart, oTimeStop.subtract(oTimePauseTot), false);
     }
     else {
       d["elapsed"] = $.MY_NOVALUE_LEN3;

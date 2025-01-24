@@ -104,6 +104,7 @@ class MySettings {
   public var fMinimumClimb as Float = 0.2;
   public var fMinimumSink as Float = 2.0;
   public var fVariometerSmoothing as Float = 0.5; //Standard deviation of altitude measurement at fixed altitude
+  public var fVariometerSmoothingName as String = "";
 
   //
   // FUNCTIONS: self
@@ -282,10 +283,10 @@ class MySettings {
     }
     self.iVariometerSmoothing = _iValue;
     switch(self.iVariometerSmoothing) {
-    case 0: self.fVariometerSmoothing = 0.2f; break;
-    case 1: self.fVariometerSmoothing = 0.5f; break;
-    case 2: self.fVariometerSmoothing = 0.7f; break;
-    case 3: self.fVariometerSmoothing = 1.0f; break;
+    case 0: self.fVariometerSmoothing = 0.2f; self.fVariometerSmoothingName = "Low"; break;
+    case 1: self.fVariometerSmoothing = 0.5f; self.fVariometerSmoothingName = "Medium"; break;
+    case 2: self.fVariometerSmoothing = 0.7f; self.fVariometerSmoothingName = "High"; break;
+    case 3: self.fVariometerSmoothing = 1.0f; self.fVariometerSmoothingName = "Ultra"; break;
     }
   }
 
@@ -391,7 +392,7 @@ class MySettings {
 
   function loadGeneralBackgroundColor() as Number {
     var iValue = App.Properties.getValue("userGeneralBackgroundColor") as Number?;
-    return iValue != null ? iValue : Gfx.COLOR_WHITE;
+    return iValue != null ? iValue : Gfx.COLOR_BLACK;
   }
   function saveGeneralBackgroundColor(_iValue as Number) as Void {
     App.Properties.setValue("userGeneralBackgroundColor", _iValue as App.PropertyValueType);

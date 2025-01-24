@@ -49,9 +49,12 @@ class MyDrawableHeader extends Ui.Drawable {
   private var oRezHeaderAccuracy2 as Ui.Drawable;
   private var oRezHeaderAccuracy3 as Ui.Drawable;
   private var oRezHeaderAccuracy4 as Ui.Drawable;
+  private var oRezOxStatus as Ui.Drawable;
 
-  // Background color
+  // Color
   private var iColorBackground as Number = Gfx.COLOR_TRANSPARENT;
+
+  private var iColorOxStatus as Number = Gfx.COLOR_TRANSPARENT;
 
   // Position accuracy
   private var iPositionAccuracy as Number = Pos.QUALITY_NOT_AVAILABLE;
@@ -69,6 +72,8 @@ class MyDrawableHeader extends Ui.Drawable {
     oRezHeaderAccuracy2 = new Rez.Drawables.drawHeaderAccuracy2();
     oRezHeaderAccuracy3 = new Rez.Drawables.drawHeaderAccuracy3();
     oRezHeaderAccuracy4 = new Rez.Drawables.drawHeaderAccuracy4();
+
+    oRezOxStatus = new Rez.Drawables.drawOxStatus();
   }
 
   function draw(_oDC) {
@@ -124,6 +129,24 @@ class MyDrawableHeader extends Ui.Drawable {
       self.oRezHeaderAccuracy4.draw(_oDC);
       break;
 
+    }
+
+    // ... SpO2 Status
+    if (LangUtils.notNaN(tOx) && LangUtils.notNaN(dOx)) {
+      if ((tOx.value() <= 6 * 60) && (dOx >= 95)) {
+        self.iColorOxStatus = Gfx.COLOR_DK_GREEN;
+      }
+      else if ((tOx.value() >= 20 * 60) || (dOx <= 90)) {
+        self.iColorOxStatus = Gfx.COLOR_RED;
+        if (dOx < 88) {
+          self.iColorOxStatus = (self.iColorOxStatus == Gfx.COLOR_RED) ? Gfx.COLOR_TRANSPARENT : Gfx.COLOR_RED;
+        }
+      }
+      else if ((tOx.value() > 6 * 60) || (dOx > 90)) {
+        self.iColorOxStatus = Gfx.COLOR_YELLOW;
+      }
+      _oDC.setColor(self.iColorOxStatus, Gfx.COLOR_TRANSPARENT);
+      self.oRezOxStatus.draw(_oDC);
     }
   }
 

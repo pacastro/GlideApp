@@ -423,7 +423,7 @@ class MyViewVarioplot extends MyViewHeader {
       drawArrow(_oDC, iCompassX, iCompassY, iCompassRadius, fCompassDir, 0.15f, Gfx.COLOR_RED, Gfx.COLOR_TRANSPARENT);
 
       // Draw compass text
-      _oDC.setColor($.oMySettings.iGeneralBackgroundColor ? Gfx.COLOR_BLACK : Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
+      _oDC.setColor(self.iColorText, Gfx.COLOR_TRANSPARENT);
       _oDC.drawText(iCompassX, iCompassY, self.oRezFontPlotS as Ui.FontResource, "N", Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
     }
     // ... cardinal points
@@ -474,9 +474,8 @@ class MyViewVarioplot extends MyViewHeader {
     // Draw values
     var fValue;
     var sValue;
-    var cTextColor = $.oMySettings.iGeneralBackgroundColor ? Gfx.COLOR_BLACK : Gfx.COLOR_WHITE;
 
-    _oDC.setColor(cTextColor, Gfx.COLOR_TRANSPARENT);
+    _oDC.setColor(self.iColorText, Gfx.COLOR_TRANSPARENT);
 
     // ... altitude
     if(LangUtils.notNaN($.oMyProcessing.fAltitude)) {
@@ -497,7 +496,7 @@ class MyViewVarioplot extends MyViewHeader {
       } 
     }
     _oDC.drawText(self.iLayoutValueXleft, self.iLayoutValueYtop, self.oRezFontPlot as Ui.FontResource, Lang.format("$1$ $2$", [sValue, $.oMySettings.sUnitElevation]), Gfx.TEXT_JUSTIFY_LEFT);
-    _oDC.setColor(cTextColor, Gfx.COLOR_TRANSPARENT);
+    _oDC.setColor(self.iColorText, Gfx.COLOR_TRANSPARENT);
 
     // ... thermal info
     if ($.oMyProcessing.bCirclingCount >= 5) {
@@ -520,7 +519,7 @@ class MyViewVarioplot extends MyViewHeader {
       sValue += $.oMySettings.sUnitElevation;
       _oDC.setColor(cThermalGainColor, Gfx.COLOR_TRANSPARENT);
       _oDC.drawText(self.iLayoutValueXleft, self.iLayoutValueYtop + self.iFontPlotHeight * 2.2, self.oRezFontPlotS as Ui.FontResource, sValue, Gfx.TEXT_JUSTIFY_LEFT);
-      _oDC.setColor(cTextColor, Gfx.COLOR_TRANSPARENT);
+      _oDC.setColor(self.iColorText, Gfx.COLOR_TRANSPARENT);
     }
 
     // ... variometer
@@ -556,7 +555,7 @@ class MyViewVarioplot extends MyViewHeader {
     else {
       sValue = $.MY_NOVALUE_LEN3;
     }
-    _oDC.setColor(Gfx.COLOR_BLUE, Gfx.COLOR_TRANSPARENT);
+    _oDC.setColor($.oMySettings.iGeneralBackgroundColor?Gfx.COLOR_DK_BLUE:Gfx.COLOR_BLUE, Gfx.COLOR_TRANSPARENT);
     _oDC.drawText(5, self.iLayoutValueYcenter - self.iFontPlotHeight, self.oRezFontPlotS as Ui.FontResource, sValue, Gfx.TEXT_JUSTIFY_LEFT);
 
     // ... wind speed
@@ -571,7 +570,7 @@ class MyViewVarioplot extends MyViewHeader {
     _oDC.drawText(5, self.iLayoutValueYcenter + self.iFontPlotHeight, self.oRezFontPlotS as Ui.FontResource, sValue, Gfx.TEXT_JUSTIFY_LEFT);
     _oDC.drawText(5, self.iLayoutValueYcenter + self.iFontPlotHeight*2, self.oRezFontPlotS as Ui.FontResource, (sValue.equals($.MY_NOVALUE_LEN3)?"":$.oMySettings.sUnitWindSpeed), Gfx.TEXT_JUSTIFY_LEFT);
 
-    _oDC.setColor($.oMySettings.iGeneralBackgroundColor ? Gfx.COLOR_BLACK : Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
+    _oDC.setColor(self.iColorText, Gfx.COLOR_TRANSPARENT);
     // ... ground speed
     if($.oMyProcessing.iAccuracy > Pos.QUALITY_NOT_AVAILABLE and LangUtils.notNaN($.oMyProcessing.fGroundSpeed)) {
       fValue = $.oMyProcessing.fGroundSpeed * $.oMySettings.fUnitHorizontalSpeedCoefficient;
@@ -595,7 +594,7 @@ class MyViewVarioplot extends MyViewHeader {
     // ... plot scale
     fValue = $.iScaleBarSize;
     sValue = $.sScaleBarUnit;
-    _oDC.setColor($.oMySettings.iGeneralBackgroundColor ? Gfx.COLOR_LT_GRAY : Gfx.COLOR_DK_GRAY, Gfx.COLOR_TRANSPARENT);
+    _oDC.setColor(self.iColorTextGr, Gfx.COLOR_TRANSPARENT);
     var iScaleBarHeight = self.iLayoutValueYbottom - self.iFontPlotHeight;
     var iScaleBarStart = self.iLayoutValueXright + 21;
     var iScaleBarEnd = iScaleBarStart - fValue.toNumber();
@@ -603,7 +602,7 @@ class MyViewVarioplot extends MyViewHeader {
     _oDC.drawLine(iScaleBarStart, iScaleBarHeight, iScaleBarStart, iScaleBarHeight - 3); // Left vertical line
     _oDC.drawLine(iScaleBarEnd, iScaleBarHeight, iScaleBarEnd, iScaleBarHeight - 3); // Right vertical line
     _oDC.drawText(iScaleBarStart, iScaleBarHeight, self.oRezFontPlotS as Ui.FontResource, sValue, Gfx.TEXT_JUSTIFY_RIGHT);
-    _oDC.setColor($.oMySettings.iGeneralBackgroundColor ? Gfx.COLOR_BLACK : Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
+    _oDC.setColor(self.iColorText, Gfx.COLOR_TRANSPARENT);
 
   }
 
@@ -761,7 +760,6 @@ class MyViewVarioplotDelegate extends Ui.BehaviorDelegate {
       $.sScaleBarUnit = scaleBar[1];
       Ui.requestUpdate();
     }
-    $.tLastTimer = Time.now();  // view ET timer
     return true;
   }
 

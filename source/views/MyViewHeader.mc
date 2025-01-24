@@ -65,6 +65,7 @@ class MyViewHeader extends MyView {
   //
 
   function initialize() {
+    $.tLastTimer = Time.now();  // view ET timer
     MyView.initialize();
   }
 
@@ -114,7 +115,7 @@ class MyViewHeader extends MyView {
 
     // ... activity status
     if($.oMyActivity == null) {  // ... stand-by
-      (self.oRezValueActivityStatus as Ui.Text).setColor(Gfx.COLOR_LT_GRAY);
+      (self.oRezValueActivityStatus as Ui.Text).setColor(self.iColorText);
       sValue = self.sValueActivityStandby;
     }
     else if(($.oMyActivity as MyActivity).isRecording()) {  // ... recording
@@ -132,7 +133,7 @@ class MyViewHeader extends MyView {
       var oTimeNow = Time.now();
       var oTimer = oTimeNow;
       if($.oMyActivity != null) {
-        oTimer = new Time.Moment(oTimeNow.subtract(($.oMyActivity as MyActivity).oTimeStart).value());
+        oTimer = new Time.Moment(oTimeNow.subtract(($.oMyActivity).oTimeStart).value());
       }
       else {
         oTimer = new Time.Moment(oTimeNow.subtract(oTimer).value());

@@ -98,26 +98,28 @@ class MyViewGeneralOx extends MyViewGlobal {
     // Set values (and dependent colors)
     var fValue;
     var sValue;
-    var bRecording = ($.oMyActivity != null);
+    var bRecording = ($.oMyActivity != null)?(($.oMyActivity as MyActivity).isRecording()):false;
 
     // ... Heart Rate
-    (self.oRezValueTopLeft as Ui.Text).setColor(bRecording ? self.iColorText : Gfx.COLOR_LT_GRAY);
+    (self.oRezValueTopLeft as Ui.Text).setColor(bRecording ? self.iColorText : self.iColorTextGr);
     fValue = oHR;
     if(LangUtils.notNaN(fValue)) {
       sValue = fValue.format("%.0f");
     } 
     else {
+      (self.oRezValueTopLeft as Ui.Text).setColor(self.iColorTextGr);
       sValue = $.MY_NOVALUE_LEN3;
     }
     (self.oRezValueTopLeft as Ui.Text).setText(sValue);
 
     // ... SpO2
-    (self.oRezValueTopRight as Ui.Text).setColor(bRecording ? self.iColorText : Gfx.COLOR_LT_GRAY);
+    (self.oRezValueTopRight as Ui.Text).setColor(bRecording ? self.iColorText : self.iColorTextGr);
     fValue = dOx;
     if(LangUtils.notNaN(fValue)) {
       sValue = fValue.format("%.0f");
     }
     else {
+      (self.oRezValueTopRight as Ui.Text).setColor(self.iColorTextGr);
       sValue = $.MY_NOVALUE_LEN3;
     }
     (self.oRezValueTopRight as Ui.Text).setText(sValue);
@@ -129,22 +131,20 @@ class MyViewGeneralOx extends MyViewGlobal {
       // Sys.println("DEBUG: tLastOx: "+fValue.day+"d"+fValue.hour+"h"+fValue.min.format("%02d")+"m");
       sValue = "Age: "+(fValue.month>1?">30 days":(fValue.day>2?(">"+(fValue.day-1)+" days"):((fValue.day-1)*24+fValue.hour+"h"+fValue.min.format("%02d")+"m")));
       if ((tOx.value() <= 6 * 60) && (dOx >= 95)) {
-        (self.oRezDrawableGlobal as MyDrawableGlobal).setColorOxStatus(Gfx.COLOR_DK_GREEN);
         (self.oRezDrawableGlobal as MyDrawableGlobal).setColorAlertOx(Gfx.COLOR_TRANSPARENT);
       }
       else if ((tOx.value() >= 20 * 60) || (dOx <= 90)) {
-        (self.oRezDrawableGlobal as MyDrawableGlobal).setColorOxStatus(Gfx.COLOR_RED);
         // (self.oRezDrawableGlobal as MyDrawableGlobal).setColorAlertOx(Gfx.COLOR_RED);
         if (dOx < 88) {
           (self.oRezDrawableGlobal as MyDrawableGlobal).setColorAlertOx(Gfx.COLOR_RED);
         }
       }
       else if ((tOx.value() > 6 * 60) || (dOx > 90)) {
-        (self.oRezDrawableGlobal as MyDrawableGlobal).setColorOxStatus(Gfx.COLOR_YELLOW);
         (self.oRezDrawableGlobal as MyDrawableGlobal).setColorAlertOx(Gfx.COLOR_TRANSPARENT);
       }
     }
     else {
+      (self.oRezValueTopRightB as Ui.Text).setColor(self.iColorTextGr);
       sValue = "Age: " + $.MY_NOVALUE_LEN3;
     }
     (self.oRezValueTopRightB as Ui.Text).setText(sValue);
@@ -157,7 +157,7 @@ class MyViewGeneralOx extends MyViewGlobal {
       sValue = fValue.format("%.0f");
     }
     else {
-      (self.oRezValueLeft as Ui.Text).setColor(Gfx.COLOR_LT_GRAY);
+      (self.oRezValueLeft as Ui.Text).setColor(self.iColorTextGr);
       sValue = $.MY_NOVALUE_LEN3;
     }
     (self.oRezValueLeft as Ui.Text).setText(sValue);
@@ -187,14 +187,14 @@ class MyViewGeneralOx extends MyViewGlobal {
       }
     }
     else {
-      (self.oRezValueBottomLeft as Ui.Text).setColor(Gfx.COLOR_LT_GRAY);
+      (self.oRezValueBottomLeft as Ui.Text).setColor(self.iColorTextGr);
       sValue = $.MY_NOVALUE_LEN3;
     }
     (self.oRezValueBottomLeft as Ui.Text).setText(sValue);
 
     // Colors
     if($.oMyProcessing.iAccuracy == Pos.QUALITY_NOT_AVAILABLE) {
-      (self.oRezDrawableGlobal as MyDrawableGlobal).setColorFieldsBackgroundOx(Gfx.COLOR_DK_RED);
+      (self.oRezDrawableGlobal as MyDrawableGlobal).setColorFieldsBackgroundOx(self.iColorBG);
       (self.oRezValueCenter as Ui.Text).setColor(Gfx.COLOR_LT_GRAY);
       // (self.oRezValueCenter as Ui.Text).setText($.MY_NOVALUE_LEN2);
       (self.oRezValueCenter as Ui.Text).setText(Ui.loadResource(Rez.Strings.AppVersion) as String);
@@ -219,6 +219,7 @@ class MyViewGeneralOx extends MyViewGlobal {
       sValue = fValue.format("%.0f");
     }
     else {
+      (self.oRezValueCenter as Ui.Text).setColor(self.iColorTextGr);
       sValue = $.MY_NOVALUE_LEN2;
     }
     (self.oRezValueCenter as Ui.Text).setText(sValue);
@@ -238,6 +239,7 @@ class MyViewGeneralOx extends MyViewGlobal {
       }
     }
     else {
+      (self.oRezValueRight as Ui.Text).setColor(self.iColorTextGr);
       sValue = $.MY_NOVALUE_LEN3;
     }
     (self.oRezValueRight as Ui.Text).setText(sValue);
@@ -250,6 +252,7 @@ class MyViewGeneralOx extends MyViewGlobal {
       sValue = fValue.format("%.0f");
     }
     else {
+      (self.oRezValueBottomRight as Ui.Text).setColor(self.iColorTextGr);
       sValue = $.MY_NOVALUE_LEN3;
     }
     (self.oRezValueBottomRight as Ui.Text).setText(sValue);
@@ -283,7 +286,6 @@ class MyViewGeneralOxDelegate extends MyViewGlobalDelegate {
                       new MyViewLogDelegate(),
                       Ui.SLIDE_IMMEDIATE);
     }
-    $.tLastTimer = Time.now();  // view ET timer
     return true;
   }
 
@@ -292,7 +294,6 @@ class MyViewGeneralOxDelegate extends MyViewGlobalDelegate {
     Ui.switchToView(new MyViewGeneral(),
                     new MyViewGeneralDelegate(),
                     Ui.SLIDE_IMMEDIATE);
-    $.tLastTimer = Time.now();  // view ET timer
     return true;
   }
 

@@ -118,7 +118,7 @@ class MyViewGeneral extends MyViewGlobal {
       sValue = fValue.format("%.0f");
     }
     else {
-      (self.oRezValueLeft as Ui.Text).setColor(Gfx.COLOR_LT_GRAY);
+      (self.oRezValueLeft as Ui.Text).setColor(self.iColorTextGr);
       sValue = $.MY_NOVALUE_LEN3;
     }
     (self.oRezValueLeft as Ui.Text).setText(sValue);
@@ -148,14 +148,14 @@ class MyViewGeneral extends MyViewGlobal {
       }
     }
     else {
-      (self.oRezValueBottomLeft as Ui.Text).setColor(Gfx.COLOR_LT_GRAY);
+      (self.oRezValueBottomLeft as Ui.Text).setColor(self.iColorTextGr);
       sValue = $.MY_NOVALUE_LEN3;
     }
     (self.oRezValueBottomLeft as Ui.Text).setText(sValue);
 
     // Colors
     if($.oMyProcessing.iAccuracy == Pos.QUALITY_NOT_AVAILABLE) {
-      (self.oRezDrawableGlobal as MyDrawableGlobal).setColorFieldsBackground(Gfx.COLOR_DK_RED);
+      (self.oRezDrawableGlobal as MyDrawableGlobal).setColorFieldsBackground(self.iColorBG);
       (self.oRezValueTopLeft as Ui.Text).setColor(Gfx.COLOR_LT_GRAY);
       (self.oRezValueTopLeft as Ui.Text).setText($.MY_NOVALUE_LEN3);
       (self.oRezValueTopRight as Ui.Text).setColor(Gfx.COLOR_LT_GRAY);
@@ -189,6 +189,7 @@ class MyViewGeneral extends MyViewGlobal {
       }
         
     } else {
+      (self.oRezValueTopLeft as Ui.Text).setColor(self.iColorTextGr);
       sValue = $.MY_NOVALUE_LEN3;
     }
     (self.oRezValueTopLeft as Ui.Text).setText(sValue);
@@ -201,6 +202,7 @@ class MyViewGeneral extends MyViewGlobal {
       sValue = fValue.format("%.0f");
     }
     else {
+      (self.oRezValueTopRight as Ui.Text).setColor(self.iColorTextGr);
       sValue = $.MY_NOVALUE_LEN3;
     }
     (self.oRezValueTopRight as Ui.Text).setText(sValue);
@@ -212,6 +214,7 @@ class MyViewGeneral extends MyViewGlobal {
       sValue = fValue.format("%.0f");
     }
     else {
+      (self.oRezValueCenter as Ui.Text).setColor(self.iColorTextGr);
       sValue = $.MY_NOVALUE_LEN2;
     }
     (self.oRezValueCenter as Ui.Text).setText(sValue);
@@ -231,6 +234,7 @@ class MyViewGeneral extends MyViewGlobal {
       }
     }
     else {
+      (self.oRezValueRight as Ui.Text).setColor(self.iColorTextGr);
       sValue = $.MY_NOVALUE_LEN3;
     }
     (self.oRezValueRight as Ui.Text).setText(sValue);
@@ -243,6 +247,7 @@ class MyViewGeneral extends MyViewGlobal {
       sValue = fValue.format("%.0f");
     }
     else {
+      (self.oRezValueBottomRight as Ui.Text).setColor(self.iColorTextGr);
       sValue = $.MY_NOVALUE_LEN3;
     }
     (self.oRezValueBottomRight as Ui.Text).setText(sValue);
@@ -294,7 +299,6 @@ class MyViewGeneralDelegate extends MyViewGlobalDelegate {
     Ui.switchToView(new MyViewGeneralOx(),
                     new MyViewGeneralOxDelegate(),
                     Ui.SLIDE_IMMEDIATE);
-    $.tLastTimer = Time.now();  // view ET timer
     return true;
   }
 

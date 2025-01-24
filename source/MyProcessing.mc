@@ -462,6 +462,10 @@ class MyProcessing {
         Ui.switchToView(new MyViewVariometer(),
                         new MyViewVariometerDelegate(),
                         Ui.SLIDE_IMMEDIATE);
+      } else if(self.bIsPrevious == 4){
+        Ui.switchToView(new MyViewTimers(),
+                        new MyViewTimersDelegate(),
+                        Ui.SLIDE_IMMEDIATE);
       }
     }
   }

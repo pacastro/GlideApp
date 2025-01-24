@@ -75,6 +75,10 @@ var iMyLogIndex as Number = -1;
 
 // Activity session (recording)
 var oMyActivity as MyActivity?;
+var oDstart = false;
+var oDstop = false;
+var oDpause = false;
+var oDTime as Time.Moment = Time.now();
 
 // Current view
 var oMyView as MyView?;

@@ -1,3 +1,12 @@
+* 1.3:
+  - Moved SpO2 color status indicator to Header (top right corner) so its available in all views with header
+  - Update to not consider paused time in the Timers/Log flight time, ET in footer still considers paused time
+  - Updated for Epix (Gen 2), Descent Mk2-3, Approach S70, Venu 2-3 and Vivoactive 4-5 watches 
+  (see USAGE file for non-5 button watches)
+  - New App icon for smaller and bigger screen devices
+  - Fixed color issues when using white background 
+  - Fixed minor bugs
+
 * 1.2:
   - Added Timers and Log pages GenOx->Gen->Vario->VarioPlot->Timers->(Log only when not recording)
   - Added Acceleration (g) and rate of turn to FIT fields recording

@@ -87,7 +87,7 @@
     <shape type="rectangle" x="10" y="10" width="10" height="10" color="Gfx.COLOR_LT_GRAY" />
   </drawable-list>
 
-  <drawable-list id="drawOxStatus" x="215" y="92" width="6" height="17" >
+  <drawable-list id="drawOxStatus" x="295" y="38" width="22" height="8" >
     <shape type="rectangle" x="0" y="0" width="fill" height="fill" />
   </drawable-list>
   <drawable-list id="drawFieldsBackgroundOx" x="0" y="156" width="fill" height="207" >

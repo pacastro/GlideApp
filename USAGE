@@ -53,7 +53,7 @@ settings with the Up, Down, Select (top right button) and Back (bottom right)
 buttons. Swipes and taps also work. Check the settings and set them to what you like!
 
 The Select button can be used to start and stop the activity recording, and Back can
-be used to exit the app.
+be used to exit the app (except in the Log view).
 
 Foreword
 --------
@@ -84,6 +84,25 @@ https://paypal.me/pc1111pp
 
 A lot of this USAGE text is also verbatim from Cedric's manual.
 
+Header
+------
+
+The Header, visible in all views (except in the Variometer view) displays the current battery 
+level, GPS signal level, and activity status (Stanby, Paused or Recording). 
+
+Also in the header view it is displayed a color status indicator for the current status of the 
+Blood Oxygen Saturation reading:
+  - color indicaction for SpO2 levels: >=95 green, 90-95 yellow, <=90 red flashing
+  or reading age takes precedence for lower status color:
+  - readings less than 6 minutos old: green, 6-20 minutes old: yeloow, over 20 minutes: red.
+
+Footer
+------
+
+The Footer, visible in all views (except in the Variometer and Log views) displays the current 
+time (Local Time or Zulu UTC). Each time the App view is changed the Elapsed Time (since the 
+activity started recording, including paused periods) is displayed for 10 seconds.
+
 General Views
 -------------
 
@@ -96,8 +115,6 @@ General View 1
  - Top-Right:
    - Blood Oxygen Saturation reading (when available, it may take same time to get a reading)
    - age of last SpO2 reading (readings are taken when age is over 5 minutes)
-   - color indicaction for SpO2 levels: >=95 green, 90-95 yellow, <=90 red, 
-     readings less than 6 minutos old: green, 6-20 minutes old: yeloow, over 20 minutes: red.
  - Left:
    your current altitude
  - Center:
@@ -138,7 +155,7 @@ ally and graphically, using visually appealing colors:
 
 
 Varioplot / Thermal Assistant View
---------------
+----------------------------------
 
 The GlideApp Varioplot / Thermal Assistant graphically displays you ascent/descent
 rate along your flight path, using visually appealing colors ranging from:
@@ -188,6 +205,7 @@ Timers View
 The GlideApp Timers view displays the start and elapsed times, distance, ascent measures
 since:
  - the (last) activity recording was started (see Activity Recording below)
+ - flight time does not consider paused time when activity is paused
 
 
 Log View
@@ -196,10 +214,11 @@ Log View
 GlideApp Log view keeps track of your last recorded activities (global session
 details; see Activity Recording below).
 
-Use the SELECT and BACK buttons to browse through the last 100 saved entries.
+Use the SELECT and BACK buttons to browse through the last 100 saved entries (date of 
+log is shown in the Footer).
 
 The Log view is not available in flight (while recording) can only be accesed after 
-starting the App or after saving an activity.
+starting the App or after saving/discarding an activity.
 
 
 Activity Recording
@@ -362,6 +381,25 @@ following across the last 60 seconds of location and variometer data:
 
 This feature is experimental, and could be completely useless. Use at your own risk.
 If you have a better algo in mind, please let me know!!
+
+About touchscreen models (no 5 button control)
+----------------------------------------------
+
+This application has been made to support some touchscreen models. However, use of those models 
+can be confusing, and the watches don't provide alert tones, so there are no vario tones, only 
+vibrations. However some approximation of vario tones can be made using system sounds (check 
+Settings -> Sounds -> Sound Driver). (bug tracker). This guide still applies, however the 
+controls are different.
+
+The Back button is unchanged (bottom right) and can be used to change settings.
+The UP and DOWN buttons (middle left and bottom left on 5 button watches) are replaced by 
+SWIPE UP and SWIPE DOWN gestures on the screen.
+The START button (top right on 5 button watches) is replaced by a tap on the screen, so can be 
+used to validate settings changes, start/stop and activity, etc.
+This can become particularly counterintuitive when changing zoom and pan in the thermal 
+assistant/varioplot view, but it works. Log view is a bit weird as well since to scroll through 
+the logs, the back button and tap on screen commands are used, while swipe up/swipe down bring 
+to the other watch screens.
 
 WARNING!!! GOTCHAS!!!
 ---------------------

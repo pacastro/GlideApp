@@ -81,9 +81,11 @@ class MyActivity {
 
   // Session
   // ... recording
-  private var oSession as AR.Session;
+  public var oSession as AR.Session;
   public var oTimeStart as Time.Moment?;
   public var oTimeStop as Time.Moment?;
+  public var oTimePause as Time.Duration?;
+  public var oTimePauseTot as Time.Duration?;
   // ... session
   public var fGlobalDistance as Float = 0.0f;
   public var fGlobalAscent as Float = 0.0f;
@@ -219,9 +221,13 @@ class MyActivity {
     self.resetLog(true);
     self.oSession.start();
     self.oTimeStart = Time.now();
+    self.oTimePauseTot = new Time.Duration(0);
     if(Toybox.Attention has :playTone) {
       Attn.playTone(Attn.TONE_START);
     }
+    oDstop = false;
+    oDstart = true;
+    oDTime = Time.now();
   }
 
   function isRecording() as Boolean {
@@ -236,10 +242,14 @@ class MyActivity {
     if(!self.oSession.isRecording()) {
       return;
     }
+    self.oTimeStop = Time.now();
     self.oSession.stop();
     if(Toybox.Attention has :playTone) {
       Attn.playTone(Attn.TONE_STOP);
     }
+    oDstart = false;
+    oDpause = true;
+    oDTime = Time.now();
   }
 
   function resume() as Void {
@@ -248,10 +258,14 @@ class MyActivity {
     if(self.oSession.isRecording()) {
       return;
     }
+    self.oTimePause = Time.now().subtract(oTimeStop);
+    self.oTimePauseTot = oTimePauseTot.add(oTimePause);
     self.oSession.start();
     if(Toybox.Attention has :playTone) {
       Attn.playTone(Attn.TONE_START);
     }
+    oDstart = true;
+    oDTime = Time.now();
   }
 
   function stop(_bSave as Boolean) as Void {
@@ -259,6 +273,10 @@ class MyActivity {
 
     if(self.oSession.isRecording()) {
       self.oSession.stop();
+    }
+    else {
+      self.oTimePause = Time.now().subtract(oTimeStop);
+      self.oTimePauseTot = oTimePauseTot.add(oTimePause);
     }
     if(_bSave) {
       self.oTimeStop = Time.now();
@@ -276,6 +294,10 @@ class MyActivity {
     }
     self.oTimeStart = null;
     self.oTimeStop = null;
+    oDstart = false;
+    oDpause = false;
+    oDstop = true;
+    oDTime = Time.now();
   }
 
 
@@ -366,6 +388,7 @@ class MyActivity {
       var dictLog = {
         "timeStart" => self.oTimeStart != null ? (self.oTimeStart as Time.Moment).value() : null,
         "timeStop" => self.oTimeStop != null ? (self.oTimeStop as Time.Moment).value() : null,
+        "timePause" => self.oTimePauseTot != null ? (self.oTimePauseTot as Time.Duration).value() : null,
         "distance" => LangUtils.notNaN(self.fGlobalDistance) ? self.fGlobalDistance : null,
         "ascent" => LangUtils.notNaN(self.fGlobalAscent) ? self.fGlobalAscent : null,
         "elapsedAscent" => LangUtils.notNaN(self.iGlobalElapsedAscent) ? self.iGlobalElapsedAscent : null,

@@ -50,7 +50,6 @@ class MyDrawableGlobal extends Ui.Drawable {
   private var oRezAlertRight as Ui.Drawable;
 
   private var oRezAlertOx as Ui.Drawable;
-  private var oRezOxStatus as Ui.Drawable;
   private var oRezFieldsBackgroundOx as Ui.Drawable;
 
   // Colors
@@ -60,7 +59,6 @@ class MyDrawableGlobal extends Ui.Drawable {
   private var iColorAlertRight as Number = Gfx.COLOR_TRANSPARENT;
 
   private var iColorAlertOx as Number = Gfx.COLOR_TRANSPARENT;
-  private var iColorOxStatus as Number = Gfx.COLOR_TRANSPARENT;
   private var iColorFieldsBackgroundOx as Number = Gfx.COLOR_TRANSPARENT;
 
 
@@ -78,7 +76,6 @@ class MyDrawableGlobal extends Ui.Drawable {
     oRezAlertRight = new Rez.Drawables.drawGlobalAlertRight();
 
     oRezAlertOx = new Rez.Drawables.drawAlertOx();
-    oRezOxStatus = new Rez.Drawables.drawOxStatus();
     oRezFieldsBackgroundOx = new Rez.Drawables.drawFieldsBackgroundOx();
   }
 
@@ -91,9 +88,6 @@ class MyDrawableGlobal extends Ui.Drawable {
 
     _oDC.setColor(self.iColorFieldsBackgroundOx, Gfx.COLOR_TRANSPARENT);
     self.oRezFieldsBackgroundOx.draw(_oDC);
-
-    _oDC.setColor(self.iColorOxStatus, Gfx.COLOR_TRANSPARENT);
-    self.oRezOxStatus.draw(_oDC);
 
     // ... alerts
     if(self.iColorAlertLeft != Gfx.COLOR_TRANSPARENT) {
@@ -141,9 +135,6 @@ class MyDrawableGlobal extends Ui.Drawable {
     self.iColorAlertOx = _iColor;
   }
 
-  function setColorOxStatus(_iColor as Number) as Void {
-    self.iColorOxStatus = _iColor;
-  }
   function setColorFieldsBackgroundOx(_iColor as Number) as Void {
     self.iColorFieldsBackgroundOx = _iColor;
   }

@@ -274,13 +274,13 @@ class MyViewVariometer extends MyView {
     var sValue;
 
     // ... battery
-    _oDC.setColor($.oMySettings.iGeneralBackgroundColor ? Gfx.COLOR_DK_GRAY : Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
+    _oDC.setColor(self.iColorTextGr, Gfx.COLOR_TRANSPARENT);
     sValue = Lang.format("$1$%", [Sys.getSystemStats().battery.format("%.0f")]);
     _oDC.drawText(self.iLayoutCacheX, self.iLayoutBatteryY, self.oRezFontStatus as Ui.FontResource, sValue, Gfx.TEXT_JUSTIFY_CENTER);
 
     // ... activity
     if($.oMyActivity == null) {  // ... stand-by
-      _oDC.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
+      _oDC.setColor(self.iColorTextGr, Gfx.COLOR_TRANSPARENT);
       sValue = self.sValueActivityStandby;
     }
     else if(($.oMyActivity as MyActivity).isRecording()) {  // ... recording
@@ -350,7 +350,6 @@ class MyViewVariometerDelegate extends MyViewGlobalDelegate {
     Ui.switchToView(new MyViewGeneral(),
                     new MyViewGeneralDelegate(),
                     Ui.SLIDE_IMMEDIATE);
-    $.tLastTimer = Time.now();  // view ET timer
     return true;
   }
 
@@ -359,7 +358,6 @@ class MyViewVariometerDelegate extends MyViewGlobalDelegate {
     Ui.switchToView(new MyViewVarioplot(),
                     new MyViewVarioplotDelegate(),
                     Ui.SLIDE_IMMEDIATE);
-    $.tLastTimer = Time.now();  // view ET timer
     return true;
   }
 

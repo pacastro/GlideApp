@@ -53,7 +53,7 @@ class MyViewTimers extends MyViewGlobal {
 
   function initialize() {
     //Populate last view
-    $.oMyProcessing.bIsPrevious = 1;
+    $.oMyProcessing.bIsPrevious = 4;
     MyViewGlobal.initialize();
 
     // Internals
@@ -113,8 +113,8 @@ class MyViewTimers extends MyViewGlobal {
 
     // Colors
     if($.oMyProcessing.iAccuracy == Pos.QUALITY_NOT_AVAILABLE or $.oMyProcessing.iAccuracy == Pos.QUALITY_LAST_KNOWN) {
-      (self.oRezDrawableGlobal as MyDrawableGlobal).setColorFieldsBackground(Gfx.COLOR_DK_RED);
-      self.iColorText = Gfx.COLOR_LT_GRAY;
+      (self.oRezDrawableGlobal as MyDrawableGlobal).setColorFieldsBackground(($.oMyProcessing.iAccuracy==Pos.QUALITY_LAST_KNOWN)?Gfx.COLOR_YELLOW:self.iColorBG);
+      self.iColorText = self.iColorTextGr;
     }
     else {
       (self.oRezDrawableGlobal as MyDrawableGlobal).setColorFieldsBackground(Gfx.COLOR_TRANSPARENT);
@@ -122,12 +122,12 @@ class MyViewTimers extends MyViewGlobal {
 
     // Set values
     var oTimeNow = Time.now();
-    var bRecording = ($.oMyActivity != null);
+    var bRecording = ($.oMyActivity != null)?(($.oMyActivity as MyActivity).isRecording()):false;
     var fValue;
     var sValue;
 
     // ... distance
-    (self.oRezValueTopLeft as Ui.Text).setColor(bRecording ? self.iColorText : Gfx.COLOR_LT_GRAY);
+    (self.oRezValueTopLeft as Ui.Text).setColor(bRecording ? self.iColorText : self.iColorTextGr);
     (self.oRezUnitTopLeft as Ui.Text).setText(self.sUnitDistance_fmt);
     if($.oMyActivity != null) {
       fValue = ($.oMyActivity as MyActivity).fGlobalDistance * $.oMySettings.fUnitDistanceCoefficient;
@@ -139,7 +139,7 @@ class MyViewTimers extends MyViewGlobal {
     (self.oRezValueTopLeft as Ui.Text).setText(sValue);
 
     // ... ascent
-    (self.oRezValueTopRight as Ui.Text).setColor(bRecording ? self.iColorText : Gfx.COLOR_LT_GRAY);
+    (self.oRezValueTopRight as Ui.Text).setColor(bRecording ? self.iColorText : self.iColorTextGr);
     (self.oRezUnitTopRight as Ui.Text).setText(self.sUnitAscent_fmt);
     if($.oMyActivity != null) {
       fValue = ($.oMyActivity as MyActivity).fGlobalAscent * $.oMySettings.fUnitElevationCoefficient;
@@ -152,7 +152,7 @@ class MyViewTimers extends MyViewGlobal {
 
     // // ... recording: distance
     // (self.oRezValueCenter as Ui.Text).setText(self.sUnitDistance_fmt);
-    (self.oRezValueCenter as Ui.Text).setColor(bRecording ? self.iColorText : Gfx.COLOR_LT_GRAY);
+    (self.oRezValueCenter as Ui.Text).setColor(bRecording ? self.iColorText : self.iColorTextGr);
 
     // ... acceleration g
     if($.oMyActivity != null) {
@@ -229,7 +229,7 @@ class MyViewTimers extends MyViewGlobal {
     // (self.oRezValueRight as Ui.Text).setText(sValue);
 
     // ... recording: start
-    (self.oRezValueBottomLeft as Ui.Text).setColor(bRecording ? self.iColorText : Gfx.COLOR_LT_GRAY);
+    (self.oRezValueBottomLeft as Ui.Text).setColor(bRecording ? self.iColorText : self.iColorTextGr);
     if($.oMyActivity != null) {
       sValue = LangUtils.formatTime(($.oMyActivity as MyActivity).oTimeStart, $.oMySettings.bUnitTimeUTC, false);
     }
@@ -239,14 +239,14 @@ class MyViewTimers extends MyViewGlobal {
     (self.oRezValueBottomLeft as Ui.Text).setText(sValue);
 
     // ... recording: elapsed
-    (self.oRezValueBottomRight as Ui.Text).setColor(bRecording ? self.iColorText : Gfx.COLOR_LT_GRAY);
+    (self.oRezValueBottomRight as Ui.Text).setColor(bRecording ? self.iColorText : self.iColorTextGr);
     if($.oMyActivity != null) {
       (self.oRezUnitBottomRight as Ui.Text).setText(self.sUnitElapsed);
       if(bRecording) {
-        sValue = LangUtils.formatElapsedTime(($.oMyActivity as MyActivity).oTimeStart, oTimeNow, false);
+        sValue = LangUtils.formatElapsedTime(($.oMyActivity).oTimeStart, oTimeNow.subtract(($.oMyActivity).oTimePauseTot), false);
       }
       else {
-        sValue = LangUtils.formatElapsedTime(($.oMyActivity as MyActivity).oTimeStart, ($.oMyActivity as MyActivity).oTimeStop, false);
+        sValue = LangUtils.formatElapsedTime(($.oMyActivity).oTimeStart, ($.oMyActivity).oTimeStop.subtract(($.oMyActivity).oTimePauseTot), false);
       }
     }
     else {
@@ -305,7 +305,6 @@ class MyViewTimersDelegate extends MyViewGlobalDelegate {
     Ui.switchToView(new MyViewVarioplot(),
                     new MyViewVarioplotDelegate(),
                     Ui.SLIDE_IMMEDIATE);
-    $.tLastTimer = Time.now();  // view ET timer
     return true;
   }
 
@@ -321,7 +320,6 @@ class MyViewTimersDelegate extends MyViewGlobalDelegate {
                       new MyViewLogDelegate(),
                       Ui.SLIDE_IMMEDIATE);
     }
-    $.tLastTimer = Time.now();  // view ET timer
     return true;
   }
 
