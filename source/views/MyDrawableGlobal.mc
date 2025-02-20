@@ -36,6 +36,7 @@
 import Toybox.Lang;
 using Toybox.Graphics as Gfx;
 using Toybox.WatchUi as Ui;
+using Toybox.Time;
 
 class MyDrawableGlobal extends Ui.Drawable {
 
@@ -60,6 +61,7 @@ class MyDrawableGlobal extends Ui.Drawable {
 
   private var iColorAlertOx as Number = Gfx.COLOR_TRANSPARENT;
   private var iColorFieldsBackgroundOx as Number = Gfx.COLOR_TRANSPARENT;
+  private var iFgColor as Number = Gfx.COLOR_TRANSPARENT;
 
 
   //
@@ -108,6 +110,58 @@ class MyDrawableGlobal extends Ui.Drawable {
       self.oRezAlertOx.draw(_oDC);
     }
 
+    // ... Display Start/Pause/Stop anim
+    if (($.oMyActivity == null) && ([2, 4, 6].indexOf($.oMyProcessing.bIsPrevious) < 0) && ($.oMyProcessing.iAccuracy > Position.QUALITY_LAST_KNOWN)) {
+      var icentX = _oDC.getWidth()/2;
+      var icentY = _oDC.getHeight()/2;
+      _oDC.setColor(Gfx.COLOR_DK_GREEN, Gfx.COLOR_TRANSPARENT);
+      _oDC.setPenWidth(_oDC.getWidth()*(bActStop?0.07f:0.03f));
+      _oDC.drawArc(icentX, icentY, icentX, Gfx.ARC_COUNTER_CLOCKWISE, 21, 39);
+    }
+
+    if ((($.oMyActivity != null) && ((bActStart) || (bActPause))) || (bActStop)) {
+      var dTimer = Time.now().subtract(oDispTime);
+      var iRadius = (_oDC.getWidth()*0.15f).toNumber();
+      var icentX = (_oDC.getWidth()/2).toNumber();
+      var icentY = (_oDC.getHeight()/2).toNumber();
+      
+      if (dTimer.value() <= 1) {
+        if (bActStart) {
+          // Draw start arrow
+          var aistart = [
+            [icentX - iRadius, icentY - iRadius],
+            [icentX + iRadius, icentY],
+            [icentX - iRadius, icentY + iRadius],
+          ];
+          iFgColor = Gfx.COLOR_DK_GREEN;
+          _oDC.setColor(iFgColor, Gfx.COLOR_TRANSPARENT);
+          _oDC.fillPolygon(aistart);
+        }
+        else if (bActPause) {
+           // Draw pause
+          iFgColor = Gfx.COLOR_ORANGE;
+          _oDC.setColor(iFgColor, Gfx.COLOR_TRANSPARENT);
+          _oDC.fillRectangle(icentX - iRadius, icentY - iRadius, iRadius/2, iRadius*2);
+          _oDC.fillRectangle(icentX + iRadius, icentY - iRadius, -iRadius/2, iRadius*2);
+        }
+        else if (bActStop) {
+          // Draw stop box
+          iFgColor = $.oMySettings.iGeneralBackgroundColor ? Gfx.COLOR_DK_RED : Gfx.COLOR_RED;
+          _oDC.setColor(iFgColor, Gfx.COLOR_TRANSPARENT);
+          _oDC.fillRectangle(icentX - iRadius, icentY - iRadius, iRadius*2, iRadius*2);
+        }
+      }
+      // Draw surrounding circle
+      _oDC.setColor(bActStop?Gfx.COLOR_DK_RED:iFgColor, Gfx.COLOR_TRANSPARENT);
+      _oDC.setPenWidth(_oDC.getWidth()*0.04f);
+      _oDC.drawCircle(icentX, icentY, icentX);
+      
+      if (dTimer.value() > 2) {
+        bActStart = false;
+        bActPause = false;
+        // bActStop = false;
+      }
+    }
   }
 
 

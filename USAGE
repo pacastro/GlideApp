@@ -95,6 +95,7 @@ Blood Oxygen Saturation reading:
   - color indicaction for SpO2 levels: >=95 green, 90-95 yellow, <=90 red flashing
   or reading age takes precedence for lower status color:
   - readings less than 6 minutos old: green, 6-20 minutes old: yeloow, over 20 minutes: red.
+  - red/blinking when SpO2 value equal or below the set up Critical level.
 
 Footer
 ------
@@ -115,6 +116,10 @@ General View 1
  - Top-Right:
    - Blood Oxygen Saturation reading (when available, it may take same time to get a reading)
    - age of last SpO2 reading (readings are taken when age is over 5 minutes)
+   When set up as enabled above caution elevation it shows "elev" and caution elevation 
+   over wich the pulse oximeter will be active.
+   When SpO2 value is equal or below the set up Critical level, the background of this 
+   field turns red.
  - Left:
    your current altitude
  - Center:
@@ -193,20 +198,52 @@ intentionally modifies the circling patern.
 
 Varioplot can be configured in settings to be show as north up or heading up.
 
-By pressing the MENU button (long-pressing the UP button), you will enter the
-Zoom mode, where short pressing the Up & Down buttons will result in zoom in and out.
+By pressing the SELECT button, you will enter the Zoom mode, where short pressing the 
+Up & Down buttons will result in zoom in and out (previous versions used the MENU button, 
+changed to match the one used by the Map View, so there is no Start/Pause/Save/Discard menu 
+available here).
 
-By pressing the MENU button (long-pressing the UP button) a second time, you
-will enter the Settings menu.
+By pressing the MENU button (long-pressing the UP button), you will enter the Settings menu.
+
+Map View
+--------
+
+The GlideApp Map view displays a moving Map tracking your current position moving over the 
+maps enabled in your device, so it is not available for devices with no mapping features. 
+You can select to display/not display this moving map in the Settings menu (default is off).
+
+As this view uses the built in map feature, it uses the watch device settings for the display 
+options such as track North Up/Heading UP or Zoom options, so the settings for varioplot 
+view have no effect on the map view and are completly independent for both views.
+
+If you want to change a map option you have to do so on the watch settings/map menu. Only Zoom 
+can be changed in the Map view by pressing SELECT button (Zoom/Pan mode) so there is no 
+Start/Pause/Save/Discard menu available in the Map View.
+
+In GlideApp you can toggle via setting menu if you want to display/not display the Header
+and Footer info and/or the flight data.
 
 Timers View
 -----------
 
 The GlideApp Timers view displays the start and elapsed times, distance, ascent measures
-since:
- - the (last) activity recording was started (see Activity Recording below)
+since the (last) activity recording was started (see Activity Recording below)
  - flight time does not consider paused time when activity is paused
 
+If enabled the center area displays a chart with data over time for selectable variables:
+  - Altitude
+  - Ascent (total)
+  - Climb Rate
+  - Speed
+  - Heart Rate
+  - Acceleration (g)
+The variable displayed can be changed by pressing the back button or in the Settings menu.
+
+When needed, the X and Y axis will automatically expand.
+
+Chart display is on by default, can be turned off in settings General tab. When chart 
+display is on, a new Chart tab in Settings is available where you can configure the
+different options (see Chart in Setup below for more details).
 
 Log View
 --------
@@ -220,6 +257,21 @@ log is shown in the Footer).
 The Log view is not available in flight (while recording) can only be accesed after 
 starting the App or after saving/discarding an activity.
 
+Info View
+---------
+
+GlideApp Info view shows different data for teh current location, as so it needs to have a location fix and can be accesed via setting Menu/Info selection.
+
+The data displayed (when connected to a mobile device with internet connection) is:
+  - Current location in Latitude and Longitude
+  - Sunrise & Sunset times for current position (local time)
+  - Civil Twilight times (begining/ending corresponding to the respective sunrise/sunset)
+    (local time, works up to 60 ° lat)
+  - Weather info for current location (provided by Garmin Weather), displaying:
+    - current temperature
+    - High/Low temperatures forecasted
+    - current wind (speed/direction) in the closest weather station used by the provider
+    - chart display with the forecasted temperature for the next 12 hrs
 
 Activity Recording
 ------------------
@@ -266,6 +318,24 @@ menu by pressing the MENU button (long-pressing the UP button).
 
 The application allows you to specify the following settings:
 
+* General
+  - Background Color:
+    the background color (black or white)
+  - Pulse Ox/Hr readings:
+    Enable/disable pulse oximeter and display/not ddisplay heart rate/oxigen saturation
+    readings
+  - Vario view Display:
+    Display/Not Display Varimeter view
+  - Map view Display:
+    Display/Not Display Map view
+  - Chart in Timers:
+    Display/Not Display Chart in Timers view
+  - ElapsedTime always in footer
+    ElapsedTime in footer for 10 sec (then local/utc time) only on view change (default), 
+    or always (no local/utc time) - default is off
+  - Clear logs:
+    delete all logs
+
 * Altimeter
   > Calibration
     - QNH:
@@ -278,22 +348,22 @@ The application allows you to specify the following settings:
   - Range:
     the range used for the variometer display (3.0, 6.0 or 9.0 m/s) and varioplot
     color range
+  - Smoothing:
+    the amount of smoothing to apply to the variometer reading (determines the standard
+    deviation of altitude applied to the Kalman Filter: 0.2, 0.5, 0.7, or 1.0)
   - Auto Thermal:
     whether the app will switch to Varioplot view automatically when circling is
     detected, and switch back once circling is no longer detected
   - Thermal Detect (EXPERIMENTAL):
     whether the app will try to detect and map a thermal in the Varioplot view
     see "About thermal detection" for more information
-  - Smoothing:
-    the amount of smoothing to apply to the variometer reading (determines the standard
-    deviation of altitude applied to the Kalman Filter: 0.2, 0.5, 0.7, or 1.0)
+  - Plot Orientation:
+    the orientation of the plot, either "North up" (default) or "Heading up"
   - Plot Range:
     the time range (in minutes) for plotting the variometer-vs-location history
   - Plot Zoom:
     the zoom setting for plotting the variometer-vs-location history, also settable directly
     in the VarioPlot page
-  - Plot Orientation:
-    the orientation of the plot, either "North up" (default) or "Heading up"
 
 * Sounds
   - Variometer Tones:
@@ -315,11 +385,37 @@ The application allows you to specify the following settings:
     speed above which the activity automatically starts/resumes
     (must be greater than the Stop Speed; ignored if set to zero)
 
-* General
-  - Background Color:
-    the background color (black or white)
-  - Clear logs:
-    delete all logs
+* Chart (available when General/Chart display is on)
+  - Show Min Max:
+    Display/Not Display Min Max Values on chart
+  - Show current value:
+    Display/Not Display current value on center of chart
+  - Show on: (activity record / always on)
+    Start chart when starting activity recording or always on
+  - Display last:
+    Display last 4 hrs or last 30 m of data
+  - Displayed var:
+    Variable to be displayed (Altitude/Ascent/ClimbRate/Speed/HeartRate/Accel)
+
+* Map (available when General/Map display is on)
+  - Show Header/Footer:
+    Display/Not Display the Header and Footer on the map view
+  - Show flight data:
+    Display/Not Display flight data on the map view (Altitude, Vertical speed, 
+    Ground speed, finesse and wind data when available)
+    When header is not displayed, flight data is moved a little bit to the top&bottom
+
+* Pulse Oximetry (available when General/Pulse Ox/Hr readings display is on)
+  - Enabled at: (over Caution elev / always on)
+    Enable pulse oximeter when current altitude is over the set up Caution elevation
+    or always on
+  - O2 Caution Elev:
+    Elevation over witch pulse oximeter activates (when required by previous set up item)
+  - SpO2 Critical Level:
+    Blood Oxigen Saturation level considered critical where SpO2 color status indicator 
+    will be red/blinking (in header top right corner) and background of SpO2 reading 
+    will turn red
+  - Vibrate on Critical:
 
 * Units
   - Distance:

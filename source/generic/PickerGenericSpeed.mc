@@ -109,44 +109,4 @@ class PickerGenericSpeed extends Ui.Picker {
                      new PickerFactoryNumber(0, 9, null)],
         :defaults => aiValues});
   }
-
-
-  //
-  // FUNCTIONS: self
-  //
-
-  function getValue(_amValues as Array, _iUnit as Number?) as Float {
-    // Input validation
-    // ... unit
-    var iUnit = _iUnit != null ? _iUnit : -1;
-    if(iUnit < 0 or iUnit > 2) {
-      var oDeviceSettings = Sys.getDeviceSettings();
-      if(oDeviceSettings has :distanceUnits and oDeviceSettings.distanceUnits != null) {
-        iUnit = oDeviceSettings.distanceUnits;
-      }
-      else {
-        iUnit = Sys.UNIT_METRIC;
-      }
-    }
-
-    // Assemble components
-    var fValue = _amValues[1]*1000.0f + _amValues[2]*100.0f + _amValues[3]*10.0f + _amValues[4];
-    if(_amValues[0] != null) {
-      fValue *= _amValues[0];
-    }
-
-    // Use user-specified speed unit (NB: SI units are always used internally)
-    if(iUnit == 2) {
-      fValue /= 19.4384449244f;  // kt (* 10) -> m/s
-    }
-    else if(iUnit == Sys.UNIT_STATUTE) {
-      fValue /= 22.3693629205f;  // mph (* 10) -> m/s
-    }
-    else {
-      fValue /= 36.0f;  // km/h (* 10) -> m/s
-    }
-
-    // Return value
-    return fValue;
-  }
 }

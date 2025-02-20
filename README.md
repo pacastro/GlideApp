@@ -32,10 +32,11 @@ saturation can be hard to get with a moving watch hand)
 rate along your flight path. This view can optionally include a detected thermal
 core to help keep within the thermal
 
-- a Varioplot/thermal assistant view, allowing to keep track of your ascent/descent 
-rate along your flight path
+- a Map view, tracking you position along the enabled maps on your device (not
+available on devices with No Mapping features)
 
-- a Timer view, shows starting recording time, elapsed time, distance and ascent
+- a Timer view, shows starting recording time, elapsed time, distance and ascent,
+with a moving over time chart display showing different configurable variables
 
 - a Log view, allowing to keep track of your last activities (unavailable during 
 flight) including flight start and end times, maximum and minimum altitudes, etc.
@@ -80,10 +81,9 @@ Please refer to the USAGE file.
 
 ## Supported watches
 
-I am using variable frequencytones for the vario, which are only supported for
-SDK 3.1.0 and above. This restricts the watches I can support. The GlideApp Lite
-Application however has had memory optimized to support watches that provie 124kb
-of memory to applications (Fenix 5, Fenix 6, Forerunner 645, Forerunner 935, etc.)
+I am using variable frequencytones for the vario, Blood Oxygen Saturation readings and
+Garmin weather info, which are only supported for SDK 3.3.0 and above. This restricts 
+the watches I can support.
 
 ## Not a programmer
 

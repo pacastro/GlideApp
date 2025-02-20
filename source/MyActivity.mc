@@ -72,7 +72,7 @@ class MyActivity {
   public const FITFIELD_GLOBALALTITUDEMAX = 85;
   public const FITFIELD_GLOBALTIMEALTITUDEMAX = 86;
   // Time constant
-  public const TIME_CONSTANT = 3;
+  private const TIME_CONSTANT = 3;
 
 
   //
@@ -225,9 +225,10 @@ class MyActivity {
     if(Toybox.Attention has :playTone) {
       Attn.playTone(Attn.TONE_START);
     }
-    oDstop = false;
-    oDstart = true;
-    oDTime = Time.now();
+    bActStop = false;
+    bActStart = true;
+    oDispTime = Time.now();
+    bChartReset = true;
   }
 
   function isRecording() as Boolean {
@@ -247,9 +248,9 @@ class MyActivity {
     if(Toybox.Attention has :playTone) {
       Attn.playTone(Attn.TONE_STOP);
     }
-    oDstart = false;
-    oDpause = true;
-    oDTime = Time.now();
+    bActStart = false;
+    bActPause = true;
+    oDispTime = Time.now();
   }
 
   function resume() as Void {
@@ -258,14 +259,16 @@ class MyActivity {
     if(self.oSession.isRecording()) {
       return;
     }
-    self.oTimePause = Time.now().subtract(oTimeStop);
-    self.oTimePauseTot = oTimePauseTot.add(oTimePause);
+    if(oTimeStop!=null) {
+      self.oTimePause = Time.now().subtract(oTimeStop);
+      self.oTimePauseTot = oTimePauseTot.add(oTimePause);
+    }
     self.oSession.start();
     if(Toybox.Attention has :playTone) {
       Attn.playTone(Attn.TONE_START);
     }
-    oDstart = true;
-    oDTime = Time.now();
+    bActStart = true;
+    oDispTime = Time.now();
   }
 
   function stop(_bSave as Boolean) as Void {
@@ -274,7 +277,7 @@ class MyActivity {
     if(self.oSession.isRecording()) {
       self.oSession.stop();
     }
-    else {
+    else if(oTimeStop!=null) {
       self.oTimePause = Time.now().subtract(oTimeStop);
       self.oTimePauseTot = oTimePauseTot.add(oTimePause);
     }
@@ -294,10 +297,10 @@ class MyActivity {
     }
     self.oTimeStart = null;
     self.oTimeStop = null;
-    oDstart = false;
-    oDpause = false;
-    oDstop = true;
-    oDTime = Time.now();
+    bActStart = false;
+    bActPause = false;
+    bActStop = true;
+    oDispTime = Time.now();
   }
 
 
@@ -337,7 +340,7 @@ class MyActivity {
     var adPositionRadians = (_oInfo.position as Pos.Location).toRadians();
     if(self.adPositionRadiansLast != null) {
       var fLegLength = LangUtils.distanceEstimate(self.adPositionRadiansLast, adPositionRadians);
-      if(fLegLength > 1000.0f) {  // # 1000m = 1km should be bigger than thermalling diameter
+      if(fLegLength > 500.0f) {  // # 1000m = 1km should be bigger than thermalling diameter/trying 500m
         self.adPositionRadiansLast = adPositionRadians;
         // ... session
         self.fGlobalDistance += fLegLength;

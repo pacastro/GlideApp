@@ -42,6 +42,7 @@ using Toybox.Sensor;
 using Toybox.System as Sys;
 using Toybox.Time;
 using Toybox.WatchUi as Ui;
+using Toybox.SensorHistory as SH;
 
 //
 // CLASS
@@ -83,6 +84,13 @@ class MyProcessing {
   // ... sensor values (fed by Toybox.Sensor)
   public var iSensorEpoch as Number = -1;
   public var fAcceleration as Float = NaN;
+
+  public var iHR = NaN;
+  public var iOx = NaN;
+  public var iOxFit = NaN;
+  public var iAgeOx = NaN;
+  public var oTimeLastOx = NaN;
+  public var iOxInterval = 5; //SpO2 meassure interval min
   // ... altimeter values (fed by Toybox.Activity, on Toybox.Sensor events)
   public var fAltitude as Float = NaN;
   // ... altimeter calculated values
@@ -111,7 +119,7 @@ class MyProcessing {
   public var bIsPrevious as Number = 1; // 1 GeneralOx, 2 General, 3 Variometer
   public var bAutoThermalTriggered as Boolean = false;
   public var iCirclingStartEpoch as Number = 0;
-  public var fCirclingStartAltitude as Float = 0;
+  public var fCirclingStartAltitude as Float = 0.0f;
   // ... plot buffer (using integer-only operations!)
   public var iPlotIndex as Number = -1;
   public var aiPlotEpoch as Array<Number>;
@@ -121,8 +129,8 @@ class MyProcessing {
   // Thermal core calculation
   public var iCenterLongitude as Number = 0;
   public var iCenterLatitude as Number = 0;
-  public var fCenterWindOffsetLongitude as Float = 0;
-  public var fCenterWindOffsetLatitude as Float = 0;
+  public var fCenterWindOffsetLongitude as Float = 0.0f;
+  public var fCenterWindOffsetLatitude as Float = 0.0f;
   public var iStandardDev as Number = 0;
   public var aiPointAltitude as Array<Number>;
 
@@ -151,6 +159,15 @@ class MyProcessing {
     for(var i=0; i<self.PLOTBUFFER_SIZE; i++) { self.aiPlotVariometer[i] = 0; }
     aiPointAltitude = new Array<Number>[self.PLOTBUFFER_SIZE];
     for(var i=0; i<self.PLOTBUFFER_SIZE; i++) { self.aiPointAltitude[i] = 0; }
+
+    // Last SpO2
+    var sensorInfo = Sensor.getInfo();
+    if ((Toybox has :SensorHistory) && (SH has :getOxygenSaturationHistory) && (sensorInfo has :oxygenSaturation)) {
+      var spo2Iterator = SH.getOxygenSaturationHistory({:period => 1,:order=>SH.ORDER_NEWEST_FIRST});
+      self.iOx = Sensor.getInfo().oxygenSaturation;
+      var sample = spo2Iterator.next();
+      self.oTimeLastOx = (sample.when != null) ? sample.when : 0;
+    }
   }
 
   function resetSensorData() as Void {
@@ -194,8 +211,38 @@ class MyProcessing {
 
   function processSensorInfo(_oInfo as Sensor.Info, _iEpoch as Number) as Void {
     //Sys.println("DEBUG: MyProcessing.processSensorInfo()");
-
+    
     // Process sensor data
+
+    if($.oMySettings.bGeneralOxDisplay) {
+      // get heart rate
+      if(_oInfo has :heartRate && _oInfo.heartRate != null) {
+        self.iHR = _oInfo.heartRate;
+      }
+
+      // get the pulse ox iterator object
+      if($.oMySettings.bOxMeasure?($.oMyAltimeter.fAltitudeActual >= $.oMySettings.iOxElevation):true) {
+        Sensor.enableSensorType(Sensor.SENSOR_ONBOARD_PULSE_OXIMETRY);
+        if(LangUtils.notNaN(self.oTimeLastOx)) {
+          var oTimeNow = Time.now();
+          self.iAgeOx = self.oTimeLastOx==0?6048000:oTimeNow.subtract(self.oTimeLastOx).value();
+          if ((self.iAgeOx >= self.iOxInterval * 60) && (oMyTimeStart.subtract(oTimeNow).value() >= 2 * 60)) {
+            if ((_oInfo has :oxygenSaturation) && (_oInfo.oxygenSaturation!=null) && (Toybox has :SensorHistory) && (SH has :getOxygenSaturationHistory)) {
+              var spo2Iterator2 = SH.getOxygenSaturationHistory({:period => 1,:order=>SH.ORDER_NEWEST_FIRST});
+              self.iOx = _oInfo.oxygenSaturation;
+              self.oTimeLastOx = spo2Iterator2.next().when;
+            }
+          }
+          self.iOxFit  = (self.iAgeOx >= (self.iOxInterval + 1) * 60)?0:self.iOx;
+          // self.iOxFit = (self.iAgeOx >= self.iOxInterval * 60)?null:spo2Iterator2.data;
+        }
+      }
+      else {
+        Sensor.disableSensorType(Sensor.SENSOR_ONBOARD_PULSE_OXIMETRY);
+      }
+    } else {
+      Sensor.disableSensorType(Sensor.SENSOR_ONBOARD_PULSE_OXIMETRY);
+    }
 
     // ... acceleration
     if(_oInfo has :accel and _oInfo.accel != null) {
@@ -218,7 +265,7 @@ class MyProcessing {
 
     // Kalman Filter initialize
     if(LangUtils.notNaN(self.fPreviousAltitude) && self.fPreviousAltitude != null && !$.oMyKalmanFilter.bFilterReady) {
-      $.oMyKalmanFilter.init(self.fPreviousAltitude, 0, self.iPreviousAltitudeEpoch);
+      $.oMyKalmanFilter.init(self.fPreviousAltitude, 0.0f, self.iPreviousAltitudeEpoch);
     }
 
     // ... variometer
@@ -226,7 +273,7 @@ class MyProcessing {
       if(self.iPreviousAltitudeEpoch >= 0 and _iEpoch-self.iPreviousAltitudeEpoch != 0) {
         self.fVariometer = (self.fAltitude-self.fPreviousAltitude) / (_iEpoch-self.iPreviousAltitudeEpoch);
         if($.oMyKalmanFilter.bFilterReady) {
-          $.oMyKalmanFilter.update(fAltitude, 0, _iEpoch);
+          $.oMyKalmanFilter.update(fAltitude, 0.0f, _iEpoch);
           self.fVariometer_filtered = $.oMyKalmanFilter.fVelocity;
           self.fAltitude = $.oMyKalmanFilter.fPosition;
         //  Sys.println(format("DEBUG: (Calculated) altimetric variometer = $1$ ~ $2$", [self.fAltitude, $.oMyKalmanFilter.fPosition]));
@@ -442,7 +489,7 @@ class MyProcessing {
     self.windStep();
     
     // ... circling Auto Switch
-    if($.oMySettings.bVariometerAutoThermal && !self.bAutoThermalTriggered && self.bCirclingCount >=10) {
+    if($.oMySettings.bVariometerAutoThermal && !self.bAutoThermalTriggered && self.bCirclingCount >=10 && [3,4,6].indexOf($.oMyProcessing.bIsPrevious) < 0) {
       self.bAutoThermalTriggered = true;
       Ui.switchToView(new MyViewVarioplot(),
                 new MyViewVarioplotDelegate(),
@@ -451,18 +498,14 @@ class MyProcessing {
     if($.oMySettings.bVariometerAutoThermal && self.bAutoThermalTriggered && self.bNotCirclingCount >=20) {
       self.bAutoThermalTriggered = false;
       if(self.bIsPrevious == 1) {
-        Ui.switchToView(new MyViewGeneralOx(),
-                        new MyViewGeneralOxDelegate(),
-                        Ui.SLIDE_IMMEDIATE);
-      } else if(self.bIsPrevious == 2) {
         Ui.switchToView(new MyViewGeneral(),
                         new MyViewGeneralDelegate(),
                         Ui.SLIDE_IMMEDIATE);
-      } else if(self.bIsPrevious == 3){
+      } else if(self.bIsPrevious == 2){
         Ui.switchToView(new MyViewVariometer(),
                         new MyViewVariometerDelegate(),
                         Ui.SLIDE_IMMEDIATE);
-      } else if(self.bIsPrevious == 4){
+      } else if(self.bIsPrevious == 5){
         Ui.switchToView(new MyViewTimers(),
                         new MyViewTimersDelegate(),
                         Ui.SLIDE_IMMEDIATE);

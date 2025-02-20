@@ -19,16 +19,39 @@
   <!-- ... activity -->
   <property id="userActivityAutoStart" type="boolean">true</property>
   <property id="userActivityAutoSpeedStart" type="float">5.56</property>
+  <!-- ... chart -->
+  <property id="userChartMinMax" type="boolean">true</property>
+  <property id="userChartValue" type="boolean">true</property>
+  <property id="userChartShow" type="boolean">true</property>
+  <property id="userChartRange" type="boolean">true</property>
+  <property id="userChartDisplay" type="number">0</property> 
+  <!-- ... map -->
+  <property id="userMapHeader" type="boolean">true</property>
+  <property id="userMapData" type="boolean">true</property>
+  <property id="userLastLat" type="float">-33.380</property>
+  <property id="userLastLon" type="float">-70.580</property>
+  <!-- ... SpO2 -->
+  <property id="userOxMeasure" type="boolean">true</property>
+  <property id="userOxElevation" type="number">2800</property>
+  <property id="userOxCritical" type="number">88</property>
+  <property id="userOxVibrate" type="boolean">true</property>
   <!-- ... general -->
   <property id="userGeneralBackgroundColor" type="number">0</property>
+  <property id="userGeneralOxDisplay" type="boolean">true</property>
+  <property id="userGeneralVarioDisplay" type="boolean">true</property>
+  <property id="userGeneralMapDisplay" type="boolean">false</property>
+  <property id="userGeneralChartDisplay" type="boolean">true</property>
+  <property id="userGeneralETDisplay" type="boolean">false</property>
   <!-- ... units -->
   <property id="userUnitDistance" type="number">-1</property>
   <property id="userUnitElevation" type="number">-1</property>
   <property id="userUnitPressure" type="number">-1</property>
   <property id="userUnitRateOfTurn" type="number">0</property>
+  <property id="userUnitWindSpeed" type="number">-1</property>
   <property id="userUnitDirection" type="number">1</property>
   <property id="userUnitHeading" type="number">0</property>
   <property id="userUnitTimeUTC" type="boolean">false</property>
-  <property id="userUnitWindSpeed" type="number">-1</property>
   <!-- ... storage -->
+  <!-- ... no setting -->
+  <property id="userNoSetting" type="string">SET START SPEED IN WATCH GLIDEAPP SETTINGS</property>
 </properties>

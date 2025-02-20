@@ -47,7 +47,7 @@ class MyPickerGenericSettings extends Ui.Picker {
   function initialize(_context as Symbol, _item as Symbol) {
     if(_context == :contextVariometer) {
 
-      if(_item == :itemRange) {
+      if(_item == :menuVariometerRange) {
         var iVariometerRange = $.oMySettings.loadVariometerRange();
         $.oMySettings.load();  // ... reload potentially modified settings
         var sFormat = $.oMySettings.fUnitVerticalSpeedCoefficient < 100.0f ? "%.01f" : "%.0f";
@@ -67,7 +67,7 @@ class MyPickerGenericSettings extends Ui.Picker {
             :defaults => [oFactory.indexOfKey(iVariometerRange)]});
       }
 
-      else if(_item == :itemSmoothing) {
+      else if(_item == :menuVariometerSmoothing) {
         var iVariometerSmoothing = $.oMySettings.loadVariometerSmoothing();
         $.oMySettings.load();  // ... reload potentially modified settings
         var asValues = [Ui.loadResource(Rez.Strings.valueVariometerSmoothingLow),Ui.loadResource(Rez.Strings.valueVariometerSmoothingMedium),Ui.loadResource(Rez.Strings.valueVariometerSmoothingHigh),Ui.loadResource(Rez.Strings.valueVariometerSmoothingUltra)];
@@ -83,7 +83,7 @@ class MyPickerGenericSettings extends Ui.Picker {
             :defaults => [oFactory.indexOfKey(iVariometerSmoothing)]});
       }
 
-      else if(_item == :itemPlotRange) {
+      else if(_item == :menuVariometerPlotRange) {
         var iVariometerPlotRange = $.oMySettings.loadVariometerPlotRange();
         var oFactory = new PickerFactoryNumber(1, 5, null);
         Picker.initialize({
@@ -97,37 +97,25 @@ class MyPickerGenericSettings extends Ui.Picker {
             :defaults => [oFactory.indexOf(iVariometerPlotRange)]});
       }
 
-      else if(_item == :itemPlotZoom) {
+      else if(_item == :menuVariometerPlotZoom) {
         var iVariometerPlotZoom = $.oMySettings.loadVariometerPlotZoom();
-        var oFactory = new PickerFactoryNumber(1, 9, null);
+        var oFactory = new PickerFactoryDictionary([0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+                                                   ["1000" ,"500", "200", "100", "50", "20", "10", "5", "2", "1"],
+                                                   null);
         Picker.initialize({
             :title => new Ui.Text({
-                :text => Ui.loadResource(Rez.Strings.titleVariometerPlotZoom) as String,
+                :text => format("$1$ [m/px]", [Ui.loadResource(Rez.Strings.titleVariometerPlotZoom)]),
+                // :text => Ui.loadResource(Rez.Strings.titleVariometerPlotZoom) as String,
                 :font => Gfx.FONT_TINY,
                 :locX=>Ui.LAYOUT_HALIGN_CENTER,
                 :locY=>Ui.LAYOUT_VALIGN_BOTTOM,
                 :color => Gfx.COLOR_BLUE}),
             :pattern => [oFactory],
-            :defaults => [oFactory.indexOf(iVariometerPlotZoom)]});
+            :defaults => [oFactory.indexOfKey(iVariometerPlotZoom)]});
       }
-
-      else if(_item == :itemPlotOrientation) {
-          var iVariometerPlotOrientation = $.oMySettings.loadVariometerPlotOrientation();
-          var oFactory = new PickerFactoryDictionary([0, 1], ["North up", "HDG up"], null);
-          Picker.initialize({
-              :title => new Ui.Text({
-                  :text => Ui.loadResource(Rez.Strings.titleVariometerPlotOrientation) as String,
-                  :font => Gfx.FONT_TINY,
-                  :locX=>Ui.LAYOUT_HALIGN_CENTER,
-                  :locY=>Ui.LAYOUT_VALIGN_BOTTOM,
-                  :color => Gfx.COLOR_BLUE}),
-              :pattern => [oFactory],
-              :defaults => [oFactory.indexOfKey(iVariometerPlotOrientation)]});
-      }
-
     }
-    else if (_context == :contextSettings) {
-      if(_item == :itemMinimumClimb) {
+    else if (_context == :contextSounds) {
+      if(_item == :menuMinimumClimb) {
         var iMinimumClimb = $.oMySettings.loadMinimumClimb();
         $.oMySettings.load();  // ... reload potentially modified settings
         var sFormat = $.oMySettings.fUnitVerticalSpeedCoefficient < 100.0f ? "%.01f" : "%.0f";
@@ -149,7 +137,7 @@ class MyPickerGenericSettings extends Ui.Picker {
             :pattern => [oFactory],
             :defaults => [oFactory.indexOfKey(iMinimumClimb)]});
       }
-      else if(_item == :itemMinimumSink) {
+      else if(_item == :menuMinimumSink) {
         var iMinimumSink = $.oMySettings.loadMinimumSink();
         $.oMySettings.load();  // ... reload potentially modified settings
         var sFormat = $.oMySettings.fUnitVerticalSpeedCoefficient < 100.0f ? "%.01f" : "%.0f";
@@ -172,29 +160,43 @@ class MyPickerGenericSettings extends Ui.Picker {
             :defaults => [oFactory.indexOfKey(iMinimumSink)]});
       }
     }
-    else if(_context == :contextGeneral) {
 
-      if(_item == :itemBackgroundColor) {
-        var iColor = $.oMySettings.loadGeneralBackgroundColor();
-        var oFactory = new PickerFactoryDictionary([Gfx.COLOR_WHITE, Gfx.COLOR_BLACK],
-                                                   [Ui.loadResource(Rez.Strings.valueColorWhite),
-                                                    Ui.loadResource(Rez.Strings.valueColorBlack)],
-                                                   null);
+    else if (_context == :contextChart) {
+      if(_item == :menuChartDisplay) {
+        var iChartDisplay = $.oMySettings.loadChartDisplay();
+        $.oMySettings.load();  // ... reload potentially modified settings
+        var asValues = [ "Altitude", "Ascent", "VertSpeed", "Speed", "HeartRate", "Accel"];
+        var oFactory = new PickerFactoryDictionary([0, 1, 2, 3, 4, 5], asValues, {:font => Gfx.FONT_XTINY});
         Picker.initialize({
             :title => new Ui.Text({
-                :text => Ui.loadResource(Rez.Strings.titleGeneralBackgroundColor) as String,
+                :text => Ui.loadResource(Rez.Strings.titleChartDisplay) as String,
                 :font => Gfx.FONT_TINY,
                 :locX=>Ui.LAYOUT_HALIGN_CENTER,
                 :locY=>Ui.LAYOUT_VALIGN_BOTTOM,
                 :color => Gfx.COLOR_BLUE}),
             :pattern => [oFactory],
-            :defaults => [oFactory.indexOfKey(iColor)]});
+            :defaults => [oFactory.indexOfKey(iChartDisplay)]});
       }
-
     }
-    else if(_context == :contextUnit) {
 
-      if(_item == :itemDistance) {
+    else if (_context == :contextOx) {
+      if(_item == :menuOxCritical) {
+        var iOxCritical = $.oMySettings.loadOxCritical();
+        var oFactory = new PickerFactoryNumber(75, 90, null);
+        Picker.initialize({
+            :title => new Ui.Text({
+                :text => format("$1$ %", [Ui.loadResource(Rez.Strings.titleOxCritical)]),
+                :font => Gfx.FONT_TINY,
+                :locX=>Ui.LAYOUT_HALIGN_CENTER,
+                :locY=>Ui.LAYOUT_VALIGN_BOTTOM,
+                :color => Gfx.COLOR_BLUE}),
+            :pattern => [oFactory],
+            :defaults => [oFactory.indexOf(iOxCritical)]});
+      }
+    }
+
+    else if(_context == :contextUnit) {
+      if(_item == :menuUnitDistance) {
         var iUnitDistance = $.oMySettings.loadUnitDistance();
         var oFactory = new PickerFactoryDictionary([-1, 0, 1 ,2],
                                                    [Ui.loadResource(Rez.Strings.valueAuto), "km", "sm", "nm"],
@@ -209,7 +211,7 @@ class MyPickerGenericSettings extends Ui.Picker {
             :pattern => [oFactory],
             :defaults => [oFactory.indexOfKey(iUnitDistance)]});
       }
-      else if(_item == :itemElevation) {
+      else if(_item == :menuUnitElevation) {
         var iUnitElevation = $.oMySettings.loadUnitElevation();
         var oFactory = new PickerFactoryDictionary([-1, 0, 1],
                                                    [Ui.loadResource(Rez.Strings.valueAuto), "m", "ft"],
@@ -224,7 +226,7 @@ class MyPickerGenericSettings extends Ui.Picker {
             :pattern => [oFactory],
             :defaults => [oFactory.indexOfKey(iUnitElevation)]});
       }
-      else if(_item == :itemPressure) {
+      else if(_item == :menuUnitPressure) {
         var iUnitPressure = $.oMySettings.loadUnitPressure();
         var oFactory = new PickerFactoryDictionary([-1, 0, 1],
                                                    [Ui.loadResource(Rez.Strings.valueAuto), "mb", "inHg"],
@@ -239,7 +241,7 @@ class MyPickerGenericSettings extends Ui.Picker {
             :pattern => [oFactory],
             :defaults => [oFactory.indexOfKey(iUnitPressure)]});
       }
-      else if(_item == :itemRateOfTurn) {
+      else if(_item == :menuUnitRateOfTurn) {
         var iUnitRateOfTurn = $.oMySettings.loadUnitRateOfTurn();
         var oFactory = new PickerFactoryDictionary([0, 1],
                                                    ["°/s", "rpm"],
@@ -254,10 +256,10 @@ class MyPickerGenericSettings extends Ui.Picker {
             :pattern => [oFactory],
             :defaults => [oFactory.indexOfKey(iUnitRateOfTurn)]});
       }
-      else if (_item == :itemWindSpeed) {
+      else if (_item == :menuUnitWindSpeed) {
         var iUnitWindSpeed = $.oMySettings.loadUnitWindSpeed();
         var oFactory = new PickerFactoryDictionary([-1, 0, 1, 2, 3],
-                                                   [Ui.loadResource(Rez.Strings.valueAuto), "km/h", "mph", "kt", "m/s"],
+                                                   [Ui.loadResource(Rez.Strings.valueAuto), "kph", "mph", "kt", "m/s"],
                                                    null);
         Picker.initialize({
             :title => new Ui.Text({
@@ -268,7 +270,7 @@ class MyPickerGenericSettings extends Ui.Picker {
             :pattern => [oFactory],
             :defaults => [oFactory.indexOfKey(iUnitWindSpeed)]});
       }
-      else if(_item == :itemDirection) {
+      else if(_item == :menuUnitDirection) {
         var iUnitDirection = $.oMySettings.loadUnitDirection();
         var oFactory = new PickerFactoryDictionary([0, 1],
                                                    ["°", "txt"],
@@ -283,7 +285,7 @@ class MyPickerGenericSettings extends Ui.Picker {
             :pattern => [oFactory],
             :defaults => [oFactory.indexOfKey(iUnitDirection)]});
       }
-       else if(_item == :itemHeading) {
+       else if(_item == :menuUnitHeading) {
         var iUnitHeading = $.oMySettings.loadUnitHeading();
         var oFactory = new PickerFactoryDictionary([0, 1],
                                                    ["°", "txt"],
@@ -298,7 +300,7 @@ class MyPickerGenericSettings extends Ui.Picker {
             :pattern => [oFactory],
             :defaults => [oFactory.indexOfKey(iUnitHeading)]});
       }
-      else if(_item == :itemTimeUTC) {
+      else if(_item == :menuUnitTimeUTC) {
         var bUnitTimeUTC = $.oMySettings.loadUnitTimeUTC();
         var oFactory = new PickerFactoryDictionary([false, true],
                                                    [Ui.loadResource(Rez.Strings.valueUnitTimeLT),
@@ -314,10 +316,8 @@ class MyPickerGenericSettings extends Ui.Picker {
             :pattern => [oFactory],
             :defaults => [oFactory.indexOfKey(bUnitTimeUTC)]});
       }
-
     }
   }
-
 }
 
 class MyPickerGenericSettingsDelegate extends Ui.PickerDelegate {
@@ -328,89 +328,109 @@ class MyPickerGenericSettingsDelegate extends Ui.PickerDelegate {
 
   private var context as Symbol = :contextNone;
   private var item as Symbol = :itemNone;
-
+  private var parent as Symbol = :parentNone;
+  private var focus as Number = 0;
 
   //
   // FUNCTIONS: Ui.PickerDelegate (override/implement)
   //
 
-  function initialize(_context as Symbol, _item as Symbol) {
+  function initialize(_context as Symbol, _item as Symbol, _parent as Symbol) {
     PickerDelegate.initialize();
     self.context = _context;
     self.item = _item;
+    self.parent = _parent;
   }
 
   function onAccept(_amValues) {
     if(self.context == :contextVariometer) {
-
-      if(self.item == :itemRange) {
+      if(self.item == :menuVariometerRange) {
         $.oMySettings.saveVariometerRange(_amValues[0] as Number);
+        focus = 0;
       }
-      else if(self.item == :itemSmoothing) {
+      else if(self.item == :menuVariometerSmoothing) {
         $.oMySettings.saveVariometerSmoothing(_amValues[0] as Number);
+        focus = 1;
       }
-      else if(self.item == :itemPlotRange) {
+      else if(self.item == :menuVariometerPlotRange) {
         $.oMySettings.saveVariometerPlotRange(_amValues[0] as Number);
+        focus = 5;
       }
-      else if(self.item == :itemPlotZoom) {
+      else if(self.item == :menuVariometerPlotZoom) {
         $.oMySettings.saveVariometerPlotZoom(_amValues[0] as Number);
-      }
-      else if(self.item == :itemPlotOrientation) {
-        $.oMySettings.saveVariometerPlotOrientation(_amValues[0] as Number);
+        $.oMySettings.setVariometerPlotZoom(_amValues[0] as Number);
+        focus = 6;
       }
 
     }
-    else if(self.context == :contextSettings) {
-      if(self.item == :itemMinimumClimb) {
+    
+    else if(self.context == :contextSounds) {
+      if(self.item == :menuMinimumClimb) {
         $.oMySettings.saveMinimumClimb(_amValues[0] as Number);
+        focus = 2;
       }
-      else if(self.item == :itemMinimumSink) {
+      else if(self.item == :menuMinimumSink) {
         $.oMySettings.saveMinimumSink(_amValues[0] as Number);
+        focus = 3;
       }
     }
-    else if(self.context == :contextGeneral) {
 
-      if(self.item == :itemBackgroundColor) {
-        $.oMySettings.saveGeneralBackgroundColor(_amValues[0] as Number);
+    else if(self.context == :contextChart) {
+      if(self.item == :menuChartDisplay) {
+        $.oMySettings.saveChartDisplay(_amValues[0] as Number);
+        focus = 4;
       }
-
     }
+
+    else if(self.context == :contextOx) {
+      if(self.item == :menuOxCritical) {
+        $.oMySettings.saveOxCritical(_amValues[0] as Number);
+        focus = 2;
+      }
+    }
+
     else if(self.context == :contextUnit) {
-
-      if(self.item == :itemDistance) {
+      if(self.item == :menuUnitDistance) {
         $.oMySettings.saveUnitDistance(_amValues[0] as Number);
+        focus = 0;
       }
-      else if(self.item == :itemElevation) {
+      else if(self.item == :menuUnitElevation) {
         $.oMySettings.saveUnitElevation(_amValues[0] as Number);
+        focus = 1;
       }
-      else if(self.item == :itemPressure) {
+      else if(self.item == :menuUnitPressure) {
         $.oMySettings.saveUnitPressure(_amValues[0] as Number);
+        focus = 2;
       }
-      else if(self.item == :itemRateOfTurn) {
+      else if(self.item == :menuUnitRateOfTurn) {
         $.oMySettings.saveUnitRateOfTurn(_amValues[0] as Number);
+        focus = 3;
       }
-      else if(self.item == :itemWindSpeed) {
+      else if(self.item == :menuUnitWindSpeed) {
         $.oMySettings.saveUnitWindSpeed(_amValues[0] as Number);
+        focus = 4;
       }
-      else if(self.item == :itemDirection) {
+      else if(self.item == :menuUnitDirection) {
         $.oMySettings.saveUnitDirection(_amValues[0] as Number);
+        focus = 5;
       }
-      else if(self.item == :itemHeading) {
+      else if(self.item == :menuUnitHeading) {
         $.oMySettings.saveUnitHeading(_amValues[0] as Number);
+        focus = 6;
       }
-      else if(self.item == :itemTimeUTC) {
+      else if(self.item == :menuUnitTimeUTC) {
         $.oMySettings.saveUnitTimeUTC(_amValues[0] as Boolean);
+        focus = 7;
       }
-      $.oMySettings.load();  // ... use proper units in settings
-
     }
     Ui.popView(Ui.SLIDE_IMMEDIATE);
+    Ui.switchToView(new MyMenu2Generic(self.parent, focus), new MyMenu2GenericDelegate(self.parent), WatchUi.SLIDE_RIGHT);
     return true;
   }
 
   function onCancel() {
     // Exit
-    Ui.popView(Ui.SLIDE_IMMEDIATE);
+    Ui.popView(Ui.SLIDE_RIGHT);
     return true;
   }
 

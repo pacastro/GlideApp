@@ -73,26 +73,36 @@ var oMyTimeStart as Time.Moment = Time.now();
 // Log
 var iMyLogIndex as Number = -1;
 
+// Chart
+var oChartModelAlt = new MyChartModel();
+var oChartModelAsc = new MyChartModel();
+var oChartModelCrt = new MyChartModel();
+var oChartModelSpd = new MyChartModel();
+var oChartModelHR = new MyChartModel();
+var oChartModelg = new MyChartModel();
+
+var bChartReset = false;
+var bRangeChange = false;
+
+// Map
+var bMHChange = false;
+
 // Activity session (recording)
 var oMyActivity as MyActivity?;
-var oDstart = false;
-var oDstop = false;
-var oDpause = false;
-var oDTime as Time.Moment = Time.now();
+var bActStart = false;
+var bActStop = false;
+var bActPause = false;
+var oDispTime as Time.Moment = Time.now();
+
+// var oProgBarTime = null;
 
 // Current view
 var oMyView as MyView?;
-
-// Sensors
-var oHR = NaN;
-var dOx = NaN;
-var tOx = NaN;
-var tLastOx = NaN;
-var iOx = 5; //SpO2 meassure interval min
+var iViewGenOxIdx = 1;
 
 // Show Timer
-var vTimer = false;
-var tLastTimer = new Time.Moment(Time.now().value() + 10 * 60);
+var bViewTimer = false;
+var oTimeLastTimer = new Time.Moment(Time.now().value() + 60 * 60);
 
 //
 // CONSTANTS
@@ -107,6 +117,7 @@ const MY_NOVALUE_BLANK = "";
 const MY_NOVALUE_LEN2 = "--";
 const MY_NOVALUE_LEN3 = "---";
 const MY_NOVALUE_LEN4 = "----";
+const MY_NOVALUE_LEN6 = "--.----";
 
 
 //
@@ -178,39 +189,33 @@ class MyApp extends App.AppBase {
     // Timers
     $.oMyTimeStart = Time.now();
 
-    // Last SpO2
-    if ((Toybox has :SensorHistory) && (SH has :getOxygenSaturationHistory)) {
-      var spo2Iterator = SH.getOxygenSaturationHistory({:period => 1,:order=>SH.ORDER_NEWEST_FIRST});
-      $.dOx = Sensor.getInfo().oxygenSaturation;
-      $.tLastOx = spo2Iterator.next().when;
-    }
   }
 
   function onStart(state) {
-    //Sys.println("DEBUG: MyApp.onStart()");
+    // Sys.println("DEBUG: MyApp.onStart()");
 
     // Load settings
     self.loadSettings();
 
     // Enable sensor events
-    //Sensor.setEnabledSensors([] as Array<Sensor.SensorType>);  // ... we need just the acceleration
-    Sensor.setEnabledSensors([Sensor.SENSOR_ONBOARD_HEARTRATE, Sensor.SENSOR_ONBOARD_PULSE_OXIMETRY]);
+    Sensor.setEnabledSensors([] as Array<Sensor.SensorType>);  // ... we need just the acceleration
+    // Sensor.setEnabledSensors([Sensor.SENSOR_ONBOARD_HEARTRATE, Sensor.SENSOR_ONBOARD_PULSE_OXIMETRY]);
     Sensor.enableSensorEvents(method(:onSensorEvent));
-    // myTimer.start(method(:getPulseOx), 300000, true);
-
+    
     // Enable position events
     self.enablePositioning();
 
     // Start UI update timer (every multiple of 5 seconds, to save energy)
     // NOTE: in normal circumstances, UI update will be triggered by position events (every ~1 second)
     self.oUpdateTimer = new Timer.Timer();
-    var iUpdateTimerDelay = (60-Sys.getClockTime().sec)%5;
-    if(iUpdateTimerDelay > 0) {
-      (self.oUpdateTimer as Timer.Timer).start(method(:onUpdateTimer_init), 1000*iUpdateTimerDelay, false);
-    }
-    else {
+    // var iUpdateTimerDelay = (60-Sys.getClockTime().sec)%5;
+    // Sys.println(Sys.getClockTime().sec + "  iUpD  " + iUpdateTimerDelay);
+    // if(iUpdateTimerDelay > 0) {
+    //   (self.oUpdateTimer as Timer.Timer).start(method(:onUpdateTimer_init), 1000*iUpdateTimerDelay, false);
+    // }
+    // else {
       (self.oUpdateTimer as Timer.Timer).start(method(:onUpdateTimer), 5000, true);
-    }
+    // }
   }
 
   function onStop(state) {
@@ -238,13 +243,16 @@ class MyApp extends App.AppBase {
   function getInitialView() {
     //Sys.println("DEBUG: MyApp.getInitialView()");
 
-    return [ new MyViewGeneralOx(), new MyViewGeneralOxDelegate() ];
+    return [ new MyViewGeneral(), new MyViewGeneralDelegate() ];
   }
 
   function onSettingsChanged() {
-    //Sys.println("DEBUG: MyApp.onSettingsChanged()");
+    // Sys.println("DEBUG: MyApp.onSettingsChanged()");
     self.loadSettings();
     self.updateUi(Time.now().value());
+    if($.oMyProcessing.bIsPrevious == 5) {
+      Ui.switchToView(new MyViewTimers(), new MyViewTimersDelegate(), Ui.SLIDE_IMMEDIATE);
+    }
   }
 
 
@@ -287,30 +295,10 @@ class MyApp extends App.AppBase {
 
     // Process sensor data
     $.oMyProcessing.processSensorInfo(_oInfo, Time.now().value());
-    // get heart rate
-    if(_oInfo has :heartRate && _oInfo.heartRate != null) {
-      oHR = _oInfo.heartRate;
-    }
-
-    // get the pulse ox iterator object
-    var fOx = dOx;
-    if(LangUtils.notNaN(tLastOx)) {
-      var oTimeNow = Time.now();
-      $.tOx = oTimeNow.subtract(tLastOx);
-      if ((tOx.value() >= iOx * 60) && (oMyTimeStart.subtract(oTimeNow).value() >= 2 * 60)) {
-        if ((_oInfo has :oxygenSaturation) && (_oInfo.oxygenSaturation!=null) && (Toybox has :SensorHistory) && (SH has :getOxygenSaturationHistory)) {
-          var spo2Iterator2 = SH.getOxygenSaturationHistory({:period => 1,:order=>SH.ORDER_NEWEST_FIRST});
-          $.dOx = _oInfo.oxygenSaturation;
-          $.tLastOx = spo2Iterator2.next().when;
-        }
-      }
-      fOx = (tOx.value() >= (iOx + 1) * 60)?0:dOx;
-      // fOx = (tOx.value() >= iOx * 60)?null:spo2Iterator2.data;
-    }
 
     // Save FIT fields
     if($.oMyActivity != null) {
-      ($.oMyActivity as MyActivity).setSpO2(fOx);
+      ($.oMyActivity as MyActivity).setSpO2($.oMyProcessing.iOxFit);
       ($.oMyActivity as MyActivity).setBarometricAltitude($.oMyProcessing.fAltitude);
       ($.oMyActivity as MyActivity).setVerticalSpeed($.oMyProcessing.fVariometer);
       ($.oMyActivity as MyActivity).setRateOfTurn($.oMyProcessing.fRateOfTurn);
@@ -360,38 +348,6 @@ class MyApp extends App.AppBase {
         }
     }
 
-    // CIQ >= 3.2.0 (use :constellations)
-    if (Pos has :CONSTELLATION_GPS) {
-
-        var options = {
-            :acquisitionType => Pos.LOCATION_CONTINUOUS
-        };
-
-        if (Pos has :POSITIONING_MODE_AVIATION) {
-           options[:mode] = Pos.POSITIONING_MODE_AVIATION;
-        }
-
-        var constellations = [
-            [ Pos.CONSTELLATION_GPS, Pos.CONSTELLATION_GLONASS, Pos.CONSTELLATION_GALILEO ],
-            [ Pos.CONSTELLATION_GPS, Pos.CONSTELLATION_GLONASS ],
-            [ Pos.CONSTELLATION_GPS, Pos.CONSTELLATION_GALILEO ],
-            [ Pos.CONSTELLATION_GPS ]
-        ];
-
-        // enableLocationEvents can fail with an exception if configuration
-        // is not supported, so we try a few and take the first one that works
-        for (var i = 0; i < constellations.size(); ++i) {
-            options[:constellations] = constellations[i];
-
-            try {
-                Pos.enableLocationEvents(options, callback);
-                return;
-            } catch(e) {
-                // just continue looping until we get one that works
-            }
-        }
-    }
-
     // CIQ < 3.2.0
     Pos.enableLocationEvents(Pos.LOCATION_CONTINUOUS, callback);
   }
@@ -418,13 +374,33 @@ class MyApp extends App.AppBase {
       ($.oMyActivity as MyActivity).processPositionInfo(_oInfo, iEpoch, oTimeNow);
     }
 
+    // Chart
+    if(($.oMyActivity != null) || !($.oMySettings.bChartShow)) {
+      oChartModelAlt.new_value(_oInfo.altitude);
+      oChartModelAsc.new_value(($.oMyActivity != null)?$.oMyActivity.fGlobalAscent:0);
+      oChartModelCrt.new_value($.oMyProcessing.fVariometer_filtered);
+      oChartModelSpd.new_value($.oMyProcessing.fGroundSpeed);
+      oChartModelHR.new_value($.oMyProcessing.iHR);
+      oChartModelg.new_value($.oMyProcessing.fAcceleration);
+    }
+
+    if(bChartReset) {
+      oChartModelAlt.reset();
+      oChartModelAsc.reset();
+      oChartModelCrt.reset();
+      oChartModelSpd.reset();
+      oChartModelHR.reset();
+      oChartModelg.reset();
+      bChartReset = false;
+    }
+
     // Automatic Activity recording
     if($.oMySettings.bActivityAutoStart and LangUtils.notNaN($.oMyProcessing.fGroundSpeed)) {
-      if($.oMyActivity == null) {
+      if(($.oMyActivity == null)&&(Time.now().subtract(oDispTime).value()>1)) { // autostart 1 sec delay for no falsestarts (superfast autostarts)
         if($.oMySettings.fActivityAutoSpeedStart > 0.0f
            and $.oMyProcessing.fGroundSpeed > $.oMySettings.fActivityAutoSpeedStart) {
           $.oMyActivity = new MyActivity();
-          ($.oMyActivity as MyActivity).start();
+          $.oMyActivity.start();
         }
       }
     }
@@ -433,15 +409,15 @@ class MyApp extends App.AppBase {
     self.updateUi(iEpoch);
   }
 
-  function onUpdateTimer_init() as Void {
-    //Sys.println("DEBUG: MyApp.onUpdateTimer_init()");
-    self.onUpdateTimer();
-    self.oUpdateTimer = new Timer.Timer();
-    (self.oUpdateTimer as Timer.Timer).start(method(:onUpdateTimer), 5000, true);
-  }
+  // function onUpdateTimer_init() as Void {
+  //   //Sys.println("DEBUG: MyApp.onUpdateTimer_init()");
+  //   self.onUpdateTimer();
+  //   self.oUpdateTimer = new Timer.Timer();
+  //   (self.oUpdateTimer as Timer.Timer).start(method(:onUpdateTimer), 5000, true);
+  // }
 
   function onUpdateTimer() as Void {
-    //Sys.println("DEBUG: MyApp.onUpdateTimer()");
+    // Sys.println("DEBUG: MyApp.onUpdateTimer()");
     var iEpoch = Time.now().value();
     if(iEpoch-self.iUpdateLastEpoch > 1) {
       self.updateUi(iEpoch);
@@ -455,7 +431,7 @@ class MyApp extends App.AppBase {
   }
 
   function updateUi(_iEpoch as Number) as Void {
-    //Sys.println("DEBUG: MyApp.updateUi()");
+    // Sys.println("DEBUG: MyApp.updateUi()");
 
     // Check sensor data age
     if($.oMyProcessing.iSensorEpoch >= 0 and _iEpoch-$.oMyProcessing.iSensorEpoch > 10) {
@@ -473,6 +449,10 @@ class MyApp extends App.AppBase {
       ($.oMyView as MyView).updateUi();
       self.iUpdateLastEpoch = _iEpoch;
     }
+
+    // if((oProgBarTime!=null)&&Time.now().subtract(oProgBarTime).value()>=1) {
+    //   $.ResetProgressDelegate.barCallback();
+    // } // if needed maybe better onSensorEvent? (free 1 timer)
   }
 
   function muteTones() as Void {
@@ -516,6 +496,17 @@ class MyApp extends App.AppBase {
     // Tones need to be more frequent than in GliderSK even at low climb rates to be able to
     // properly map thermals (especially broken up thermals)
     if(self.iTones || self.iVibrations) {
+      // Alert tones (priority over variometer)
+      if(($.oMyProcessing.iOx != null) && $.oMySettings.bOxVibrate && ($.oMyProcessing.iOx <= $.oMySettings.iOxCritical)) {
+        if(Time.now().value() % 3 == 0) {
+          var vibeData = [new Attention.VibeProfile(80, 200),
+                          new Attention.VibeProfile(0, 600),
+                          new Attention.VibeProfile(50, 200)];
+          Attention.vibrate(vibeData);
+        }
+        return;
+      }
+
       var fValue = $.oMyProcessing.fVariometer_filtered;
       var iDeltaTick = (self.iTonesTick-self.iTonesLastTick) > 8 ? 8 : self.iTonesTick-self.iTonesLastTick;
       if(fValue >= $.oMySettings.fMinimumClimb && iDeltaTick >= 8.0f - fValue) {
@@ -553,6 +544,67 @@ class MyApp extends App.AppBase {
     }
     App.Storage.deleteValue("storLogIndex");
     $.iMyLogIndex = -1;
+    if(Toybox.Attention has :playTone) {
+        Attn.playTone(Attn.TONE_RESET);
+    }
+  }
+
+  function calculateScaleBar(iMaxBarSize as Lang.Number, fPlotScale as Lang.Float, sUnit as Lang.String, fUnitCoefficient as Lang.Float) as Void {
+    var iMinBarSize = 10;
+    var fMinBarScale = iMinBarSize * fUnitCoefficient * fPlotScale;
+    var fMaxBarScale = iMaxBarSize * fUnitCoefficient * fPlotScale;
+
+    var aiSizeSnap = [10, 5, 2, 1];
+
+    // Try to find a nice size
+    for (var i = 0; i < aiSizeSnap.size(); i++) {
+      var iSize = aiSizeSnap[i];
+      var iSizeSnap = (fMaxBarScale / iSize).toNumber() * iSize;
+      if (iSizeSnap >= fMinBarScale && iSizeSnap <= fMaxBarScale) {
+        var iBarSize = iMaxBarSize * iSizeSnap / fMaxBarScale;
+        // return [iBarSize.toNumber(), iSizeSnap + sUnit];
+        $.iScaleBarSize = iBarSize.toNumber();
+        $.sScaleBarUnit = iSizeSnap + sUnit;
+        return;
+      }
+    }
+
+    // Failed, try smaller unit
+    if ($.oMySettings.sUnitDistance.equals("nm") || $.oMySettings.sUnitDistance.equals("sm")) {
+      sUnit = "ft";
+      fUnitCoefficient = 3.280839895f;
+    } else if ($.oMySettings.sUnitDistance.equals("km")) {
+      sUnit = "m";
+      fUnitCoefficient = 1.0f;
+    } else {
+      // "Unreachable" Unknown unit...
+      // return [0, "ERR"];
+      $.iScaleBarSize = 0;
+      $.sScaleBarUnit = "ERR";
+      return;
+    }
+
+    aiSizeSnap = [1000, 500, 200, 100, 50, 10];
+    fMinBarScale = iMinBarSize * fUnitCoefficient * fPlotScale;
+    fMaxBarScale = iMaxBarSize * fUnitCoefficient * fPlotScale;
+
+    // Try to find a nice size with the smaller unit
+    for (var i = 0; i < aiSizeSnap.size(); i++) {
+      var iSize = aiSizeSnap[i];
+      var iSizeSnap = (fMaxBarScale / iSize).toNumber() * iSize;
+      if (iSizeSnap >= fMinBarScale && iSizeSnap <= fMaxBarScale) {
+        var iBarSize = iMaxBarSize * iSizeSnap / fMaxBarScale;
+        // return [iBarSize.toNumber(), iSizeSnap + sUnit];
+        $.iScaleBarSize = iBarSize.toNumber();
+        $.sScaleBarUnit = iSizeSnap + sUnit;
+        return;
+      }
+    }
+
+    // Failed again, do not try snapping
+    // return [iMaxBarSize, fMaxBarScale.format("%.0f") + sUnit];
+    $.iScaleBarSize = iMaxBarSize;
+    $.sScaleBarUnit = fMaxBarScale.format("%.0f") + sUnit;
   }
 
 }

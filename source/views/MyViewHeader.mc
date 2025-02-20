@@ -52,7 +52,7 @@ class MyViewHeader extends MyView {
 
   // Resources
   // ... drawable
-  private var oRezDrawableHeader as MyDrawableHeader?;
+  public var oRezDrawableHeader as MyDrawableHeader?;
   // ... header
   private var oRezValueBatteryLevel as Ui.Text?;
   private var oRezValueActivityStatus as Ui.Text?;
@@ -65,12 +65,14 @@ class MyViewHeader extends MyView {
   //
 
   function initialize() {
-    $.tLastTimer = Time.now();  // view ET timer
+    if($.oMyActivity != null) { $.oTimeLastTimer = Time.now();}  // view ET timer
     MyView.initialize();
   }
 
   function onLayout(_oDC) {
-    View.setLayout(self.bHeaderOnly ? Rez.Layouts.layoutHeader(_oDC) : Rez.Layouts.layoutGlobal(_oDC));
+    View.setLayout(self.bHeaderOnly ? Rez.Layouts.layoutHeader(_oDC) : 
+                  ($.oMySettings.bGeneralChartDisplay&&($.oMyProcessing.bIsPrevious == 5)) ? Rez.Layouts.layoutGlobalChart(_oDC) : 
+                  Rez.Layouts.layoutGlobal(_oDC));
 
     // Load resources
     // ... drawable
@@ -96,18 +98,14 @@ class MyViewHeader extends MyView {
   //
 
   function updateLayout(_bUpdateTime) {
-    //Sys.println("DEBUG: MyViewHeader.updateLayout()");
+    // Sys.println("DEBUG: MyViewHeader.updateLayout()");
     MyView.updateLayout(_bUpdateTime);
-
     // Set colors
     // ... background
     (self.oRezDrawableHeader as MyDrawableHeader).setColorBackground($.oMySettings.iGeneralBackgroundColor);
-
+    
     // Set header/footer values
     var sValue;
-
-    // ... position accuracy
-    (self.oRezDrawableHeader as MyDrawableHeader).setPositionAccuracy($.oMyProcessing.iAccuracy);
 
     // ... battery level
     (self.oRezValueBatteryLevel as Ui.Text).setColor(self.iColorText);
@@ -139,11 +137,11 @@ class MyViewHeader extends MyView {
         oTimer = new Time.Moment(oTimeNow.subtract(oTimer).value());
       }
       // var oTimer = new Time.Moment(oTimeNow.subtract($.oMyTimeStart).value());
-      $.vTimer = oTimeNow.subtract($.tLastTimer).value()<10?true:false;
-      var oTimeInfo = ($.oMySettings.bUnitTimeUTC || $.vTimer)? Gregorian.utcInfo($.vTimer?oTimer:oTimeNow, Time.FORMAT_SHORT) : Gregorian.info(oTimeNow, Time.FORMAT_SHORT);
+      $.bViewTimer = oTimeNow.subtract($.oTimeLastTimer).value()<10?true:false;
+      var oTimeInfo = ($.oMySettings.bUnitTimeUTC || $.bViewTimer || $.oMySettings.bGeneralETDisplay)? Gregorian.utcInfo(($.bViewTimer||$.oMySettings.bGeneralETDisplay)?oTimer:oTimeNow, Time.FORMAT_SHORT) : Gregorian.info(oTimeNow, Time.FORMAT_SHORT);
       // var oTimeInfo = $.oMySettings.bUnitTimeUTC ? Gregorian.utcInfo(oTimeNow, Time.FORMAT_SHORT) : Gregorian.info(oTimeNow, Time.FORMAT_SHORT);
       (self.oRezValueFooter as Ui.Text).setColor(self.iColorText);
-      (self.oRezValueFooter as Ui.Text).setText(format("$1$$2$$3$ $4$", [oTimeInfo.hour.format("%02d"), oTimeNow.value() % 2 ? "." : ":", oTimeInfo.min.format("%02d"), $.vTimer?"ET":$.oMySettings.sUnitTime]));
+      (self.oRezValueFooter as Ui.Text).setText(format("$1$$2$$3$ $4$", [oTimeInfo.hour.format("%02d"), oTimeNow.value() % 2 ? "." : ":", oTimeInfo.min.format("%02d"), ($.bViewTimer||$.oMySettings.bGeneralETDisplay)?"ET":$.oMySettings.sUnitTime]));
     }
   }
 

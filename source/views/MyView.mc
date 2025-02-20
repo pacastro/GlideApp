@@ -110,7 +110,7 @@ class MyView extends Ui.View {
   }
 
   function updateUi() as Void {
-    //Sys.println("DEBUG: MyView.updateUi()");
+    // Sys.println("DEBUG: MyView.updateUi()");
 
     // Request UI update
     if(self.bShow) {

@@ -1,3 +1,31 @@
+* 2.0:
+  - Updated UI using Menu2 functionality in settings/activity menu:
+    - Added toogles for on/off settings
+    - Added sublabels to display current setting values
+    - Added Start/Pause/Save/Discard graphics trying to emulate native apps
+    - Updated confirmation dialogs
+  - Added chart to the timers view (center area)
+    - Selectable variable to display: Altitude/Total ascent/VertSpeed/Speed/HeartRate/Accel (g)
+    - Toogle to display/not display Min Max values on chart
+    - Toogle to display/not display current value on center of chart
+    - Toogle to start chart on activity recording or always on
+    - Toogle to display last 4 hrs or last 30 min of data (auto expand X & Y axis)
+  - Added Moving Map view (option available for devices with maps)
+  - For Varioplot, moved zoom mode button to the Select button (same as on moving map)
+  - Added Info view (on Settings menu) that shows current location (Lat/Lon), sunrise-sunset times,
+    civil twilight times, current time (local&utc), current weather (provided 
+    by Garmin Weather) and a chart with the forecasted next 12 hr temperatures
+  - Added toogle option to enable/disable pulse oximeter/heart rate readings
+  - Added multiple setup options for Pulse Oximetry (see Usage for details)
+  - Added toogle option to display/not display variometer view (in General tab)
+  - Added toogle option to display/not display Map view (in General tab)
+  - Added toogle option to display/not display chart in timers view (in General tab)
+  - Added toogle option to display only ElapsedTime in footer (no local/utc time)
+  - Added Settings via ConnectIQ app in movile devices
+  - Updated for Instinct 3 Amoled and Descent G2
+  - Removed compatibility for low memory devices Fenix6-6s/Forerunner 245
+  - Fixed minor bugs
+
 * 1.3:
   - Moved SpO2 color status indicator to Header (top right corner) so its available in all views with header
   - Update to not consider paused time in the Timers/Log flight time, ET in footer still considers paused time

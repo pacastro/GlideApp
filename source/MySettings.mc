@@ -63,8 +63,27 @@ class MySettings {
   // ... activity
   public var bActivityAutoStart as Boolean = false; //Auto-start recording after launch
   public var fActivityAutoSpeedStart as Float = 5.56f;
+  // ... chart
+  public var bChartMinMax as Boolean = true;
+  public var bChartValue as Boolean = true;
+  public var bChartShow as Boolean = true;
+  public var bChartRange as Boolean = true;
+  public var iChartDisplay as Number = 0;
+  // ... map
+  public var bMapHeader as Boolean = true;
+  public var bMapData as Boolean = true;
+  // ... SpO2
+  public var bOxMeasure as Boolean = true;
+  public var iOxElevation as Number = 2800;
+  public var iOxCritical as Number = 80;
+  public var bOxVibrate as Boolean = true;
   // ... general
   public var iGeneralBackgroundColor as Number = Gfx.COLOR_WHITE;
+  public var bGeneralOxDisplay as Boolean = true;
+  public var bGeneralVarioDisplay as Boolean = true;
+  public var bGeneralMapDisplay as Boolean = false;
+  public var bGeneralChartDisplay as Boolean = true;
+  public var bGeneralETDisplay as Boolean = false;
   // ... units
   public var iUnitDistance as Number = -1;
   public var iUnitElevation as Number = -1;
@@ -87,6 +106,8 @@ class MySettings {
   public var sUnitDirection as String = "txt";
   public var sUnitHeading as String = "txt";
   public var sUnitTime as String = "LT";
+  public var sChartDisplay as String = "Altitude";
+  public var sChartUnitDisplay as String = "m";
   // ... conversion coefficients
   public var fUnitDistanceCoefficient as Float = 0.001f;
   public var fUnitHorizontalSpeedCoefficient as Float = 3.6f;
@@ -100,7 +121,7 @@ class MySettings {
   public var fVariometerRange as Float = 3.0f;
   public var iVariometerPlotOrientation as Number = 0;
   public var fVariometerPlotZoom as Float = 0.0030866666667f;
-  public var fVariometerPlotScale as Number = 1.0f;
+  public var fVariometerPlotScale as Float = 1.0f;
   public var fMinimumClimb as Float = 0.2;
   public var fMinimumSink as Float = 2.0;
   public var fVariometerSmoothing as Float = 0.5; //Standard deviation of altitude measurement at fixed altitude
@@ -130,8 +151,27 @@ class MySettings {
     // ... activity
     self.setActivityAutoStart(self.loadActivityAutoStart());
     self.setActivityAutoSpeedStart(self.loadActivityAutoSpeedStart());
+    // ... chart
+    self.setChartMinMax(self.loadChartMinMax());
+    self.setChartValue(self.loadChartValue());
+    self.setChartShow(self.loadChartShow());
+    self.setChartRange(self.loadChartRange());
+    self.setChartDisplay(self.loadChartDisplay());
+    // ... Map
+    self.setMapHeader(self.loadMapHeader());
+    self.setMapData(self.loadMapData());
+    // ... SpO2
+    self.setOxMeasure(self.loadOxMeasure());
+    self.setOxElevation(self.loadOxElevation());
+    self.setOxCritical(self.loadOxCritical());
+    self.setOxVibrate(self.loadOxVibrate());
     // ... general
     self.setGeneralBackgroundColor(self.loadGeneralBackgroundColor());
+    self.setGeneralOxDisplay(self.loadGeneralOxDisplay());
+    self.setGeneralVarioDisplay(self.loadGeneralVarioDisplay());
+    self.setGeneralMapDisplay(self.loadGeneralMapDisplay());
+    self.setGeneralChartDisplay(self.loadGeneralChartDisplay());
+    self.setGeneralETDisplay(self.loadGeneralETDisplay());
     // ... units
     self.setUnitDistance(self.loadUnitDistance());
     self.setUnitElevation(self.loadUnitElevation());
@@ -390,15 +430,237 @@ class MySettings {
     self.fActivityAutoSpeedStart = _fValue;
   }
 
+  function loadChartMinMax() as Boolean {
+    var bValue = App.Properties.getValue("userChartMinMax") as Boolean?;
+    return bValue != null ? bValue : true;
+  }
+  function saveChartMinMax(_bValue as Boolean) as Void {
+    App.Properties.setValue("userChartMinMax", _bValue as App.PropertyValueType);
+  }
+  function setChartMinMax(_bValue as Boolean) as Void {
+    self.bChartMinMax = _bValue;
+  }
+
+  function loadChartValue() as Boolean {
+    var bValue = App.Properties.getValue("userChartValue") as Boolean?;
+    return bValue != null ? bValue : true;
+  }
+  function saveChartValue(_bValue as Boolean) as Void {
+    App.Properties.setValue("userChartValue", _bValue as App.PropertyValueType);
+  }
+  function setChartValue(_bValue as Boolean) as Void {
+    self.bChartValue = _bValue;
+  }
+
+  function loadChartShow() as Boolean {
+    var bValue = App.Properties.getValue("userChartShow") as Boolean?;
+    return bValue != null ? bValue : true;
+  }
+  function saveChartShow(_bValue as Boolean) as Void {
+    App.Properties.setValue("userChartShow", _bValue as App.PropertyValueType);
+  }
+  function setChartShow(_bValue as Boolean) as Void {
+    self.bChartShow = _bValue;
+  }
+
+  function loadChartRange() as Boolean {
+    var bValue = App.Properties.getValue("userChartRange") as Boolean?;
+    return bValue != null ? bValue : true;
+  }
+  function saveChartRange(_bValue as Boolean) as Void {
+    App.Properties.setValue("userChartRange", _bValue as App.PropertyValueType);
+  }
+  function setChartRange(_bValue as Boolean) as Void {
+    self.bChartRange = _bValue;
+  }
+
+  function loadChartDisplay() as Number {
+    var iValue = App.Properties.getValue("userChartDisplay") as Number?;
+    return iValue != null ? iValue : 0;
+  }
+  function saveChartDisplay(_iValue as Number) as Void {
+    App.Properties.setValue("userChartDisplay", _iValue as App.PropertyValueType);
+  }
+  function setChartDisplay(_iValue as Number) as Void {
+    if(_iValue.toNumber() < 0 or _iValue.toNumber() > 5) {
+      _iValue = 0;
+    }
+    if(_iValue == 0) { 
+      self.sChartDisplay = "Altitude";
+      self.sChartUnitDisplay = sUnitElevation;
+    }
+    else if(_iValue == 1) {
+      self.sChartDisplay = "Ascent";
+      self.sChartUnitDisplay = sUnitElevation;
+    }
+    else if(_iValue == 2) {
+      self.sChartDisplay = "VertSpeed";
+      self.sChartUnitDisplay = sUnitVerticalSpeed;
+    }
+    else if(_iValue == 3) {
+      self.sChartDisplay = "Speed";
+      self.sChartUnitDisplay = sUnitHorizontalSpeed;
+    }
+    else if(_iValue == 4) {
+      self.sChartDisplay = "HeartRate";
+      self.sChartUnitDisplay = "bpm";
+    }
+    else if(_iValue == 5) {
+      self.sChartDisplay = "Acceleration";
+      self.sChartUnitDisplay = "g";
+    }
+  }
+
+  function loadMapHeader() as Boolean {
+    var bValue = App.Properties.getValue("userMapHeader") as Boolean?;
+    return bValue != null ? bValue : true;
+  }
+  function saveMapHeader(_bValue as Boolean) as Void {
+    App.Properties.setValue("userMapHeader", _bValue as App.PropertyValueType);
+  }
+  function setMapHeader(_bValue as Boolean) as Void {
+    self.bMapHeader = _bValue;
+  }
+
+  function loadMapData() as Boolean {
+    var bValue = App.Properties.getValue("userMapData") as Boolean?;
+    return bValue != null ? bValue : true;
+  }
+  function saveMapData(_bValue as Boolean) as Void {
+    App.Properties.setValue("userMapData", _bValue as App.PropertyValueType);
+  }
+  function setMapData(_bValue as Boolean) as Void {
+    self.bMapData = _bValue;
+  }
+
+  function loadOxMeasure() as Boolean {
+    var bValue = App.Properties.getValue("userOxMeasure") as Boolean?;
+    return bValue != null ? bValue : true;
+  }
+  function saveOxMeasure(_bValue as Boolean) as Void {
+    App.Properties.setValue("userOxMeasure", _bValue as App.PropertyValueType);
+  }
+  function setOxMeasure(_bValue as Boolean) as Void {
+    self.bOxMeasure = _bValue;
+  }
+
+  function loadOxElevation() as Number {
+    var iValue = App.Properties.getValue("userOxElevation") as Number?;
+    return iValue != null ? iValue : 2800;
+  }
+  function saveOxElevation(_iValue as Number) as Void {
+    App.Properties.setValue("userOxElevation", _iValue as App.PropertyValueType);
+  }
+  function setOxElevation(_iValue as Number) as Void {
+    if(_iValue > 5000) {
+      _iValue = 5000;
+    }
+    else if(_iValue < 0) {
+      _iValue = 0;
+    }
+    self.iOxElevation = _iValue;
+  }
+
+  function loadOxCritical() as Number {
+    var iValue = App.Properties.getValue("userOxCritical") as Number?;
+    return iValue != null ? iValue : 80;
+  }
+  function saveOxCritical(_iValue as Number) as Void {
+    App.Properties.setValue("userOxCritical", _iValue as App.PropertyValueType);
+  }
+  function setOxCritical(_iValue as Number) as Void {
+    if(_iValue > 90) {
+      _iValue = 90;
+    }
+    else if(_iValue < 75) {
+      _iValue = 75;
+    }
+    self.iOxCritical = _iValue;
+  }
+
+  function loadOxVibrate() as Boolean {
+    var bValue = App.Properties.getValue("userOxVibrate") as Boolean?;
+    return bValue != null ? bValue : true;
+  }
+  function saveOxVibrate(_bValue as Boolean) as Void {
+    App.Properties.setValue("userOxVibrate", _bValue as App.PropertyValueType);
+  }
+  function setOxVibrate(_bValue as Boolean) as Void {
+    self.bOxVibrate = _bValue;
+  }
+
   function loadGeneralBackgroundColor() as Number {
     var iValue = App.Properties.getValue("userGeneralBackgroundColor") as Number?;
-    return iValue != null ? iValue : Gfx.COLOR_BLACK;
+    return iValue != null ? iValue : 0;
   }
   function saveGeneralBackgroundColor(_iValue as Number) as Void {
     App.Properties.setValue("userGeneralBackgroundColor", _iValue as App.PropertyValueType);
   }
   function setGeneralBackgroundColor(_iValue as Number) as Void {
-    self.iGeneralBackgroundColor = _iValue;
+    if(_iValue==0) {
+      self.iGeneralBackgroundColor = Gfx.COLOR_BLACK;
+    }
+    else {
+      self.iGeneralBackgroundColor = Gfx.COLOR_WHITE;
+    }
+  }
+
+  function loadGeneralOxDisplay() as Boolean {
+    var bValue = App.Properties.getValue("userGeneralOxDisplay") as Boolean?;
+    return bValue != null ? bValue : true;
+  }
+  function saveGeneralOxDisplay(_bValue as Boolean) as Void {
+    App.Properties.setValue("userGeneralOxDisplay", _bValue as App.PropertyValueType);
+  }
+  function setGeneralOxDisplay(_bValue as Boolean) as Void {
+    self.bGeneralOxDisplay = _bValue;
+  }
+
+  function loadGeneralVarioDisplay() as Boolean {
+    var bValue = App.Properties.getValue("userGeneralVarioDisplay") as Boolean?;
+    return bValue != null ? bValue : true;
+  }
+  function saveGeneralVarioDisplay(_bValue as Boolean) as Void {
+    App.Properties.setValue("userGeneralVarioDisplay", _bValue as App.PropertyValueType);
+  }
+  function setGeneralVarioDisplay(_bValue as Boolean) as Void {
+    self.bGeneralVarioDisplay = _bValue;
+  }
+
+  function loadGeneralMapDisplay() as Boolean {
+    var bValue = App.Properties.getValue("userGeneralMapDisplay") as Boolean?;
+    return ((Ui has :MapView)?bValue:false) != null ? bValue : false;
+  }
+  function saveGeneralMapDisplay(_bValue as Boolean) as Void {
+    App.Properties.setValue("userGeneralMapDisplay", ((Ui has :MapView)?_bValue:false) as App.PropertyValueType);
+  }
+  function setGeneralMapDisplay(_bValue as Boolean) as Void {
+    self.bGeneralMapDisplay = (Ui has :MapView)?_bValue:false;
+    if(!(Ui has :MapView)) {
+      App.Properties.setValue("userGeneralMapDisplay", false as App.PropertyValueType);
+    }
+  }
+
+  function loadGeneralChartDisplay() as Boolean {
+    var bValue = App.Properties.getValue("userGeneralChartDisplay") as Boolean?;
+    return bValue != null ? bValue : true;
+  }
+  function saveGeneralChartDisplay(_bValue as Boolean) as Void {
+    App.Properties.setValue("userGeneralChartDisplay", _bValue as App.PropertyValueType);
+  }
+  function setGeneralChartDisplay(_bValue as Boolean) as Void {
+    self.bGeneralChartDisplay = _bValue;
+  }
+
+   function loadGeneralETDisplay() as Boolean {
+    var bValue = App.Properties.getValue("userGeneralETDisplay") as Boolean?;
+    return bValue != null ? bValue : false;
+  }
+  function saveGeneralETDisplay(_bValue as Boolean) as Void {
+    App.Properties.setValue("userGeneralETDisplay", _bValue as App.PropertyValueType);
+  }
+  function setGeneralETDisplay(_bValue as Boolean) as Void {
+    self.bGeneralETDisplay = _bValue;
   }
   
   function loadUnitDistance() as Number {
@@ -597,9 +859,15 @@ class MySettings {
     if(_iValue < 0 or _iValue > 3) {
       _iValue = -1;
     }
-    self.sUnitWindSpeed = _iValue;
-    if(self.sUnitWindSpeed < 0) {  // ... auto
-      _iValue = App.Properties.getValue("userUnitDistance") as Number?;
+    self.iUnitWindSpeed = _iValue;
+    if(self.iUnitWindSpeed < 0) {  // ... auto
+      var oDeviceSettings = Sys.getDeviceSettings();
+      if(oDeviceSettings has :distanceUnits and oDeviceSettings.distanceUnits != null) {
+        _iValue = oDeviceSettings.distanceUnits;
+      }
+      else {
+        _iValue = Sys.UNIT_METRIC;
+      }
     }
 
     if (_iValue == Sys.UNIT_METRIC) {

@@ -50,15 +50,11 @@ class MyDrawableHeader extends Ui.Drawable {
   private var oRezHeaderAccuracy3 as Ui.Drawable;
   private var oRezHeaderAccuracy4 as Ui.Drawable;
   private var oRezOxStatus as Ui.Drawable;
+  private var oRezMapHeaderBg as Ui.Drawable;
 
   // Color
   private var iColorBackground as Number = Gfx.COLOR_TRANSPARENT;
-
   private var iColorOxStatus as Number = Gfx.COLOR_TRANSPARENT;
-
-  // Position accuracy
-  private var iPositionAccuracy as Number = Pos.QUALITY_NOT_AVAILABLE;
-
 
   //
   // FUNCTIONS: Ui.Drawable (override/implement)
@@ -74,16 +70,20 @@ class MyDrawableHeader extends Ui.Drawable {
     oRezHeaderAccuracy4 = new Rez.Drawables.drawHeaderAccuracy4();
 
     oRezOxStatus = new Rez.Drawables.drawOxStatus();
+    oRezMapHeaderBg = new Rez.Drawables.drawMapHeaderBackground();
   }
 
   function draw(_oDC) {
+    _oDC.setColor($.oMySettings.iGeneralBackgroundColor, Gfx.COLOR_TRANSPARENT);
+    self.oRezMapHeaderBg.draw(_oDC);
+
     // Draw
     // ... background
     _oDC.setColor(self.iColorBackground, self.iColorBackground);
     _oDC.clear();
 
     // ... positioning accuracy
-    switch(self.iPositionAccuracy) {
+    switch($.oMyProcessing.iAccuracy) {
 
     case Pos.QUALITY_GOOD:
       _oDC.setColor(Gfx.COLOR_DK_GREEN, Gfx.COLOR_TRANSPARENT);
@@ -132,24 +132,25 @@ class MyDrawableHeader extends Ui.Drawable {
     }
 
     // ... SpO2 Status
-    if (LangUtils.notNaN(tOx) && LangUtils.notNaN(dOx)) {
-      if ((tOx.value() <= 6 * 60) && (dOx >= 95)) {
+    if ($.oMySettings.bGeneralOxDisplay && LangUtils.notNaN($.oMyProcessing.iAgeOx) && LangUtils.notNaN($.oMyProcessing.iOx)
+        && ($.oMySettings.bOxMeasure?($.oMyAltimeter.fAltitudeActual >= $.oMySettings.iOxElevation):true)) {
+      if (($.oMyProcessing.iAgeOx <= 6 * 60) && ($.oMyProcessing.iOx >= 95)) {
         self.iColorOxStatus = Gfx.COLOR_DK_GREEN;
       }
-      else if ((tOx.value() >= 20 * 60) || (dOx <= 90)) {
-        self.iColorOxStatus = Gfx.COLOR_RED;
-        if (dOx < 88) {
-          self.iColorOxStatus = (self.iColorOxStatus == Gfx.COLOR_RED) ? Gfx.COLOR_TRANSPARENT : Gfx.COLOR_RED;
+      else if (($.oMyProcessing.iAgeOx >= 20 * 60) || ($.oMyProcessing.iOx <= 90)) {
+        if ($.oMyProcessing.iOx <= $.oMySettings.iOxCritical) {
+          self.iColorOxStatus = Time.now().value() % 2 ? Gfx.COLOR_RED : Gfx.COLOR_TRANSPARENT;
+        } else {
+          self.iColorOxStatus = Gfx.COLOR_RED;
         }
       }
-      else if ((tOx.value() > 6 * 60) || (dOx > 90)) {
+      else if (($.oMyProcessing.iAgeOx > 6 * 60) || ($.oMyProcessing.iOx > 90)) {
         self.iColorOxStatus = Gfx.COLOR_YELLOW;
       }
       _oDC.setColor(self.iColorOxStatus, Gfx.COLOR_TRANSPARENT);
       self.oRezOxStatus.draw(_oDC);
     }
   }
-
 
   //
   // FUNCTIONS: self
@@ -158,9 +159,4 @@ class MyDrawableHeader extends Ui.Drawable {
   function setColorBackground(_iColorBackground as Number) as Void {
     self.iColorBackground = _iColorBackground;
   }
-
-  function setPositionAccuracy(_iPositionAccuracy as Number) as Void {
-    self.iPositionAccuracy = _iPositionAccuracy;
-  }
-
 }

@@ -40,6 +40,9 @@ using Toybox.Position as Pos;
 using Toybox.System as Sys;
 using Toybox.WatchUi as Ui;
 
+using Toybox.Time;
+using Toybox.Time.Gregorian;
+
 class MyViewGeneral extends MyViewGlobal {
   //
   // VARIABLES
@@ -54,7 +57,7 @@ class MyViewGeneral extends MyViewGlobal {
 
   function initialize() {
     //Populate last view
-    $.oMyProcessing.bIsPrevious = 2;
+    $.oMyProcessing.bIsPrevious = 1;
     MyViewGlobal.initialize();
   }
 
@@ -63,14 +66,21 @@ class MyViewGeneral extends MyViewGlobal {
     MyViewGlobal.prepare();
 
     // Set colors (value-independent), labels and units
-    // ... Wind Dir
-    (View.findDrawableById("labelTopLeft") as Ui.Text).setText(Ui.loadResource(Rez.Strings.labelWindDirection) as String);
-    if($.oMySettings.iUnitDirection==0) {
-      (View.findDrawableById("unitTopLeft") as Ui.Text).setText("[°]");
+    if((($.oMySettings.bGeneralOxDisplay?1:0) * $.iViewGenOxIdx) < 1) {
+      // ... Wind Dir
+      (View.findDrawableById("labelTopLeft") as Ui.Text).setText(Ui.loadResource(Rez.Strings.labelWindDirection) as String);
+      if($.oMySettings.iUnitDirection==0) {
+        (View.findDrawableById("unitTopLeft") as Ui.Text).setText("[°]");
+      }
+      // ... Wind Speed
+      (View.findDrawableById("labelTopRight") as Ui.Text).setText(Ui.loadResource(Rez.Strings.labelWindSpeed) as String);
+      (View.findDrawableById("unitTopRight") as Ui.Text).setText(Lang.format("[$1$]", [$.oMySettings.sUnitWindSpeed]));
+    } else {
+      // ... Heart Rate
+      (View.findDrawableById("labelTopLeft") as Ui.Text).setText(Ui.loadResource(Rez.Strings.labelHeartRate) as String);
+      // ... Oxygen Saturation
+      (View.findDrawableById("labelTopRight") as Ui.Text).setText(Ui.loadResource(Rez.Strings.labelSpO2) as String);
     }
-    // ... Wind Speed
-    (View.findDrawableById("labelTopRight") as Ui.Text).setText(Ui.loadResource(Rez.Strings.labelWindSpeed) as String);
-    (View.findDrawableById("unitTopRight") as Ui.Text).setText(Lang.format("[$1$]", [$.oMySettings.sUnitWindSpeed]));
     // ... altitude
     (View.findDrawableById("labelLeft") as Ui.Text).setText(Ui.loadResource(Rez.Strings.labelAltitude) as String);
     (View.findDrawableById("unitLeft") as Ui.Text).setText(Lang.format("[$1$]", [$.oMySettings.sUnitElevation]));
@@ -96,12 +106,14 @@ class MyViewGeneral extends MyViewGlobal {
     //Sys.println("DEBUG: MyViewVarioplot.onUpdate()");
 
     // Update layout
-    View.onUpdate(_oDC);
-    self.updateLayout();
-    self.drawArrow(_oDC);
+    MyViewGlobal.onUpdate(_oDC);
+    self.updateLayout(true);
+    if((($.oMySettings.bGeneralOxDisplay?1:0) * $.iViewGenOxIdx) < 1) {
+      self.drawArrow(_oDC);
+    }
   }
 
-  function updateLayout() {  
+  function updateLayout(_b) {  
     //Sys.println("DEBUG: MyViewGeneral.updateLayout()");
     MyViewGlobal.updateLayout(true);
 
@@ -109,6 +121,64 @@ class MyViewGeneral extends MyViewGlobal {
     var fValue;
     var iValue;
     var sValue;
+    var bRecording = ($.oMyActivity != null)?($.oMyActivity.isRecording()):false;
+
+    if((($.oMySettings.bGeneralOxDisplay?1:0) * $.iViewGenOxIdx) > 0) {
+      // ... Heart Rate
+      (self.oRezValueTopLeft as Ui.Text).setColor(bRecording ? self.iColorText : self.iColorTextGr);
+      fValue = $.oMyProcessing.iHR;
+      if(LangUtils.notNaN(fValue)) {
+        sValue = fValue.format("%.0f");
+      } 
+      else {
+        (self.oRezValueTopLeft as Ui.Text).setColor(self.iColorTextGr);
+        sValue = $.MY_NOVALUE_LEN3;
+      }
+      (self.oRezValueTopLeft as Ui.Text).setText(sValue);
+
+      // ... SpO2
+      if($.oMySettings.bOxMeasure && ($.oMyAltimeter.fAltitudeActual < $.oMySettings.iOxElevation)) {
+        (self.oRezValueTopRight as Ui.Text).setColor($.oMySettings.iGeneralBackgroundColor?Gfx.COLOR_LT_GRAY:Gfx.COLOR_DK_GRAY);
+        sValue = "elev";
+      }
+      else {
+        (self.oRezValueTopRight as Ui.Text).setColor(bRecording ? self.iColorText : self.iColorTextGr);
+        fValue = $.oMyProcessing.iOx;
+        if(LangUtils.notNaN(fValue)) {
+          sValue = fValue.format("%.0f");
+          if(fValue > $.oMySettings.iOxCritical) {
+            (self.oRezDrawableGlobal as MyDrawableGlobal).setColorAlertOx(Gfx.COLOR_TRANSPARENT);
+          }
+          else {
+            (self.oRezDrawableGlobal as MyDrawableGlobal).setColorAlertOx(self.iColorBG);
+          }
+        }
+        else {
+          (self.oRezValueTopRight as Ui.Text).setColor(self.iColorTextGr);
+          sValue = $.MY_NOVALUE_LEN3;
+        }
+      }
+      (self.oRezValueTopRight as Ui.Text).setText(sValue);
+
+      // ... SpO2 Age
+      if($.oMySettings.bOxMeasure && ($.oMyAltimeter.fAltitudeActual < $.oMySettings.iOxElevation)) {
+        (self.oRezValueTopRightB as Ui.Text).setColor(self.iColorTextGr);
+        sValue = format(">$1$ $2$", [($.oMySettings.iOxElevation*$.oMySettings.fUnitElevationCoefficient).format("%.0f"), $.oMySettings.sUnitElevation]);
+      }
+      else {
+        (self.oRezValueTopRightB as Ui.Text).setColor(Gfx.COLOR_DK_GRAY);
+        if(LangUtils.notNaN($.oMyProcessing.iAgeOx)&&LangUtils.notNaN(fValue)) {
+          fValue = Gregorian.utcInfo(new Time.Moment($.oMyProcessing.iAgeOx), Time.FORMAT_SHORT);
+          // Sys.println("DEBUG: $.oMyProcessing.oTimeLastOx: "+fValue.day+"d"+fValue.hour+"h"+fValue.min.format("%02d")+"m");
+          sValue = "Age: "+(fValue.month>1?">30 days":(fValue.day>2?(">"+(fValue.day-1)+" days"):((fValue.day-1)*24+fValue.hour+"h"+fValue.min.format("%02d")+"m")));
+        }
+        else {
+          (self.oRezValueTopRightB as Ui.Text).setColor(self.iColorTextGr);
+          sValue = "Age: " + $.MY_NOVALUE_LEN3;
+        }
+      }
+      (self.oRezValueTopRightB as Ui.Text).setText(sValue);
+    } else { (self.oRezValueTopRightB as Ui.Text).setText(""); }
 
     // ... altitude
     (self.oRezValueLeft as Ui.Text).setColor(self.iColorText);
@@ -155,13 +225,18 @@ class MyViewGeneral extends MyViewGlobal {
 
     // Colors
     if($.oMyProcessing.iAccuracy == Pos.QUALITY_NOT_AVAILABLE) {
-      (self.oRezDrawableGlobal as MyDrawableGlobal).setColorFieldsBackground(self.iColorBG);
-      (self.oRezValueTopLeft as Ui.Text).setColor(self.iColorTextGr);
-      (self.oRezValueTopLeft as Ui.Text).setText($.MY_NOVALUE_LEN3);
-      (self.oRezValueTopRight as Ui.Text).setColor(self.iColorTextGr);
-      (self.oRezValueTopRight as Ui.Text).setText($.MY_NOVALUE_LEN3);
+      if((($.oMySettings.bGeneralOxDisplay?1:0) * $.iViewGenOxIdx) > 0) {
+        (self.oRezDrawableGlobal as MyDrawableGlobal).setColorFieldsBackgroundOx(self.iColorBG);
+      } else {
+        (self.oRezDrawableGlobal as MyDrawableGlobal).setColorFieldsBackground(self.iColorBG);
+        (self.oRezValueTopLeft as Ui.Text).setColor(self.iColorTextGr);
+        (self.oRezValueTopLeft as Ui.Text).setText($.MY_NOVALUE_LEN3);
+        (self.oRezValueTopRight as Ui.Text).setColor(self.iColorTextGr);
+        (self.oRezValueTopRight as Ui.Text).setText($.MY_NOVALUE_LEN3);
+      }
       (self.oRezValueCenter as Ui.Text).setColor(self.iColorTextGr);
-      (self.oRezValueCenter as Ui.Text).setText($.MY_NOVALUE_LEN2);
+      // (self.oRezValueCenter as Ui.Text).setText($.MY_NOVALUE_LEN2);
+      (self.oRezValueCenter as Ui.Text).setText("v"+Ui.loadResource(Rez.Strings.AppVersion) as String);
       (self.oRezValueRight as Ui.Text).setColor(self.iColorTextGr);
       (self.oRezValueRight as Ui.Text).setText($.MY_NOVALUE_LEN3);
       (self.oRezValueBottomRight as Ui.Text).setColor(self.iColorTextGr);
@@ -169,43 +244,52 @@ class MyViewGeneral extends MyViewGlobal {
       return;
     }
     else if($.oMyProcessing.iAccuracy == Pos.QUALITY_LAST_KNOWN) {
-      (self.oRezDrawableGlobal as MyDrawableGlobal).setColorFieldsBackground(Gfx.COLOR_YELLOW);
+      if((($.oMySettings.bGeneralOxDisplay?1:0) * $.iViewGenOxIdx) > 0) {
+        (self.oRezDrawableGlobal as MyDrawableGlobal).setColorFieldsBackgroundOx(Gfx.COLOR_YELLOW);
+      } else {
+        (self.oRezDrawableGlobal as MyDrawableGlobal).setColorFieldsBackground(Gfx.COLOR_YELLOW);
+      }
       self.iColorText = Gfx.COLOR_LT_GRAY;
     }
     else {
-      (self.oRezDrawableGlobal as MyDrawableGlobal).setColorFieldsBackground(Gfx.COLOR_TRANSPARENT);
-    }
-
-
-    // ... Wind Direction
-    (self.oRezValueTopLeft as Ui.Text).setColor(self.iColorText);
-    //sValue = LangUtils.formatTime(oTimeNow, $.oMySettings.bUnitTimeUTC, false);
-    iValue = $.oMyProcessing.iWindDirection;
-    if(LangUtils.notNaN(iValue) && $.oMyProcessing.bWindValid) {
-      if($.oMySettings.iUnitDirection == 1) {
-        sValue = $.oMyProcessing.convertDirection(iValue);
+      if((($.oMySettings.bGeneralOxDisplay?1:0) * $.iViewGenOxIdx) > 0) {
+        (self.oRezDrawableGlobal as MyDrawableGlobal).setColorFieldsBackgroundOx(Gfx.COLOR_TRANSPARENT);
       } else {
-        sValue = iValue.format("%d");
+        (self.oRezDrawableGlobal as MyDrawableGlobal).setColorFieldsBackground(Gfx.COLOR_TRANSPARENT);
       }
-        
-    } else {
-      (self.oRezValueTopLeft as Ui.Text).setColor(self.iColorTextGr);
-      sValue = $.MY_NOVALUE_LEN3;
     }
-    (self.oRezValueTopLeft as Ui.Text).setText(sValue);
 
-    // ... Wind Speed
-    (self.oRezValueTopRight as Ui.Text).setColor(self.iColorText);
-    fValue = $.oMyProcessing.fWindSpeed;
-    if(LangUtils.notNaN(fValue) && $.oMyProcessing.bWindValid) {
-      fValue *= $.oMySettings.fUnitWindSpeedCoefficient;
-      sValue = fValue.format("%.0f");
+    if((($.oMySettings.bGeneralOxDisplay?1:0) * $.iViewGenOxIdx) < 1) {
+      // ... Wind Direction
+      (self.oRezValueTopLeft as Ui.Text).setColor(self.iColorText);
+      //sValue = LangUtils.formatTime(oTimeNow, $.oMySettings.bUnitTimeUTC, false);
+      iValue = $.oMyProcessing.iWindDirection;
+      if(LangUtils.notNaN(iValue) && $.oMyProcessing.bWindValid) {
+        if($.oMySettings.iUnitDirection == 1) {
+          sValue = $.oMyProcessing.convertDirection(iValue);
+        } else {
+          sValue = iValue.format("%d");
+        }
+          
+      } else {
+        (self.oRezValueTopLeft as Ui.Text).setColor(self.iColorTextGr);
+        sValue = $.MY_NOVALUE_LEN3;
+      }
+      (self.oRezValueTopLeft as Ui.Text).setText(sValue);
+
+      // ... Wind Speed
+      (self.oRezValueTopRight as Ui.Text).setColor(self.iColorText);
+      fValue = $.oMyProcessing.fWindSpeed;
+      if(LangUtils.notNaN(fValue) && $.oMyProcessing.bWindValid) {
+        fValue *= $.oMySettings.fUnitWindSpeedCoefficient;
+        sValue = fValue.format("%.0f");
+      }
+      else {
+        (self.oRezValueTopRight as Ui.Text).setColor(self.iColorTextGr);
+        sValue = $.MY_NOVALUE_LEN3;
+      }
+      (self.oRezValueTopRight as Ui.Text).setText(sValue);
     }
-    else {
-      (self.oRezValueTopRight as Ui.Text).setColor(self.iColorTextGr);
-      sValue = $.MY_NOVALUE_LEN3;
-    }
-    (self.oRezValueTopRight as Ui.Text).setText(sValue);
 
     // ... finesse
     (self.oRezValueCenter as Ui.Text).setColor(self.iColorText);
@@ -253,14 +337,6 @@ class MyViewGeneral extends MyViewGlobal {
     (self.oRezValueBottomRight as Ui.Text).setText(sValue);
   }
 
-  function onHide() {
-    //Sys.println("DEBUG: MyViewGeneral.onHide()");
-    MyViewGlobal.onHide();
-
-    // Mute tones
-    (App.getApp() as MyApp).muteTones();
-  }
-
   function drawArrow(_oDC as Gfx.Dc) as Void {
     if($.oMyProcessing.bWindValid) {
       var iRadius = _oDC.getWidth()*0.05f;;
@@ -286,6 +362,13 @@ class MyViewGeneral extends MyViewGlobal {
     }
   }
 
+  function onHide() {
+    //Sys.println("DEBUG: MyViewGeneral.onHide()");
+    MyViewGlobal.onHide();
+
+    // Mute tones
+    (App.getApp() as MyApp).muteTones();
+  }
 }
 
 class MyViewGeneralDelegate extends MyViewGlobalDelegate {
@@ -296,18 +379,43 @@ class MyViewGeneralDelegate extends MyViewGlobalDelegate {
 
   function onPreviousPage() {
     //Sys.println("DEBUG: MyViewGeneralDelegate.onPreviousPage()");
-    Ui.switchToView(new MyViewGeneralOx(),
-                    new MyViewGeneralOxDelegate(),
-                    Ui.SLIDE_IMMEDIATE);
+    if($.oMySettings.bGeneralOxDisplay && iViewGenOxIdx==0) {
+        iViewGenOxIdx = (iViewGenOxIdx+1) % 2;
+        Ui.switchToView(new MyViewGeneral(),
+                        new MyViewGeneralDelegate(),
+                        Ui.SLIDE_IMMEDIATE);
+    }
+    else if($.oMyActivity != null) { //Skip the log view if we are recording, e.g. in flight
+      Ui.switchToView(new MyViewTimers(),
+                      new MyViewTimersDelegate(),
+                      Ui.SLIDE_IMMEDIATE);
+    }
+    else {
+      Ui.switchToView(new MyViewLog(),
+                      new MyViewLogDelegate(),
+                      Ui.SLIDE_IMMEDIATE);
+    }
     return true;
   }
 
   function onNextPage() {
     //Sys.println("DEBUG: MyViewVarioplotDelegate.onNextPage()");
-        Ui.switchToView(new MyViewVariometer(),
-                        new MyViewVariometerDelegate(),
+    if($.oMySettings.bGeneralOxDisplay && iViewGenOxIdx==1) {
+        iViewGenOxIdx = (iViewGenOxIdx+1) % 2;
+        Ui.switchToView(new MyViewGeneral(),
+                        new MyViewGeneralDelegate(),
                         Ui.SLIDE_IMMEDIATE);
-    // }
+    }
+    else if ($.oMySettings.bGeneralVarioDisplay) {
+      Ui.switchToView(new MyViewVariometer(),
+                      new MyViewVariometerDelegate(),
+                      Ui.SLIDE_IMMEDIATE);
+    }
+    else {
+      Ui.switchToView(new MyViewVarioplot(),
+                      new MyViewVarioplotDelegate(),
+                      Ui.SLIDE_IMMEDIATE);
+    }
     return true;
   }
 

@@ -98,41 +98,4 @@ class PickerGenericPressure extends Ui.Picker {
                      new PickerFactoryNumber(0, 9, null)],
         :defaults => aiValues});
   }
-
-
-  //
-  // FUNCTIONS: self
-  //
-
-  function getValue(_amValues as Array, _iUnit as Number?) as Float {
-    // Input validation
-    // ... unit
-    var iUnit = _iUnit != null ? _iUnit : -1;
-    if(iUnit < 0) {
-      var oDeviceSettings = Sys.getDeviceSettings();
-      if(oDeviceSettings has :distanceUnits and oDeviceSettings.distanceUnits != null) {
-        iUnit = oDeviceSettings.distanceUnits;
-      }
-      else {
-        iUnit = Sys.UNIT_METRIC;
-      }
-    }
-
-    // Assemble components
-    var fValue = _amValues[1]*1000.0f + _amValues[2]*100.0f + _amValues[3]*10.0f + _amValues[4];
-    if(_amValues[0] != null) {
-      fValue *= _amValues[0];
-    }
-
-    // Use user-specified pressure unit (NB: metric units are always used internally)
-    if(iUnit == Sys.UNIT_STATUTE) {
-      fValue /= 0.2953f;  // inHg (* 1000) -> Pa
-    }
-    else {
-      fValue *= 10.0f;  // mb (* 10) -> Pa
-    }
-
-    // Return value
-    return fValue;
-  }
 }

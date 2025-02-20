@@ -58,7 +58,7 @@ class MyViewLog extends MyViewGlobal {
   //
   // VARIABLES
   //
-
+  (:icon) var NoExclude as Symbol = :NoExclude;
   // Resources (cache)
   // ... fields (units)
   private var oRezUnitLeft as Ui.Text?;
@@ -67,6 +67,8 @@ class MyViewLog extends MyViewGlobal {
   // ... strings
   private var sTitle as String = "Log";
   private var sUnitElevation_fmt as String = "[m]";
+  // // ... Layer
+  public var hintLayer as Ui.View?;
 
   // Internals
   // ... fields
@@ -84,7 +86,7 @@ class MyViewLog extends MyViewGlobal {
 
   function initialize() {
     //Populate last view
-    $.oMyProcessing.bIsPrevious = 5;
+    $.oMyProcessing.bIsPrevious = 6;
     MyViewGlobal.initialize();
 
     // Current view/log index
@@ -93,22 +95,11 @@ class MyViewLog extends MyViewGlobal {
     // Internals
     // ... fields
     self.iFieldEpoch = Time.now().value();
-  }
 
-  function onUpdate(_oDC as Gfx.Dc) as Void {
-    //Sys.println("DEBUG: MyViewLog.onUpdate()");
-
-    // Load log
-    if(self.iLogIndex != $.iMyViewLogIndex) {
-      self.loadLog();
-    }
-
-    // Done
-    MyViewGlobal.onUpdate(_oDC);
   }
 
   function prepare() as Void {
-    //Sys.println("DEBUG: MyViewLog.prepare()");
+    // Sys.println("DEBUG: MyViewLog.prepare()");
     MyViewGlobal.prepare();
 
     // Load resources
@@ -149,6 +140,21 @@ class MyViewLog extends MyViewGlobal {
     self.bTitleShow = true;
     (self.oRezValueFooter as Ui.Text).setColor(Gfx.COLOR_DK_GRAY);
     (self.oRezValueFooter as Ui.Text).setText(Ui.loadResource(Rez.Strings.titleViewLog) as String);
+
+    // ... Layer hint buttons
+    if(self has :NoExclude) { hintLayer = new HintLayer(true, true); }
+  }
+
+  function onUpdate(_oDC as Gfx.Dc) as Void {
+    //Sys.println("DEBUG: MyViewLog.onUpdate()");
+
+    // Load log
+    if(self.iLogIndex != $.iMyViewLogIndex) {
+      self.loadLog();
+    }
+
+    // Done
+    MyViewGlobal.onUpdate(_oDC);
   }
 
   function updateLayout(_b as Boolean) as Void {
@@ -320,7 +326,6 @@ class MyViewLog extends MyViewGlobal {
     // Done
     self.dictLog = d;
   }
-
 }
 
 class MyViewLogDelegate extends MyViewGlobalDelegate {
@@ -363,8 +368,9 @@ class MyViewLogDelegate extends MyViewGlobalDelegate {
 
   function onNextPage() {
     //Sys.println("DEBUG: MyViewLogDelegate.onNextPage()");
-    Ui.switchToView(new MyViewGeneralOx(),
-                    new MyViewGeneralOxDelegate(),
+    iViewGenOxIdx = 1;
+    Ui.switchToView(new MyViewGeneral(),
+                    new MyViewGeneralDelegate(),
                     Ui.SLIDE_IMMEDIATE);
     return true;
   }
