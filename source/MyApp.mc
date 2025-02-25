@@ -65,6 +65,7 @@ var oMyKalmanFilter as MyKalmanFilter = new MyKalmanFilter();
 
 // Internal altimeter
 var oMyAltimeter as MyAltimeter = new MyAltimeter();
+var bAltimeter as Boolean = (Activity.getActivityInfo() has :rawAmbientPressure);
 
 // Processing logic
 var oMyProcessing as MyProcessing = new MyProcessing();
@@ -162,29 +163,6 @@ class MyApp extends App.AppBase {
     if(iLogIndex != null) {
       $.iMyLogIndex = iLogIndex;
     }
-    else {
-      // MIGRATION; TODO: Remove after 2022.12.31
-      var iLogEpoch = 0;
-      for(var n=0; n<$.MY_STORAGE_SLOTS; n++) {
-        var s = n.format("%02d");
-        var dictLog = App.Storage.getValue(format("storLog$1$", [s])) as Dictionary?;
-        if(dictLog == null) {
-          break;
-        } else {
-          var i = dictLog.get("timeStart") as Number?;
-          if(i == null) {
-            break;
-          }
-          else if(i > iLogEpoch) {
-            $.iMyLogIndex = n;
-            iLogEpoch = i;
-          }
-        }
-      }
-      if($.iMyLogIndex >= 0) {
-        App.Storage.setValue("storLogIndex", $.iMyLogIndex as App.PropertyValueType);
-      }
-    }
 
     // Timers
     $.oMyTimeStart = Time.now();
@@ -277,6 +255,8 @@ class MyApp extends App.AppBase {
 
   function onSensorEvent(_oInfo as Sensor.Info) as Void {
     //Sys.println("DEBUG: MyApp.onSensorEvent());
+    var oTimeNow = Time.now();
+    var iEpoch = oTimeNow.value();
 
     // Process altimeter data
     var oActivityInfo = Activity.getActivityInfo();  // ... we need *raw ambient* pressure
@@ -295,6 +275,9 @@ class MyApp extends App.AppBase {
 
     // Process sensor data
     $.oMyProcessing.processSensorInfo(_oInfo, Time.now().value());
+    if($.oMyActivity != null) {
+      ($.oMyActivity as MyActivity).processSensorInfo(_oInfo, iEpoch, oTimeNow); // Log Altitude
+    }
 
     // Save FIT fields
     if($.oMyActivity != null) {
@@ -303,6 +286,26 @@ class MyApp extends App.AppBase {
       ($.oMyActivity as MyActivity).setVerticalSpeed($.oMyProcessing.fVariometer);
       ($.oMyActivity as MyActivity).setRateOfTurn($.oMyProcessing.fRateOfTurn);
       ($.oMyActivity as MyActivity).setAcceleration($.oMyProcessing.fAcceleration);
+    }
+
+    // Chart
+    if((($.oMyActivity != null) || !($.oMySettings.bChartShow)) && ($.oMyProcessing.fAltitude != null)) {
+      oChartModelAlt.new_value(_oInfo.altitude);
+      oChartModelAsc.new_value(($.oMyActivity != null)?$.oMyActivity.fGlobalAscent:0);
+      oChartModelCrt.new_value($.oMyProcessing.fVariometer_filtered);
+      oChartModelSpd.new_value($.oMyProcessing.fGroundSpeed);
+      oChartModelHR.new_value($.oMyProcessing.iHR);
+      oChartModelg.new_value($.oMyProcessing.fAcceleration);
+    }
+
+    if(bChartReset) {
+      oChartModelAlt.reset();
+      oChartModelAsc.reset();
+      oChartModelCrt.reset();
+      oChartModelSpd.reset();
+      oChartModelHR.reset();
+      oChartModelg.reset();
+      bChartReset = false;
     }
   }
 
@@ -371,27 +374,7 @@ class MyApp extends App.AppBase {
     // Process position data
     $.oMyProcessing.processPositionInfo(_oInfo, iEpoch);
     if($.oMyActivity != null) {
-      ($.oMyActivity as MyActivity).processPositionInfo(_oInfo, iEpoch, oTimeNow);
-    }
-
-    // Chart
-    if(($.oMyActivity != null) || !($.oMySettings.bChartShow)) {
-      oChartModelAlt.new_value(_oInfo.altitude);
-      oChartModelAsc.new_value(($.oMyActivity != null)?$.oMyActivity.fGlobalAscent:0);
-      oChartModelCrt.new_value($.oMyProcessing.fVariometer_filtered);
-      oChartModelSpd.new_value($.oMyProcessing.fGroundSpeed);
-      oChartModelHR.new_value($.oMyProcessing.iHR);
-      oChartModelg.new_value($.oMyProcessing.fAcceleration);
-    }
-
-    if(bChartReset) {
-      oChartModelAlt.reset();
-      oChartModelAsc.reset();
-      oChartModelCrt.reset();
-      oChartModelSpd.reset();
-      oChartModelHR.reset();
-      oChartModelg.reset();
-      bChartReset = false;
+      ($.oMyActivity as MyActivity).processPositionInfo(_oInfo, iEpoch, oTimeNow); // Log Distance
     }
 
     // Automatic Activity recording

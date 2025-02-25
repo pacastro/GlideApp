@@ -1,3 +1,7 @@
+* 2.1:
+  - Bigger font for units display in bigger screen watches (>= 390x390)
+  - Small optimizations and fixed minor bugs
+
 * 2.0:
   - Updated UI using Menu2 functionality in settings/activity menu:
     - Added toogles for on/off settings

@@ -259,9 +259,10 @@ class MyProcessing {
     if(LangUtils.notNaN($.oMyAltimeter.fAltitudeActual)) {  // ... the closest to the device's raw barometric sensor value
       self.fAltitude = $.oMyAltimeter.fAltitudeActual;
     }
-    //else {
+    else {
     //  Sys.println("WARNING: Internal altimeter has no altitude available");
-    //}
+      self.fAltitude = self.iAccuracy > 1 ? _oInfo.altitude : null; // ... no barometer, use GPS altitude
+    }
 
     // Kalman Filter initialize
     if(LangUtils.notNaN(self.fPreviousAltitude) && self.fPreviousAltitude != null && !$.oMyKalmanFilter.bFilterReady) {

@@ -49,10 +49,6 @@ class MyViewVariometer extends MyView {
   // VARIABLES
   //
 
-  // Resources
-  // ... fonts
-  private var oRezFontStatus as Ui.FontResource?;
-
   // Layout-specific
   private var iLayoutCenter as Number = (Sys.getDeviceSettings().screenWidth * 0.5).toNumber();
   private var iLayoutValueR as Number = (iLayoutCenter * 0.5).toNumber();
@@ -79,10 +75,6 @@ class MyViewVariometer extends MyView {
   function onLayout(_oDC) {
     //Sys.println("DEBUG: MyViewVariometer.onLayout()");
     // No layout; see drawLayout() below
-
-    // Load resources
-    // ... fonts
-    self.oRezFontStatus = Ui.loadResource(Rez.Fonts.fontStatus) as Ui.FontResource;
   }
 
   function onShow() {
@@ -161,7 +153,7 @@ class MyViewVariometer extends MyView {
     // ... battery
     _oDC.setColor(self.iColorTextGr, Gfx.COLOR_TRANSPARENT);
     sValue = Lang.format("$1$%", [Sys.getSystemStats().battery.format("%.0f")]);
-    _oDC.drawText(self.iLayoutCacheX, self.iLayoutBatteryY, self.oRezFontStatus as Ui.FontResource, sValue, Gfx.TEXT_JUSTIFY_CENTER);
+    _oDC.drawText(self.iLayoutCacheX, self.iLayoutBatteryY, Gfx.FONT_XTINY, sValue, Gfx.TEXT_JUSTIFY_CENTER);
 
     // ... activity
     if($.oMyActivity == null) {  // ... stand-by
@@ -176,7 +168,7 @@ class MyViewVariometer extends MyView {
       _oDC.setColor(Gfx.COLOR_YELLOW, Gfx.COLOR_TRANSPARENT);
       sValue = self.sValueActivityPaused;
     }
-    _oDC.drawText(self.iLayoutCacheX, self.iLayoutActivityY - Gfx.getFontHeight(self.oRezFontStatus), self.oRezFontStatus as Ui.FontResource, sValue, Gfx.TEXT_JUSTIFY_CENTER);
+    _oDC.drawText(self.iLayoutCacheX, self.iLayoutActivityY - Gfx.getFontHeight(Gfx.FONT_XTINY), Gfx.FONT_XTINY, sValue, Gfx.TEXT_JUSTIFY_CENTER);
 
     // ... time
     var oTimeNow = Time.now();
@@ -218,7 +210,7 @@ class MyViewVariometer extends MyView {
     else {
       sValue = $.MY_NOVALUE_LEN3;
     }
-    _oDC.drawText(self.iLayoutCacheX, self.iLayoutCenter, Gfx.FONT_NUMBER_MILD, sValue, Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
+    _oDC.drawText(self.iLayoutCacheX, self.iLayoutCenter, Gfx.FONT_NUMBER_MEDIUM, sValue, Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
     _oDC.setColor($.oMySettings.iGeneralBackgroundColor ? Gfx.COLOR_BLACK : Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
     _oDC.drawText(self.iLayoutUnitX, self.iLayoutCenter, Gfx.FONT_TINY, $.oMySettings.sUnitVerticalSpeed, Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
   }

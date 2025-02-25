@@ -181,6 +181,7 @@ class MyViewGeneral extends MyViewGlobal {
     } else { (self.oRezValueTopRightB as Ui.Text).setText(""); }
 
     // ... altitude
+    (View.findDrawableById("labelLeft") as Ui.Text).setColor($.bAltimeter ? Gfx.COLOR_DK_GRAY : ($.oMyProcessing.iAccuracy == 2 ? Gfx.COLOR_RED : 0xffaa55));
     (self.oRezValueLeft as Ui.Text).setColor(self.iColorText);
     fValue = $.oMyProcessing.fAltitude;
     if(LangUtils.notNaN(fValue)) {

@@ -40,6 +40,7 @@ using Toybox.Application as App;
 using Toybox.Attention as Attn;
 using Toybox.FitContributor as FC;
 using Toybox.Position as Pos;
+using Toybox.Sensor;
 using Toybox.Time;
 using Toybox.System as Sys;
 
@@ -96,6 +97,7 @@ class MyActivity {
   public var oGlobalTimeAltitudeMax as Time.Moment?;
   // ... internals
   private var iEpochLast as Number = -1;
+  private var iEpochLast2 as Number = -1;
   private var adPositionRadiansLast as Array<Double>?;
   private var fAltitudeLast as Float = NaN;
 
@@ -327,11 +329,10 @@ class MyActivity {
   function processPositionInfo(_oInfo as Pos.Info, _iEpoch as Number, _oTimeNow as Time.Moment) as Void {
     //Sys.println("DEBUG: MyActivity.processPositionInfo()");
 
-    // NOTE: We use Pos.Info.altitude to remain consistent with other (internal) Activity position/altitude data
+    // NOTE: We use Pos.Info. to remain consistent with other (internal) Activity position data
     if(!self.oSession.isRecording()
        or !(_oInfo has :accuracy) or _oInfo.accuracy < Pos.QUALITY_GOOD
        or !(_oInfo has :position) or _oInfo.position == null
-       or !(_oInfo has :altitude) or _oInfo.altitude == null
        or _iEpoch - self.iEpochLast < self.TIME_CONSTANT) {
       return;
     }
@@ -350,11 +351,25 @@ class MyActivity {
       self.adPositionRadiansLast = adPositionRadians;
     }
 
+    // Epoch
+    self.iEpochLast = _iEpoch;
+  }
+
+  function processSensorInfo(_oInfo as Sensor.Info, _iEpoch as Number, _oTimeNow as Time.Moment) as Void {
+  //Sys.println("DEBUG: MyActivity.processPositionInfo()");
+
+    // NOTE: We use Sensor.Info.altitude to remain consistent with other (internal) Activity altitude data
+    if(!self.oSession.isRecording()
+       or ($.oMyProcessing.iAccuracy < Pos.QUALITY_USABLE)
+       or !(_oInfo has :altitude) or _oInfo.altitude == null
+       or _iEpoch - self.iEpochLast2 < self.TIME_CONSTANT) {
+      return;
+    }
     // Ascent
-    if(self.iEpochLast >= 0 and (_oInfo.altitude as Float) > self.fAltitudeLast) {
+    if(self.iEpochLast2 >= 0 and (_oInfo.altitude as Float) > self.fAltitudeLast) {
       // ... session
       self.fGlobalAscent += ((_oInfo.altitude as Float) - self.fAltitudeLast);
-      self.iGlobalElapsedAscent += (_iEpoch - self.iEpochLast);
+      self.iGlobalElapsedAscent += (_iEpoch - self.iEpochLast2);
     }
     self.fAltitudeLast = _oInfo.altitude as Float;
 
@@ -370,7 +385,7 @@ class MyActivity {
     }
 
     // Epoch
-    self.iEpochLast = _iEpoch;
+    self.iEpochLast2 = _iEpoch;
   }
 
   function saveLog(_bSession as Boolean) as Void {

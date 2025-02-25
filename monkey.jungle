@@ -14,6 +14,7 @@ round-390x390.excludeAnnotations = noicon
 round-416x416.excludeAnnotations = noicon
 round-454x454.excludeAnnotations = noicon
 
+fr245m.excludeAnnotations = icon
 fr745.excludeAnnotations = icon
 fr945.excludeAnnotations = icon
 fr945lte.excludeAnnotations = icon
@@ -24,6 +25,7 @@ descentmk2s.excludeAnnotations = icon
 descentmk2.excludeAnnotations = icon
 
 # Resources
+fr245m.resourcePath = resources; resources-noicon-240x240
 fr745.resourcePath = resources; resources-noicon-240x240
 fr945.resourcePath = resources; resources-noicon-240x240
 fr945lte.resourcePath = resources; resources-noicon-240x240

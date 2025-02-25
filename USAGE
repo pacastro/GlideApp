@@ -121,7 +121,8 @@ General View 1
    When SpO2 value is equal or below the set up Critical level, the background of this 
    field turns red.
  - Left:
-   your current altitude
+   your current altitude (altitude label will be orange on devices with no barometric sensor,
+   and will use GPS altitude)
  - Center:
    your current finesse
  - Right:
@@ -140,7 +141,8 @@ General View 2
  - Top-Right:
    estimated wind speed (when available)
  - Left:
-   your current altitude
+   your current altitude (altitude label will be orange on devices with no barometric sensor,
+   and will use GPS altitude)
  - Center:
    your current finesse
  - Right:
