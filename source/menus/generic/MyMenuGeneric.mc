@@ -104,6 +104,9 @@ class MyMenu2Generic extends Ui.Menu2 {
       Menu2.setTitle(Rez.Strings.titleSettingsVariometer);
       Menu2.addItem(new Ui.MenuItem(Rez.Strings.titleVariometerRange, format("$1$ $2$", [($.oMySettings.fVariometerRange*$.oMySettings.fUnitVerticalSpeedCoefficient).format(sFormat), $.oMySettings.sUnitVerticalSpeed]), :menuVariometerRange, {}));
       Menu2.addItem(new Ui.MenuItem(Rez.Strings.titleVariometerSmoothing, $.oMySettings.fVariometerSmoothingName, :menuVariometerSmoothing, {}));
+      Menu2.addItem(new Ui.MenuItem(Rez.Strings.titleVariometerAvgTime, $.oMySettings.fVariometerAvgTime == 0 ? "current data" : ($.oMySettings.fVariometerAvgTime.format("%.0f") + " s"), :menuVariometerAvgTime, {}));
+      Menu2.addItem(new Ui.ToggleMenuItem(Rez.Strings.titleVariometerAvgLast, {:enabled=>"Avg last Thermal", :disabled=>"Avg last n sec"}, :menuVariometerAvgLast, $.oMySettings.bVariometerAvgLast, {:alignment=>WatchUi.MenuItem.MENU_ITEM_LABEL_ALIGN_RIGHT}));
+      Menu2.addItem(new Ui.ToggleMenuItem(Rez.Strings.titleVariometerdE, null, :menuVariometerdE, $.oMySettings.bVariometerdE, {:alignment=>WatchUi.MenuItem.MENU_ITEM_LABEL_ALIGN_RIGHT}));
       Menu2.addItem(new Ui.ToggleMenuItem(Rez.Strings.titleVariometerAutoThermal, null, :menuVariometerAutoThermal, $.oMySettings.bVariometerAutoThermal, {:alignment=>WatchUi.MenuItem.MENU_ITEM_LABEL_ALIGN_RIGHT}));
       Menu2.addItem(new Ui.ToggleMenuItem(Rez.Strings.titleVariometerThermalDetect, null, :menuVariometerThermalDetect, $.oMySettings.bVariometerThermalDetect, {:alignment=>WatchUi.MenuItem.MENU_ITEM_LABEL_ALIGN_RIGHT}));
       Menu2.addItem(new Ui.ToggleMenuItem(Rez.Strings.titleVariometerPlotOrientation, {:enabled=>"North Up", :disabled=>"Heading Up"}, :menuVariometerPlotOrientation, ($.oMySettings.iVariometerPlotOrientation?false:true), {:alignment=>WatchUi.MenuItem.MENU_ITEM_LABEL_ALIGN_RIGHT}));
@@ -138,6 +141,7 @@ class MyMenu2Generic extends Ui.Menu2 {
       Menu2.setTitle(Rez.Strings.titleSettingsMap);
       Menu2.addItem(new Ui.ToggleMenuItem(Rez.Strings.titleMapHeader, null, :menuMapHeader, $.oMySettings.bMapHeader, {:alignment=>WatchUi.MenuItem.MENU_ITEM_LABEL_ALIGN_RIGHT}));
       Menu2.addItem(new Ui.ToggleMenuItem(Rez.Strings.titleMapData, null, :menuMapData, $.oMySettings.bMapData, {:alignment=>WatchUi.MenuItem.MENU_ITEM_LABEL_ALIGN_RIGHT}));
+      Menu2.addItem(new Ui.ToggleMenuItem(Rez.Strings.titleMapTrack, null, :menuMapTrack, $.oMySettings.bMapTrack, {:alignment=>WatchUi.MenuItem.MENU_ITEM_LABEL_ALIGN_RIGHT}));
     }
 
     else if(menu == :menuSettingsOx) {
@@ -194,7 +198,7 @@ class MyMenu2GenericDelegate extends Ui.Menu2InputDelegate {
   //
 
   private var menu as Symbol = :menuNone;
-   (:icon) var NoExclude as Symbol = :NoExclude;
+  (:icon) var NoExclude as Symbol = :NoExclude;
 
   //
   // FUNCTIONS: Ui.MenuInputDelegate (override/implement)
@@ -279,7 +283,15 @@ class MyMenu2GenericDelegate extends Ui.Menu2InputDelegate {
     }
 
     else if(self.menu == :menuSettingsVariometer) {
-      if(itemId == :menuVariometerAutoThermal) {
+      if(itemId == :menuVariometerAvgLast) {
+        $.oMySettings.saveVariometerAvgLast(item.isEnabled());
+        $.oMySettings.setVariometerAvgLast(item.isEnabled());
+      }
+      else if(itemId == :menuVariometerdE) {
+        $.oMySettings.saveVariometerdE(item.isEnabled());
+        $.oMySettings.setVariometerdE(item.isEnabled());
+      }
+      else if(itemId == :menuVariometerAutoThermal) {
         $.oMySettings.saveVariometerAutoThermal(item.isEnabled());
         $.oMySettings.setVariometerAutoThermal(item.isEnabled());
       }
@@ -360,6 +372,10 @@ class MyMenu2GenericDelegate extends Ui.Menu2InputDelegate {
       else if(itemId == :menuMapData) {
         $.oMySettings.saveMapData(item.isEnabled());
         $.oMySettings.setMapData(item.isEnabled());
+      }
+      else if(itemId == :menuMapTrack) {
+        $.oMySettings.saveMapTrack(item.isEnabled());
+        $.oMySettings.setMapTrack(item.isEnabled());
       }
     }
 

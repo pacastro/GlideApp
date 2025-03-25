@@ -155,11 +155,32 @@ General View 2
 Variometer View
 ---------------
 
-The GlideApp Variometer displays your current ascent/descent rate both textu-
-ally and graphically, using visually appealing colors:
+The GlideApp Variometer displays your current ascent/descent rate both textually 
+and graphically, using visually appealing colors:
  - GREEN for ascent
  - RED for descent
 
+The textual display shows the average vertical speed for a selectable time span
+(10, 20 or 30 seconds), or the current data. 
+
+Graphically the current vertical speed is shown with the main needle moving along 
+the range strip (tracking altitude variation only dAlt). You can also select 
+(see Settings) to display a secondary needle for kinetic energy (speed) compensated 
+variations (dE), compensating pure altitude variations with exchance of speed into 
+altitde (kinetic into potential energy) and vice versa. An efficiency of 90% is used 
+for energy conversions alonside with GPS derived ground speed.. so this is an 
+aproximation to a real Total Energy variometer.
+
+Additionally a green T bug indicator is also displayed graphically 
+showing the average vertical speed for the last thermal or the average for the last
+n seconds (average time selected).
+
+There is a secondary inner strip that shows the min and max acceleration (g) 
+readings, the min-max range is shown in yellow. The current g load is shown with a 
+red diamond indicator in the main strip.
+
+Once an activity is being recorded, you can change the variometer range by pressing
+the back button.
 
 Varioplot / Thermal Assistant View
 ----------------------------------
@@ -348,11 +369,19 @@ The application allows you to specify the following settings:
 
 * Variometer
   - Range:
-    the range used for the variometer display (3.0, 6.0 or 9.0 m/s) and varioplot
+    the range used for the variometer display (3.0, 5.0 or 10.0 m/s) and varioplot
     color range
   - Smoothing:
     the amount of smoothing to apply to the variometer reading (determines the standard
     deviation of altitude applied to the Kalman Filter: 0.2, 0.5, 0.7, or 1.0)
+  - Average Time:
+    time span in seconds for the period to average variometer readings (10, 20, 30),
+    "current data" option displays the actaul current value and no average value
+  - Green T bug:
+    Display with green T bug indcicator the average for last thermal or average 
+    for last n seconds (average time above)
+  - Show dE:
+    Display/Not Display secondary needle with cinetic energy compensated variations
   - Auto Thermal:
     whether the app will switch to Varioplot view automatically when circling is
     detected, and switch back once circling is no longer detected
@@ -410,7 +439,7 @@ The application allows you to specify the following settings:
 * Pulse Oximetry (available when General/Pulse Ox/Hr readings display is on)
   - Enabled at: (over Caution elev / always on)
     Enable pulse oximeter when current altitude is over the set up Caution elevation
-    or always on
+    or always on (always on reduces battery endurance)
   - O2 Caution Elev:
     Elevation over witch pulse oximeter activates (when required by previous set up item)
   - SpO2 Critical Level:

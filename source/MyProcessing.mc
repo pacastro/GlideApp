@@ -64,6 +64,9 @@ class MyProcessing {
   //
 
   // Internal calculation objects
+  private var fKineticEnergyEfficiency as Float = 0.9f;
+  private var iPreviousEnergyGpoch as Number = -1;
+  private var fPreviousGroundSpeed as Float = 0.0f;
   // ... we must calculate our own vertical speed
   private var iPreviousAltitudeEpoch as Number = -1;
   private var fPreviousAltitude as Float = 0.0f;
@@ -75,7 +78,6 @@ class MyProcessing {
   private var iWindSectorCount as Number = 0;
   private var iWindOldSector as Number = 0;
   private var iWindSector as Number = 0;
-
   // ... we must calculate our own rate of turn
   private var iPreviousHeadingGpoch as Number = -1;
   private var fPreviousHeading as Float = 0.0f;
@@ -96,6 +98,9 @@ class MyProcessing {
   // ... altimeter calculated values
   public var fVariometer as Float = NaN;
   public var fVariometer_filtered as Float = NaN;
+  public var aVariometer_history as AFloats = [];
+  public var aVariometer_lastThermal as AFloats = [];
+  public var fVarioLastThAvg as Float = NaN;
   // ... position values (fed by Toybox.Position)
   public var bPositionStateful as Boolean = false;
   public var iPositionEpoch as Number = -1;
@@ -105,7 +110,8 @@ class MyProcessing {
   public var fGroundSpeed as Float = NaN;
   public var fHeading as Float = NaN;
   // ... position calculated values
-  public var fRateOfTurn as Float = NaN;
+  public var fVariometerdE = NaN;
+  public var fRateOfTurn as Float = 0.0f;
   // ... finesse
   public var bAscent as Boolean = true;
   public var fFinesse as Float = NaN;
@@ -116,7 +122,7 @@ class MyProcessing {
   // ... circling
   public var bCirclingCount as Number = 0;
   public var bNotCirclingCount as Number = 0;
-  public var bIsPrevious as Number = 1; // 1 GeneralOx, 2 General, 3 Variometer
+  public var bIsPrevious as Number = 1; // 1 General, 2 Variometer, 3 Varioplot
   public var bAutoThermalTriggered as Boolean = false;
   public var iCirclingStartEpoch as Number = 0;
   public var fCirclingStartAltitude as Float = 0.0f;
@@ -168,6 +174,7 @@ class MyProcessing {
       var sample = spo2Iterator.next();
       self.oTimeLastOx = (sample.when != null) ? sample.when : 0;
     }
+
   }
 
   function resetSensorData() as Void {
@@ -185,6 +192,9 @@ class MyProcessing {
     // ... altimeter calculated values
     self.fVariometer = NaN;
     self.fVariometer_filtered = NaN;
+    self.aVariometer_history = [];
+    self.aVariometer_lastThermal = [];
+    self.fVarioLastThAvg = NaN;
     // ... filters
   }
 
@@ -192,6 +202,11 @@ class MyProcessing {
     //Sys.println("DEBUG: MyProcessing.resetPositionData()");
 
     // Reset
+    // ... we must calculate our own potential energy "vertical speed"
+    self.iPreviousEnergyGpoch = -1;
+    // ... we must calculate our own rate of turn
+    self.iPreviousHeadingGpoch = -1;
+    self.fPreviousHeading = 0.0f;
     // ... position values
     self.bPositionStateful = false;
     self.iPositionEpoch = -1;
@@ -202,7 +217,8 @@ class MyProcessing {
     self.fHeading = NaN;
 
     // ... position calculated values
-    self.fRateOfTurn = NaN;
+    self.fVariometerdE = NaN;
+    self.fRateOfTurn = 0.0f;
 
     // ... finesse
     self.fFinesse = NaN;
@@ -279,6 +295,20 @@ class MyProcessing {
           self.fAltitude = $.oMyKalmanFilter.fPosition;
         //  Sys.println(format("DEBUG: (Calculated) altimetric variometer = $1$ ~ $2$", [self.fAltitude, $.oMyKalmanFilter.fPosition]));
         }
+        if(LangUtils.notNaN(self.fVariometer_filtered)) {
+          if(($.oMySettings.fVariometerAvgTime < self.aVariometer_history.size()) && ($.oMySettings.fVariometerAvgTime > 0)) {
+            self.aVariometer_history = self.aVariometer_history.slice(-$.oMySettings.fVariometerAvgTime, null);
+          }
+          var n = $.oMySettings.fVariometerAvgTime == 0 ? 20 : $.oMySettings.fVariometerAvgTime;
+          if(self.aVariometer_history.size() >= n) {
+            for(var i = 0; i < n - 1; i++) {
+              self.aVariometer_history[i] = self.aVariometer_history[i+1];
+            }
+            self.aVariometer_history[n - 1] = self.fVariometer_filtered;
+          } else {
+            self.aVariometer_history.add(self.fVariometer_filtered);
+          }
+        }
 
         //Sys.println(format("DEBUG: (Calculated) altimetric variometer = $1$ ~ $2$ ~ $3$", [self.fVariometer, self.fVariometer_filtered]));
         
@@ -332,6 +362,12 @@ class MyProcessing {
     self.bPositionStateful = false;
     if(_oInfo has :position and _oInfo.position != null) {
       self.oLocation = _oInfo.position;
+      if($.oMySettings.bMapTrack) {
+        self.iPositionCount++;
+        if((iAccuracy >= Pos.QUALITY_POOR) && (Ui has :MapView) && ($.oMySettings.bGeneralMapDisplay) && ($.oMyActivity != null) && (self.iPositionCount % 10 == 0)) {
+          self.oPolyTrack.addLocation(self.oLocation);
+        }
+      }
       //Sys.println(format("DEBUG: (Position.Info) position = $1$, $2$", [self.oLocation.toDegrees()[0], self.oLocation.toDegrees()[1]]));
     }
     //else {
@@ -358,8 +394,22 @@ class MyProcessing {
       bStateful = false;
     }
 
-    // ... variometer
-
+    // ... variometer dE
+    if($.oMySettings.bVariometerdE and LangUtils.notNaN(self.fAltitude) and LangUtils.notNaN(self.fGroundSpeed)) {  // ... energetic variometer
+      if(self.iPreviousEnergyGpoch >= 0 and self.iPositionGpoch-self.iPreviousEnergyGpoch != 0) {
+        // ΔEtot = ΔEkinetic + ΔEpot = 1/2*mΔ(v2) + mgΔh
+        // ΔEtot = 0 -> mg*dh/dt = -1/2*m*d(v2)/dt
+        // dh/dt = -1/(2*g)*d(v2)/dt = dE compensation -> VariodE = Vario + (dh/dt)*kineticeff
+        self.fVariometerdE =
+          self.fVariometer_filtered 
+          - self.fKineticEnergyEfficiency * (self.fPreviousGroundSpeed * self.fPreviousGroundSpeed - self.fGroundSpeed * self.fGroundSpeed) 
+          / (2 * 9.80665f * (self.iPositionGpoch-self.iPreviousEnergyGpoch));
+        //Sys.println(format("DEBUG: (Calculated) energetic variometer = $1$ ~ $2$", [self.fVariometerdE, self.fVariometer_filtered]));
+      }
+      self.iPreviousEnergyGpoch = self.iPositionGpoch;
+      self.fPreviousGroundSpeed = self.fGroundSpeed;
+      // self.iPreviousAltitudeEpoch = -1;  // ... prevent artefact when switching variometer mode
+    }
     if(LangUtils.isNaN(self.fVariometer)) {
       bStateful = false;
     }
@@ -390,7 +440,7 @@ class MyProcessing {
         else if(fValue > 3.14159265359f) {
           fValue -= 6.28318530718f;
         }
-        self.fRateOfTurn = fValue;
+        self.fRateOfTurn = (self.fRateOfTurn + fValue) / 2; // smooth a little bit, moving 2 sec average
         //Sys.println(format("DEBUG: (Calculated) rate of turn = $1$ ~ $2$", [self.fRateOfTurn, self.fRateOfTurn_filtered]));
       }
       self.iPreviousHeadingGpoch = self.iPositionGpoch;
@@ -496,7 +546,7 @@ class MyProcessing {
                 new MyViewVarioplotDelegate(),
                 Ui.SLIDE_IMMEDIATE);
     }
-    if($.oMySettings.bVariometerAutoThermal && self.bAutoThermalTriggered && self.bNotCirclingCount >=20) {
+    if($.oMySettings.bVariometerAutoThermal && self.bAutoThermalTriggered && self.bNotCirclingCount >=15) {
       self.bAutoThermalTriggered = false;
       if(self.bIsPrevious == 1) {
         Ui.switchToView(new MyViewGeneral(),
@@ -595,9 +645,10 @@ class MyProcessing {
     var iMin = 0;
     var iMax = 0;
     // Sys.println(format("DEBUG: Number of wind sectors ~ $1$", [self.iWindSectorCount]));
-    if(self.iWindSectorCount.abs() >= self.DIRECTION_NUM_OF_SECTORS) {
-      if(self.bCirclingCount >= 5) { self.bNotCirclingCount = 0; } //Definitely circling
+    if((self.fRateOfTurn.abs() > Math.toRadians(6)) && (self.iWindSectorCount.abs() >= self.DIRECTION_NUM_OF_SECTORS)) {
       self.bCirclingCount += 1;
+      if(self.bCirclingCount >= 5) { self.bNotCirclingCount = 0; } //Definitely circling
+      if(LangUtils.notNaN(self.fVariometer_filtered)) { self.aVariometer_lastThermal.add(self.fVariometer_filtered); }
       for(var i = 1; i < self.DIRECTION_NUM_OF_SECTORS; i++) {
         if(self.afSpeed[i] > self.afSpeed[iMax]) { iMax = i; }
         if(self.afSpeed[i] < self.afSpeed[iMin]) { iMin = i; }
@@ -611,8 +662,12 @@ class MyProcessing {
       }
     }
     else {
-      if(self.bNotCirclingCount >= 20) { self.bCirclingCount = 0; } //No longer circling
+      if(self.bNotCirclingCount >= 10) { self.bCirclingCount = 0; } //No longer circling
       bNotCirclingCount += 1;
+      if((self.aVariometer_lastThermal.size() > 5)) {
+        self.fVarioLastThAvg = Math.mean(self.aVariometer_lastThermal).toFloat();
+      }
+      self.aVariometer_lastThermal = [];
     }
   }
 

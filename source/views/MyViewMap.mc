@@ -95,9 +95,12 @@ class MyViewMap extends Ui.MapTrackView {
         // set the current mode for the map to be preview
         setMapMode(Ui.MAP_MODE_PREVIEW);
 
+        // set Popyline style
+        $.oMyProcessing.oPolyTrack.setColor(Gfx.COLOR_GREEN);
+        $.oMyProcessing.oPolyTrack.setWidth((Sys.getDeviceSettings().screenHeight/100).toNumber());
+        MapView.clear();
+
         // create the bounding box for the map area
-        // var top_left = new Position.Location({:latitude => -33.314073 + 0.066, :longitude =>-70.66935 + 0.0896, :format => :degrees});
-        // var bottom_right = new Position.Location({:latitude => -33.446114 - 0.066, :longitude =>-70.490243 - 0.0896, :format => :degrees});
         var lat = App.Properties.getValue("userLastLat") as Float;
         var lon = App.Properties.getValue("userLastLon") as Float;
         if(($.oMyPositionLocation!=null) || ($.oMyProcessing.iAccuracy > Pos.QUALITY_NOT_AVAILABLE)) {
@@ -184,6 +187,9 @@ class MyViewMap extends Ui.MapTrackView {
 
     function updateLayout(_bUpdateTime) {
         //Sys.println("DEBUG: MyViewHeader.updateLayout()");
+        if(($.oMyActivity != null) && ($.oMySettings.bMapTrack)) { 
+            MapView.setPolyline($.oMyProcessing.oPolyTrack); 
+        }
         if($.oMySettings.bMapHeader) {
             // Set colors
             // ... background

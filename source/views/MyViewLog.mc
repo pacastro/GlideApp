@@ -142,7 +142,7 @@ class MyViewLog extends MyViewGlobal {
     (self.oRezValueFooter as Ui.Text).setText(Ui.loadResource(Rez.Strings.titleViewLog) as String);
 
     // ... Layer hint buttons
-    if(self has :NoExclude) { hintLayer = new HintLayer(true, true); }
+    if((self has :NoExclude) && ($.iMyViewLogIndex >= 0)) { hintLayer = new HintLayer(true, true); }
   }
 
   function onUpdate(_oDC as Gfx.Dc) as Void {

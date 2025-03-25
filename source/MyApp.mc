@@ -127,11 +127,6 @@ const MY_NOVALUE_LEN6 = "--.----";
 
 class MyApp extends App.AppBase {
 
-  //
-  // CONSTANTS
-  //
-
-  //
   // VARIABLES
   //
 
@@ -148,7 +143,6 @@ class MyApp extends App.AppBase {
   private var iTones as Boolean = false;
   private var iVibrations as Boolean = false;
   private var bSinkToneTriggered as Boolean = false;
-
 
   //
   // FUNCTIONS: App.AppBase (override/implement)

@@ -53,8 +53,8 @@ class MyPickerGenericSettings extends Ui.Picker {
         var sFormat = $.oMySettings.fUnitVerticalSpeedCoefficient < 100.0f ? "%.01f" : "%.0f";
         var asValues =
           [format("$1$\n$2$", [(3.0f*$.oMySettings.fUnitVerticalSpeedCoefficient).format(sFormat), $.oMySettings.sUnitVerticalSpeed]),
-            format("$1$\n$2$", [(6.0f*$.oMySettings.fUnitVerticalSpeedCoefficient).format(sFormat), $.oMySettings.sUnitVerticalSpeed]),
-            format("$1$\n$2$", [(9.0f*$.oMySettings.fUnitVerticalSpeedCoefficient).format(sFormat), $.oMySettings.sUnitVerticalSpeed])];
+            format("$1$\n$2$", [(5.0f*$.oMySettings.fUnitVerticalSpeedCoefficient).format(sFormat), $.oMySettings.sUnitVerticalSpeed]),
+            format("$1$\n$2$", [(10.0f*$.oMySettings.fUnitVerticalSpeedCoefficient).format(sFormat), $.oMySettings.sUnitVerticalSpeed])];
         var oFactory = new PickerFactoryDictionary([0, 1, 2], asValues, {:font => Gfx.FONT_TINY});
         Picker.initialize({
             :title => new Ui.Text({
@@ -81,6 +81,22 @@ class MyPickerGenericSettings extends Ui.Picker {
                 :color => Gfx.COLOR_BLUE}),
             :pattern => [oFactory],
             :defaults => [oFactory.indexOfKey(iVariometerSmoothing)]});
+      }
+
+      else if(_item == :menuVariometerAvgTime) {
+        var iVariometerAvgTime = $.oMySettings.loadVariometerAvgTime();
+        $.oMySettings.load();  // ... reload potentially modified settings
+        var asValues = ["current\ndata", "10 s", "20 s", "30 s"];
+        var oFactory = new PickerFactoryDictionary([0, 1, 2, 3], asValues, {:font => Gfx.FONT_TINY});
+        Picker.initialize({
+            :title => new Ui.Text({
+                :text => Ui.loadResource(Rez.Strings.titleVariometerAvgTime) as String,
+                :font => Gfx.FONT_TINY,
+                :locX=>Ui.LAYOUT_HALIGN_CENTER,
+                :locY=>Ui.LAYOUT_VALIGN_BOTTOM,
+                :color => Gfx.COLOR_BLUE}),
+            :pattern => [oFactory],
+            :defaults => [oFactory.indexOfKey(iVariometerAvgTime)]});
       }
 
       else if(_item == :menuVariometerPlotRange) {
@@ -352,14 +368,18 @@ class MyPickerGenericSettingsDelegate extends Ui.PickerDelegate {
         $.oMySettings.saveVariometerSmoothing(_amValues[0] as Number);
         focus = 1;
       }
+      else if(self.item == :menuVariometerAvgTime) {
+        $.oMySettings.saveVariometerAvgTime(_amValues[0] as Number);
+        focus = 2;
+      }
       else if(self.item == :menuVariometerPlotRange) {
         $.oMySettings.saveVariometerPlotRange(_amValues[0] as Number);
-        focus = 5;
+        focus = 7;
       }
       else if(self.item == :menuVariometerPlotZoom) {
         $.oMySettings.saveVariometerPlotZoom(_amValues[0] as Number);
         $.oMySettings.setVariometerPlotZoom(_amValues[0] as Number);
-        focus = 6;
+        focus = 8;
       }
 
     }

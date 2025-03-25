@@ -93,7 +93,7 @@ class MyViewVarioplot extends MyViewHeader {
   //
 
   function initialize() {
-    $.oMyProcessing.bIsPrevious = 3;
+    $.oMyProcessing.bIsPrevious = $.oMyProcessing.bAutoThermalTriggered ? $.oMyProcessing.bIsPrevious : 3;
     MyViewHeader.initialize();
 
     // // Layout-specific initialization

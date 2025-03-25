@@ -50,6 +50,9 @@ class MySettings {
   public var fAltimeterCalibrationQNH as Float = 101325.0f;
   // ... variometer
   public var iVariometerRange as Number = 0;
+  public var iVariometerAvgTime as Number = 2;
+  public var bVariometerAvgLast as Boolean = true;
+  public var bVariometerdE as Boolean = false;
   public var bVariometerAutoThermal as Boolean = true;
   public var bVariometerThermalDetect as Boolean = true;
   public var iVariometerSmoothing as Number = 1;
@@ -72,6 +75,7 @@ class MySettings {
   // ... map
   public var bMapHeader as Boolean = true;
   public var bMapData as Boolean = true;
+  public var bMapTrack as Boolean = true;
   // ... SpO2
   public var bOxMeasure as Boolean = true;
   public var iOxElevation as Number = 2800;
@@ -119,6 +123,7 @@ class MySettings {
 
   // Other
   public var fVariometerRange as Float = 3.0f;
+  public var fVariometerAvgTime as Number = 20;
   public var iVariometerPlotOrientation as Number = 0;
   public var fVariometerPlotZoom as Float = 0.0030866666667f;
   public var fVariometerPlotScale as Float = 1.0f;
@@ -137,6 +142,9 @@ class MySettings {
     self.setAltimeterCalibrationQNH(self.loadAltimeterCalibrationQNH());
     // ... variometer
     self.setVariometerRange(self.loadVariometerRange());
+    self.setVariometerAvgTime(self.loadVariometerAvgTime());
+    self.setVariometerAvgLast(self.loadVariometerAvgLast());
+    self.setVariometerdE(self.loadVariometerdE());
     self.setVariometerPlotOrientation(self.loadVariometerPlotOrientation());
     self.setVariometerAutoThermal(self.loadVariometerAutoThermal());
     self.setVariometerThermalDetect(self.loadVariometerThermalDetect());
@@ -160,6 +168,7 @@ class MySettings {
     // ... Map
     self.setMapHeader(self.loadMapHeader());
     self.setMapData(self.loadMapData());
+    self.setMapTrack(self.loadMapTrack());
     // ... SpO2
     self.setOxMeasure(self.loadOxMeasure());
     self.setOxElevation(self.loadOxElevation());
@@ -218,9 +227,43 @@ class MySettings {
     self.iVariometerRange = _iValue;
     switch(self.iVariometerRange) {
     case 0: self.fVariometerRange = 3.0f; break;
-    case 1: self.fVariometerRange = 6.0f; break;
-    case 2: self.fVariometerRange = 9.0f; break;
+    case 1: self.fVariometerRange = 5.0f; break;
+    case 2: self.fVariometerRange = 10.0f; break;
     }
+  }
+
+  function loadVariometerAvgTime() as Number {
+    var iValue = App.Properties.getValue("userVariometerAvgTime") as Number?;
+    return iValue != null ? iValue : 2;
+  }
+  function saveVariometerAvgTime(_iValue as Number) as Void {
+    App.Properties.setValue("userVariometerAvgTime", _iValue as App.PropertyValueType);
+  }
+  function setVariometerAvgTime(_iValue as Number) as Void {
+    if(_iValue > 3) {
+      _iValue = 3;
+    }
+    else if(_iValue < 0) {
+      _iValue = 0;
+    }
+    self.iVariometerAvgTime = _iValue;
+    switch(self.iVariometerAvgTime) {
+    case 0: self.fVariometerAvgTime = 0; break;
+    case 1: self.fVariometerAvgTime = 10; break;
+    case 2: self.fVariometerAvgTime = 20; break;
+    case 3: self.fVariometerAvgTime = 30; break;
+    }
+  }
+
+  function loadVariometerAvgLast() as Boolean {
+    var bValue = App.Properties.getValue("userVariometerAvgLast") as Boolean?;
+    return bValue != null ? bValue : true;
+  }
+  function saveVariometerAvgLast(_bValue as Boolean) as Void {
+    App.Properties.setValue("userVariometerAvgLast", _bValue as App.PropertyValueType);
+  }
+  function setVariometerAvgLast(_bValue as Boolean) as Void {
+    self.bVariometerAvgLast = _bValue;
   }
 
   function loadVariometerPlotOrientation () as Number {
@@ -283,6 +326,17 @@ class MySettings {
     case 8: self.fVariometerPlotZoom = 0.0154333333333f; self.fVariometerPlotScale = 2.0f; break;  // 2m/px
     case 9: self.fVariometerPlotZoom = 0.0308666666667f; self.fVariometerPlotScale = 1.0f; break;  // 1m/px
     }
+  }
+
+  function loadVariometerdE() as Boolean {
+    var bValue = App.Properties.getValue("userVariometerdE") as Boolean?;
+    return bValue != null ? bValue : false;
+  }
+  function saveVariometerdE(_bValue as Boolean) as Void {
+    App.Properties.setValue("userVariometerdE", _bValue as App.PropertyValueType);
+  }
+  function setVariometerdE(_bValue as Boolean) as Void {
+    self.bVariometerdE = _bValue;
   }
 
   function loadVariometerAutoThermal() as Boolean {
@@ -531,6 +585,17 @@ class MySettings {
   }
   function setMapData(_bValue as Boolean) as Void {
     self.bMapData = _bValue;
+  }
+
+  function loadMapTrack() as Boolean {
+    var bValue = App.Properties.getValue("userMapTrack") as Boolean?;
+    return bValue != null ? bValue : true;
+  }
+  function saveMapTrack(_bValue as Boolean) as Void {
+    App.Properties.setValue("userMapTrack", _bValue as App.PropertyValueType);
+  }
+  function setMapTrack(_bValue as Boolean) as Void {
+    self.bMapTrack = _bValue;
   }
 
   function loadOxMeasure() as Boolean {

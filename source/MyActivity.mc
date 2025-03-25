@@ -131,11 +131,11 @@ class MyActivity {
     //Sys.println("DEBUG: MyActivity.initialize()");
 
     // Session (recording)
-    // SPORT_FLYING = 20 (since API 3.0.10)
+    // SPORT_FLYING = 20 (since API 3.2)
     oSession = AR.createSession({
         :name => "GlideApp",
-        :sport => 20 as AR.Sport2});
-        // :subSport => AR.SUB_SPORT_GENERIC});
+        :sport => 20 as Activity.Sport,
+        :subSport => Activity.SUB_SPORT_GENERIC});
 
     // FIT fields
 

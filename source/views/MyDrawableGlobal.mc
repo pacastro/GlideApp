@@ -111,7 +111,7 @@ class MyDrawableGlobal extends Ui.Drawable {
     }
 
     // ... Display Start/Pause/Stop anim
-    if (($.oMyActivity == null) && ([2, 4, 6].indexOf($.oMyProcessing.bIsPrevious) < 0) && ($.oMyProcessing.iAccuracy > Position.QUALITY_LAST_KNOWN)) {
+    if (($.oMyActivity == null) && ([3, 4, 6].indexOf($.oMyProcessing.bIsPrevious) < 0) && ($.oMyProcessing.iAccuracy > Position.QUALITY_LAST_KNOWN)) {
       var icentX = _oDC.getWidth()/2;
       var icentY = _oDC.getHeight()/2;
       _oDC.setColor(Gfx.COLOR_DK_GREEN, Gfx.COLOR_TRANSPARENT);

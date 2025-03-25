@@ -5,6 +5,9 @@
   <property id="userAltimeterCalibrationQNH" type="float">101325.0</property>
   <!-- ... variometer -->
   <property id="userVariometerRange" type="number">0</property>
+  <property id="userVariometerAvgTime" type="number">2</property>
+  <property id="userVariometerAvgLast" type="boolean">true</property>
+  <property id="userVariometerdE" type="boolean">false</property>
   <property id="userVariometerAutoThermal" type="boolean">true</property>
   <property id="userVariometerThermalDetect" type="boolean">true</property>
   <property id="userVariometerSmoothing" type="number">1</property> 
@@ -28,6 +31,7 @@
   <!-- ... map -->
   <property id="userMapHeader" type="boolean">true</property>
   <property id="userMapData" type="boolean">true</property>
+  <property id="userMapTrack" type="boolean">true</property>
   <property id="userLastLat" type="float">-33.380</property>
   <property id="userLastLon" type="float">-70.580</property>
   <!-- ... SpO2 -->

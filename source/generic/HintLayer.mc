@@ -35,18 +35,15 @@ class HintLayer extends Ui.View {
     addLayer(hints);
 
     // ... Layer hint buttons
-    if($.iMyViewLogIndex >= 0) {
-      hints.getDc().clear();
-      if(loc1) {
-        var appIcon1 = Ui.loadResource($.Rez.Drawables.rightTop);
-        hints.getDc().drawBitmap(Rez.Styles.system_loc__hint_button_right_top.x, Rez.Styles.system_loc__hint_button_right_top.y, appIcon1);
-      } 
-      if(loc2) {
-        var appIcon2 = Ui.loadResource($.Rez.Drawables.rightBottom);
-        hints.getDc().drawBitmap(Rez.Styles.system_loc__hint_button_right_bottom.x, Rez.Styles.system_loc__hint_button_right_bottom.y, appIcon2);
-      }
+    hints.getDc().clear();
+    if(loc1) {
+      var appIcon1 = Ui.loadResource($.Rez.Drawables.rightTop);
+      hints.getDc().drawBitmap(Rez.Styles.system_loc__hint_button_right_top.x, Rez.Styles.system_loc__hint_button_right_top.y, appIcon1);
+    } 
+    if(loc2) {
+      var appIcon2 = Ui.loadResource($.Rez.Drawables.rightBottom);
+      hints.getDc().drawBitmap(Rez.Styles.system_loc__hint_button_right_bottom.x, Rez.Styles.system_loc__hint_button_right_bottom.y, appIcon2);
     }
-
   }
 
   (:noicon)

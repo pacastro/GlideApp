@@ -40,8 +40,8 @@
     <setting propertyKey="@Properties.userVariometerRange" title="@Strings.titleVariometerRange">
         <settingConfig type="list">
             <listEntry value="0">3.0 m/s</listEntry>
-            <listEntry value="1">6.0 m/s</listEntry>
-            <listEntry value="2">9.0 m/s</listEntry>
+            <listEntry value="1">5.0 m/s</listEntry>
+            <listEntry value="2">10.0 m/s</listEntry>
         </settingConfig>
     </setting>
 
@@ -52,6 +52,23 @@
             <listEntry value="2">High</listEntry>
             <listEntry value="3">Ultra</listEntry>
         </settingConfig>
+    </setting>
+
+    <setting propertyKey="@Properties.userVariometerAvgTime" title="@Strings.titleVariometerAvgTime">
+        <settingConfig type="list">
+            <listEntry value="0">current data</listEntry>
+            <listEntry value="1">10 s</listEntry>
+            <listEntry value="2">20 s</listEntry>
+            <listEntry value="3">30 s</listEntry>
+        </settingConfig>
+    </setting>
+
+    <setting propertyKey="@Properties.userVariometerAvgLast" title="T bug avg for last: thermal/n sec">
+        <settingConfig type="boolean" />
+    </setting>
+
+    <setting propertyKey="@Properties.userVariometerdE" title="@Strings.titleVariometerdE">
+        <settingConfig type="boolean" />
     </setting>
 
     <setting propertyKey="@Properties.userVariometerAutoThermal" title="@Strings.titleVariometerAutoThermal">
@@ -159,10 +176,14 @@
     <setting propertyKey="@Properties.userMapData" title="@Strings.titleMapData">
         <settingConfig type="boolean" />
     </setting>
+
+    <setting propertyKey="@Properties.userMapTrack" title="@Strings.titleMapTrack">
+        <settingConfig type="boolean" />
+    </setting>
   </group>
 
   <group id="Ox" title="@Strings.titleSettingsOx" enableIfTrue="@Properties.userGeneralOxDisplay">
-    <setting propertyKey="@Properties.userOxMeasure" title="Enable over Caution elev/always on ">
+    <setting propertyKey="@Properties.userOxMeasure" title="Enable: over caution elev/always on ">
         <settingConfig type="boolean" />
     </setting>
 
