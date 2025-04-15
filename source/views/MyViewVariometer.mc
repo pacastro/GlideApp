@@ -48,20 +48,15 @@ class MyViewVariometer extends MyView {
   //
   // VARIABLES
   //
-  (:icon) var NoExclude as Symbol = :NoExclude;
   // Layout-specific
   private var iLayoutCenter as Number = (Sys.getDeviceSettings().screenWidth * 0.5).toNumber();
   private var iLayoutValueR as Number = (iLayoutCenter * 0.79).toNumber();
-  // private var iLayoutCacheX as Number = (iLayoutCenter * 0.84).toNumber();
   private var iLayoutCacheR as Number = (iLayoutCenter * 0.74).toNumber();
   private var iLayoutBatteryY as Number = (Sys.getDeviceSettings().screenHeight * 0.615).toNumber();
   private var iLayoutActivityY as Number = (Sys.getDeviceSettings().screenHeight - iLayoutBatteryY);
   private var iLayoutTimeY as Number = Math.round(Sys.getDeviceSettings().screenHeight * 0.675);
   private var iLayoutAltitudeY as Number = (Sys.getDeviceSettings().screenHeight - iLayoutTimeY);
   private var iLayoutRightX as Number = (Sys.getDeviceSettings().screenWidth * 0.883).toNumber();
-  
-  // ... Layer
-  public var hintLayer as Ui.View?;
 
   //
   // FUNCTIONS: MyView (override/implement)
@@ -69,7 +64,7 @@ class MyViewVariometer extends MyView {
 
   function initialize() {
     //Populate last view
-    $.oMyProcessing.bIsPrevious = 2;
+    $.oMyProcessing.iIsCurrent = 2;
 
     MyView.initialize();
   }
@@ -80,26 +75,28 @@ class MyViewVariometer extends MyView {
   }
 
   function onShow() {
-    //Sys.println("DEBUG: MyViewVariometer.onShow()");
+    // Sys.println("DEBUG: MyViewVariometer.onShow()");
     MyView.onShow();
 
-    if((self has :NoExclude) && ($.oMyActivity != null)) { hintLayer = new HintLayer(false, true); }
+    // Layer
+    auxLayer = new AuxLayer(false, true, true);
 
     // Unmute tones
     (App.getApp() as MyApp).unmuteTones();
   }
 
-  function onUpdate(_oDC) {
-    //Sys.println("DEBUG: MyViewVariometer.onUpdate()");
+  function onUpdate(_oDC) as Void {
+    // Sys.println("DEBUG: MyViewVariometer.onUpdate()");
     MyView.onUpdate(_oDC);
 
     // Draw layout
-    self.drawLayout(_oDC);
+    self.drawVario(_oDC);
   }
 
   function onHide() {
     //Sys.println("DEBUG: MyViewVariometer.onHide()");
     MyView.onHide();
+    auxLayer.onHide();
 
     // Mute tones
     (App.getApp() as MyApp).muteTones();
@@ -108,7 +105,9 @@ class MyViewVariometer extends MyView {
   // FUNCTIONS: self
   //
 
-  function drawLayout(_oDC) {
+  function drawVario(_oDC) as Void {
+    // Sys.println("DEBUG: MyViewVariometer.draw()");
+
     if(_oDC has :setAntiAlias) { _oDC.setAntiAlias(true); }
     // Draw background
     _oDC.setPenWidth(self.iLayoutCenter);
@@ -281,6 +280,19 @@ class MyViewVariometer extends MyView {
       sValue = $.MY_NOVALUE_LEN3;
     }
      _oDC.drawText(self.iLayoutCenter, self.iLayoutCenter + Gfx.getFontHeight(Gfx.FONT_XTINY), Gfx.FONT_XTINY, Lang.format("$1$ $2$", [sValue, $.oMySettings.sUnitHorizontalSpeed]), Gfx.TEXT_JUSTIFY_CENTER);
+  
+    if (($.oMyActivity == null) && ($.oMyProcessing.iAccuracy > Position.QUALITY_LAST_KNOWN)) {
+      _oDC.setColor(Gfx.COLOR_DK_GREEN, Gfx.COLOR_TRANSPARENT);
+      _oDC.setPenWidth(_oDC.getWidth() * 0.018f);
+      _oDC.drawArc(iLayoutCenter, iLayoutCenter, (iLayoutCenter*0.965).toNumber(), Gfx.ARC_COUNTER_CLOCKWISE, 20, 40);
+    }
+
+    // ... SpO2 Status
+    if ($.oMySettings.bGeneralOxDisplay && ($.oMySettings.bOxMeasure?(LangUtils.notNaN($.oMyProcessing.fAltitude) ? ($.oMyProcessing.fAltitude >= $.oMySettings.iOxElevation):false): true)) {
+      _oDC.setColor($.oMyProcessing.iColorOxStatus, Gfx.COLOR_TRANSPARENT);
+      _oDC.fillRectangle((Sys.getDeviceSettings().screenWidth * 0.85).toNumber(), (Sys.getDeviceSettings().screenWidth * 0.395).toNumber(), 
+                        (Sys.getDeviceSettings().screenWidth * 0.0577).toNumber(), (Sys.getDeviceSettings().screenWidth * 0.0231).toNumber());
+    }
   }
 }
 

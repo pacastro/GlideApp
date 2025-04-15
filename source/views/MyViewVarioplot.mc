@@ -56,7 +56,6 @@ class MyViewVarioplot extends MyViewHeader {
   //
   // VARIABLES
   //
-  (:icon) var NoExclude as Symbol = :NoExclude;
   // Display mode (internal)
   private var fMapRotation as Float = 0.0f;
   // Resources
@@ -68,9 +67,6 @@ class MyViewVarioplot extends MyViewHeader {
   private var oRezFontPlot as Ui.FontResource?;
   private var oRezFontPlotS as Ui.FontResource?;
   private var iFontPlotHeight as Number = 0;
-
-  // // ... Layer
-  public var hintLayer as Ui.View?;
 
   // Layout-specific
   private var iLayoutCenter as Number = (Sys.getDeviceSettings().screenWidth * 0.5).toNumber();
@@ -93,7 +89,7 @@ class MyViewVarioplot extends MyViewHeader {
   //
 
   function initialize() {
-    $.oMyProcessing.bIsPrevious = $.oMyProcessing.bAutoThermalTriggered ? $.oMyProcessing.bIsPrevious : 3;
+    $.oMyProcessing.iIsCurrent = $.oMyProcessing.bAutoThermalTriggered ? $.oMyProcessing.iIsCurrent : 3;
     MyViewHeader.initialize();
 
     // // Layout-specific initialization
@@ -112,21 +108,12 @@ class MyViewVarioplot extends MyViewHeader {
     self.iFontPlotHeight = Gfx.getFontHeight(oRezFontPlotS);
 
     // Color scale
-    switch($.oMySettings.iVariometerRange) {
-    default:
-    case 0:
-      self.aiScale = [-3000, -2000, -1000, -50, 50, 1000, 2000, 3000] as Array<Number>;
-      break;
-    case 1:
-      self.aiScale = [-6000, -4000, -2000, -100, 100, 2000, 4000, 6000] as Array<Number>;
-      break;
-    case 2:
-      self.aiScale = [-9000, -6000, -3000, -150, 150, 3000, 6000, 9000] as Array<Number>;
-      break;
-    }
+    if($.oMySettings.iVariometerRange == 0) { self.aiScale = [-3000, -2000, -1000, -50, 50, 1000, 2000, 3000] as Array<Number>; }
+    else if($.oMySettings.iVariometerRange == 1) { self.aiScale = [-6000, -4000, -2000, -100, 100, 2000, 4000, 6000] as Array<Number>; }
+    else if($.oMySettings.iVariometerRange == 2) { self.aiScale = [-9000, -6000, -3000, -150, 150, 3000, 6000, 9000] as Array<Number>; }
 
-    // ... Layer hint buttons
-    if(self has :NoExclude) { hintLayer = new HintLayer(true, false); }
+    // Layer
+    auxLayer = new AuxLayer(true, false, false);
 
     // Unmute tones
     (App.getApp() as MyApp).unmuteTones();
@@ -495,6 +482,7 @@ class MyViewVarioplot extends MyViewHeader {
 
   function onHide() {
     MyViewHeader.onHide();
+    auxLayer.onHide();
 
     // Mute tones
     (App.getApp() as MyApp).muteTones();

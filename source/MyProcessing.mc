@@ -62,7 +62,7 @@ class MyProcessing {
   //
   // VARIABLES
   //
-
+  (:oxsensor) var OxSensor as Symbol = :OxSensor;
   // Internal calculation objects
   private var fKineticEnergyEfficiency as Float = 0.9f;
   private var iPreviousEnergyGpoch as Number = -1;
@@ -93,6 +93,8 @@ class MyProcessing {
   public var iAgeOx = NaN;
   public var oTimeLastOx = NaN;
   public var iOxInterval = 5; //SpO2 meassure interval min
+  public var bOxSensor = true; //Pulse Ox sensor present?
+  public var iColorOxStatus = Graphics.COLOR_TRANSPARENT;
   // ... altimeter values (fed by Toybox.Activity, on Toybox.Sensor events)
   public var fAltitude as Float = NaN;
   // ... altimeter calculated values
@@ -112,6 +114,7 @@ class MyProcessing {
   // ... position calculated values
   public var fVariometerdE = NaN;
   public var fRateOfTurn as Float = 0.0f;
+  public var fPreviousRateOfTurn as Float = 0.0f;
   // ... finesse
   public var bAscent as Boolean = true;
   public var fFinesse as Float = NaN;
@@ -122,7 +125,7 @@ class MyProcessing {
   // ... circling
   public var bCirclingCount as Number = 0;
   public var bNotCirclingCount as Number = 0;
-  public var bIsPrevious as Number = 1; // 1 General, 2 Variometer, 3 Varioplot
+  public var iIsCurrent as Number = 1; // 1 General, 2 Variometer, 3 Varioplot
   public var bAutoThermalTriggered as Boolean = false;
   public var iCirclingStartEpoch as Number = 0;
   public var fCirclingStartAltitude as Float = 0.0f;
@@ -168,11 +171,14 @@ class MyProcessing {
 
     // Last SpO2
     var sensorInfo = Sensor.getInfo();
-    if ((Toybox has :SensorHistory) && (SH has :getOxygenSaturationHistory) && (sensorInfo has :oxygenSaturation)) {
-      var spo2Iterator = SH.getOxygenSaturationHistory({:period => 1,:order=>SH.ORDER_NEWEST_FIRST});
-      self.iOx = Sensor.getInfo().oxygenSaturation;
+    if ((Toybox has :SensorHistory) && (SH has :getOxygenSaturationHistory) && (sensorInfo has :oxygenSaturation) && (self has :OxSensor)) {
+      var spo2Iterator = SH.getOxygenSaturationHistory({:period => 1,:order => SH.ORDER_NEWEST_FIRST});
+      self.iOx = sensorInfo.oxygenSaturation;
       var sample = spo2Iterator.next();
       self.oTimeLastOx = (sample.when != null) ? sample.when : 0;
+      self.bOxSensor = true;
+    } else {
+      self.bOxSensor = false;
     }
 
   }
@@ -219,6 +225,7 @@ class MyProcessing {
     // ... position calculated values
     self.fVariometerdE = NaN;
     self.fRateOfTurn = 0.0f;
+    self.fPreviousRateOfTurn = 0.0f;
 
     // ... finesse
     self.fFinesse = NaN;
@@ -230,18 +237,18 @@ class MyProcessing {
     
     // Process sensor data
 
-    if($.oMySettings.bGeneralOxDisplay) {
-      // get heart rate
-      if(_oInfo has :heartRate && _oInfo.heartRate != null) {
-        self.iHR = _oInfo.heartRate;
-      }
+    // get heart rate
+    if(_oInfo has :heartRate && _oInfo.heartRate != null) {
+      self.iHR = _oInfo.heartRate;
+    }
 
-      // get the pulse ox iterator object
-      if($.oMySettings.bOxMeasure?($.oMyAltimeter.fAltitudeActual >= $.oMySettings.iOxElevation):true) {
+    // get the pulse ox iterator object
+    if($.oMySettings.bGeneralOxDisplay) {
+      if($.oMySettings.bOxMeasure?(LangUtils.notNaN(self.fAltitude) ? (self.fAltitude >= $.oMySettings.iOxElevation):false): true) {
         Sensor.enableSensorType(Sensor.SENSOR_ONBOARD_PULSE_OXIMETRY);
         if(LangUtils.notNaN(self.oTimeLastOx)) {
           var oTimeNow = Time.now();
-          self.iAgeOx = self.oTimeLastOx==0?6048000:oTimeNow.subtract(self.oTimeLastOx).value();
+          self.iAgeOx = self.oTimeLastOx==0 ? 6048000 : oTimeNow.subtract(self.oTimeLastOx).value();
           if ((self.iAgeOx >= self.iOxInterval * 60) && (oMyTimeStart.subtract(oTimeNow).value() >= 2 * 60)) {
             if ((_oInfo has :oxygenSaturation) && (_oInfo.oxygenSaturation!=null) && (Toybox has :SensorHistory) && (SH has :getOxygenSaturationHistory)) {
               var spo2Iterator2 = SH.getOxygenSaturationHistory({:period => 1,:order=>SH.ORDER_NEWEST_FIRST});
@@ -251,12 +258,27 @@ class MyProcessing {
           }
           self.iOxFit  = (self.iAgeOx >= (self.iOxInterval + 1) * 60)?0:self.iOx;
           // self.iOxFit = (self.iAgeOx >= self.iOxInterval * 60)?null:spo2Iterator2.data;
+          if(LangUtils.notNaN(self.iAgeOx) && LangUtils.notNaN(self.iOx)) {
+            if ((self.iAgeOx <= 6 * 60) && (self.iOx >= 95)) {
+              iColorOxStatus = Graphics.COLOR_DK_GREEN;
+            }
+            else if ((self.iAgeOx >= 20 * 60) || (self.iOx <= 90)) {
+              if (self.iOx <= $.oMySettings.iOxCritical) {
+                iColorOxStatus = Time.now().value() % 2 ? Graphics.COLOR_RED : Graphics.COLOR_TRANSPARENT;
+              } else {
+                iColorOxStatus = Graphics.COLOR_RED;
+              }
+            }
+            else if ((self.iAgeOx > 6 * 60) || (self.iOx > 90)) {
+              iColorOxStatus = Graphics.COLOR_YELLOW;
+            }
+          }
         }
       }
       else {
         Sensor.disableSensorType(Sensor.SENSOR_ONBOARD_PULSE_OXIMETRY);
       }
-    } else {
+    } else if(self.bOxSensor) {
       Sensor.disableSensorType(Sensor.SENSOR_ONBOARD_PULSE_OXIMETRY);
     }
 
@@ -362,12 +384,6 @@ class MyProcessing {
     self.bPositionStateful = false;
     if(_oInfo has :position and _oInfo.position != null) {
       self.oLocation = _oInfo.position;
-      if($.oMySettings.bMapTrack) {
-        self.iPositionCount++;
-        if((iAccuracy >= Pos.QUALITY_POOR) && (Ui has :MapView) && ($.oMySettings.bGeneralMapDisplay) && ($.oMyActivity != null) && (self.iPositionCount % 10 == 0)) {
-          self.oPolyTrack.addLocation(self.oLocation);
-        }
-      }
       //Sys.println(format("DEBUG: (Position.Info) position = $1$, $2$", [self.oLocation.toDegrees()[0], self.oLocation.toDegrees()[1]]));
     }
     //else {
@@ -440,7 +456,8 @@ class MyProcessing {
         else if(fValue > 3.14159265359f) {
           fValue -= 6.28318530718f;
         }
-        self.fRateOfTurn = (self.fRateOfTurn + fValue) / 2; // smooth a little bit, moving 2 sec average
+        self.fRateOfTurn = (self.fPreviousRateOfTurn + fValue) / 2; // smooth a little bit, moving 2 sec average
+        self.fPreviousRateOfTurn = fValue;
         //Sys.println(format("DEBUG: (Calculated) rate of turn = $1$ ~ $2$", [self.fRateOfTurn, self.fRateOfTurn_filtered]));
       }
       self.iPreviousHeadingGpoch = self.iPositionGpoch;
@@ -540,7 +557,7 @@ class MyProcessing {
     self.windStep();
     
     // ... circling Auto Switch
-    if($.oMySettings.bVariometerAutoThermal && !self.bAutoThermalTriggered && self.bCirclingCount >=10 && [3,4,6].indexOf($.oMyProcessing.bIsPrevious) < 0) {
+    if($.oMySettings.bVariometerAutoThermal && !self.bAutoThermalTriggered && self.bCirclingCount >=10 && [3,4,6].indexOf($.oMyProcessing.iIsCurrent) < 0) {
       self.bAutoThermalTriggered = true;
       Ui.switchToView(new MyViewVarioplot(),
                 new MyViewVarioplotDelegate(),
@@ -548,15 +565,15 @@ class MyProcessing {
     }
     if($.oMySettings.bVariometerAutoThermal && self.bAutoThermalTriggered && self.bNotCirclingCount >=15) {
       self.bAutoThermalTriggered = false;
-      if(self.bIsPrevious == 1) {
+      if(self.iIsCurrent == 1) {
         Ui.switchToView(new MyViewGeneral(),
                         new MyViewGeneralDelegate(),
                         Ui.SLIDE_IMMEDIATE);
-      } else if(self.bIsPrevious == 2){
+      } else if(self.iIsCurrent == 2){
         Ui.switchToView(new MyViewVariometer(),
                         new MyViewVariometerDelegate(),
                         Ui.SLIDE_IMMEDIATE);
-      } else if(self.bIsPrevious == 5){
+      } else if(self.iIsCurrent == 5){
         Ui.switchToView(new MyViewTimers(),
                         new MyViewTimersDelegate(),
                         Ui.SLIDE_IMMEDIATE);
@@ -593,17 +610,15 @@ class MyProcessing {
       _fValue = 360;
     }
     var iSector = (_fValue + (360 / self.DIRECTION_NUM_OF_SECTORS / 2)) % 360 / (360 / self.DIRECTION_NUM_OF_SECTORS);
-    switch(iSector) {
-      case 0: return "N";
-      case 1: return "NE";
-      case 2: return "E";
-      case 3: return "SE";
-      case 4: return "S";
-      case 5: return "SW";
-      case 6: return "W";
-      case 7: return "NW";
-      default: return "N";
-    }
+    if(iSector == 0) { return "N"; }
+    else if(iSector == 1) { return "NE"; }
+    else if(iSector == 2) { return "E"; }
+    else if(iSector == 3) { return "SE"; }
+    else if(iSector == 4) { return "S"; }
+    else if(iSector == 5) { return "SW"; }
+    else if(iSector == 6) { return "W"; }
+    else if(iSector == 7) { return "NW"; }
+    else { return "N"; }
   }
 
   function windStep() as Void {

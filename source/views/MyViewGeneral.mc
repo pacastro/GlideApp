@@ -47,17 +47,12 @@ class MyViewGeneral extends MyViewGlobal {
   //
   // VARIABLES
   //
-
-  //strings
-  // private var sUnitElapsed as String = "elapsed";
-
-  //
   // FUNCTIONS: MyViewGlobal (override/implement)
   //
 
   function initialize() {
     //Populate last view
-    $.oMyProcessing.bIsPrevious = 1;
+    $.oMyProcessing.iIsCurrent = 1;
     MyViewGlobal.initialize();
   }
 
@@ -98,23 +93,25 @@ class MyViewGeneral extends MyViewGlobal {
     (View.findDrawableById("labelBottomRight") as Ui.Text).setText(Ui.loadResource(Rez.Strings.labelGroundSpeed) as String);
     (View.findDrawableById("unitBottomRight") as Ui.Text).setText(Lang.format("[$1$]", [$.oMySettings.sUnitHorizontalSpeed]));
 
+    // Layer
+    auxLayer = new AuxLayer(false, false, false);
+
     // Unmute tones
      (App.getApp() as MyApp).unmuteTones();
   }
 
   function onUpdate(_oDC as Gfx.Dc) as Void {
-    //Sys.println("DEBUG: MyViewVarioplot.onUpdate()");
+    // Sys.println("DEBUG: MyViewGeneral.onUpdate()");
 
     // Update layout
     MyViewGlobal.onUpdate(_oDC);
-    self.updateLayout(true);
     if((($.oMySettings.bGeneralOxDisplay?1:0) * $.iViewGenOxIdx) < 1) {
       self.drawArrow(_oDC);
     }
   }
 
   function updateLayout(_b) {  
-    //Sys.println("DEBUG: MyViewGeneral.updateLayout()");
+    // Sys.println("DEBUG: MyViewGeneral.updateLayout()");
     MyViewGlobal.updateLayout(true);
 
     // Set values (and dependent colors)
@@ -137,7 +134,7 @@ class MyViewGeneral extends MyViewGlobal {
       (self.oRezValueTopLeft as Ui.Text).setText(sValue);
 
       // ... SpO2
-      if($.oMySettings.bOxMeasure && ($.oMyAltimeter.fAltitudeActual < $.oMySettings.iOxElevation)) {
+      if($.oMySettings.bOxMeasure && (LangUtils.notNaN($.oMyProcessing.fAltitude) ? ($.oMyProcessing.fAltitude < $.oMySettings.iOxElevation):true)) {
         (self.oRezValueTopRight as Ui.Text).setColor($.oMySettings.iGeneralBackgroundColor?Gfx.COLOR_LT_GRAY:Gfx.COLOR_DK_GRAY);
         sValue = "elev";
       }
@@ -161,7 +158,7 @@ class MyViewGeneral extends MyViewGlobal {
       (self.oRezValueTopRight as Ui.Text).setText(sValue);
 
       // ... SpO2 Age
-      if($.oMySettings.bOxMeasure && ($.oMyAltimeter.fAltitudeActual < $.oMySettings.iOxElevation)) {
+      if($.oMySettings.bOxMeasure && (LangUtils.notNaN($.oMyProcessing.fAltitude) ? ($.oMyProcessing.fAltitude < $.oMySettings.iOxElevation):true)) {
         (self.oRezValueTopRightB as Ui.Text).setColor(self.iColorTextGr);
         sValue = format(">$1$ $2$", [($.oMySettings.iOxElevation*$.oMySettings.fUnitElevationCoefficient).format("%.0f"), $.oMySettings.sUnitElevation]);
       }
@@ -263,7 +260,6 @@ class MyViewGeneral extends MyViewGlobal {
     if((($.oMySettings.bGeneralOxDisplay?1:0) * $.iViewGenOxIdx) < 1) {
       // ... Wind Direction
       (self.oRezValueTopLeft as Ui.Text).setColor(self.iColorText);
-      //sValue = LangUtils.formatTime(oTimeNow, $.oMySettings.bUnitTimeUTC, false);
       iValue = $.oMyProcessing.iWindDirection;
       if(LangUtils.notNaN(iValue) && $.oMyProcessing.bWindValid) {
         if($.oMySettings.iUnitDirection == 1) {
@@ -366,6 +362,8 @@ class MyViewGeneral extends MyViewGlobal {
   function onHide() {
     //Sys.println("DEBUG: MyViewGeneral.onHide()");
     MyViewGlobal.onHide();
+
+    auxLayer.onHide();
 
     // Mute tones
     (App.getApp() as MyApp).muteTones();

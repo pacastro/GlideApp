@@ -52,7 +52,8 @@ class MyViewHeader extends MyView {
 
   // Resources
   // ... drawable
-  public var oRezDrawableHeader as MyDrawableHeader?;
+  private var oRezDrawableHeader as MyDrawableHeader?;
+  private var oRezDrawableCenter as Ui.Drawable?;
   // ... header
   private var oRezValueBatteryLevel as Ui.Text?;
   private var oRezValueActivityStatus as Ui.Text?;
@@ -67,12 +68,13 @@ class MyViewHeader extends MyView {
   function initialize() {
     if($.oMyActivity != null) { $.oTimeLastTimer = Time.now();}  // view ET timer
     MyView.initialize();
+
+    // ... Center borders
+    if(!($.oMySettings.bGeneralChartDisplay&&($.oMyProcessing.iIsCurrent == 5))) { self.oRezDrawableCenter = new Rez.Drawables.drawCenterBorders(); }
   }
 
   function onLayout(_oDC) {
-    View.setLayout(self.bHeaderOnly ? Rez.Layouts.layoutHeader(_oDC) : 
-                  ($.oMySettings.bGeneralChartDisplay&&($.oMyProcessing.bIsPrevious == 5)) ? Rez.Layouts.layoutGlobalChart(_oDC) : 
-                  Rez.Layouts.layoutGlobal(_oDC));
+    View.setLayout(self.bHeaderOnly ? Rez.Layouts.layoutHeader(_oDC) : Rez.Layouts.layoutGlobal(_oDC));
 
     // Load resources
     // ... drawable
@@ -90,6 +92,8 @@ class MyViewHeader extends MyView {
     // Update layout
     self.updateLayout(true);
     MyView.onUpdate(_oDC);
+
+    if(!($.oMySettings.bGeneralChartDisplay&&($.oMyProcessing.iIsCurrent == 5))) { self.oRezDrawableCenter.draw(_oDC); }
   }
 
 
@@ -136,10 +140,8 @@ class MyViewHeader extends MyView {
       else {
         oTimer = new Time.Moment(oTimeNow.subtract(oTimer).value());
       }
-      // var oTimer = new Time.Moment(oTimeNow.subtract($.oMyTimeStart).value());
       $.bViewTimer = oTimeNow.subtract($.oTimeLastTimer).value()<10?true:false;
       var oTimeInfo = ($.oMySettings.bUnitTimeUTC || $.bViewTimer || $.oMySettings.bGeneralETDisplay)? Gregorian.utcInfo(($.bViewTimer||$.oMySettings.bGeneralETDisplay)?oTimer:oTimeNow, Time.FORMAT_SHORT) : Gregorian.info(oTimeNow, Time.FORMAT_SHORT);
-      // var oTimeInfo = $.oMySettings.bUnitTimeUTC ? Gregorian.utcInfo(oTimeNow, Time.FORMAT_SHORT) : Gregorian.info(oTimeNow, Time.FORMAT_SHORT);
       (self.oRezValueFooter as Ui.Text).setColor(self.iColorText);
       (self.oRezValueFooter as Ui.Text).setText(format("$1$$2$$3$ $4$", [oTimeInfo.hour.format("%02d"), oTimeNow.value() % 2 ? "." : ":", oTimeInfo.min.format("%02d"), ($.bViewTimer||$.oMySettings.bGeneralETDisplay)?"ET":$.oMySettings.sUnitTime]));
     }

@@ -37,6 +37,7 @@ import Toybox.Lang;
 using Toybox.Position as Pos;
 using Toybox.Graphics as Gfx;
 using Toybox.WatchUi as Ui;
+using Toybox.System as Sys;
 
 class MyDrawableHeader extends Ui.Drawable {
 
@@ -49,12 +50,10 @@ class MyDrawableHeader extends Ui.Drawable {
   private var oRezHeaderAccuracy2 as Ui.Drawable;
   private var oRezHeaderAccuracy3 as Ui.Drawable;
   private var oRezHeaderAccuracy4 as Ui.Drawable;
-  private var oRezOxStatus as Ui.Drawable;
   private var oRezMapHeaderBg as Ui.Drawable;
 
   // Color
   private var iColorBackground as Number = Gfx.COLOR_TRANSPARENT;
-  private var iColorOxStatus as Number = Gfx.COLOR_TRANSPARENT;
 
   //
   // FUNCTIONS: Ui.Drawable (override/implement)
@@ -69,7 +68,6 @@ class MyDrawableHeader extends Ui.Drawable {
     oRezHeaderAccuracy3 = new Rez.Drawables.drawHeaderAccuracy3();
     oRezHeaderAccuracy4 = new Rez.Drawables.drawHeaderAccuracy4();
 
-    oRezOxStatus = new Rez.Drawables.drawOxStatus();
     oRezMapHeaderBg = new Rez.Drawables.drawMapHeaderBackground();
   }
 
@@ -83,72 +81,50 @@ class MyDrawableHeader extends Ui.Drawable {
     _oDC.clear();
 
     // ... positioning accuracy
-    switch($.oMyProcessing.iAccuracy) {
-
-    case Pos.QUALITY_GOOD:
+    if($.oMyProcessing.iAccuracy == Pos.QUALITY_GOOD) {
       _oDC.setColor(Gfx.COLOR_DK_GREEN, Gfx.COLOR_TRANSPARENT);
       self.oRezHeaderAccuracy1.draw(_oDC);
       self.oRezHeaderAccuracy2.draw(_oDC);
       self.oRezHeaderAccuracy3.draw(_oDC);
       self.oRezHeaderAccuracy4.draw(_oDC);
-      break;
-
-    case Pos.QUALITY_USABLE:
+    }
+    else if($.oMyProcessing.iAccuracy == Pos.QUALITY_USABLE) {
       _oDC.setColor(Gfx.COLOR_ORANGE, Gfx.COLOR_TRANSPARENT);
       self.oRezHeaderAccuracy1.draw(_oDC);
       self.oRezHeaderAccuracy2.draw(_oDC);
       self.oRezHeaderAccuracy3.draw(_oDC);
       _oDC.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
       self.oRezHeaderAccuracy4.draw(_oDC);
-      break;
-
-    case Pos.QUALITY_POOR:
+    }
+    else if($.oMyProcessing.iAccuracy == Pos.QUALITY_POOR) {
       _oDC.setColor(Gfx.COLOR_RED, Gfx.COLOR_TRANSPARENT);
       self.oRezHeaderAccuracy1.draw(_oDC);
       self.oRezHeaderAccuracy2.draw(_oDC);
       _oDC.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
       self.oRezHeaderAccuracy3.draw(_oDC);
       self.oRezHeaderAccuracy4.draw(_oDC);
-      break;
-
-    case Pos.QUALITY_LAST_KNOWN:
+    }
+    else if($.oMyProcessing.iAccuracy == Pos.QUALITY_LAST_KNOWN) {
       _oDC.setColor(Gfx.COLOR_DK_RED, Gfx.COLOR_TRANSPARENT);
       self.oRezHeaderAccuracy1.draw(_oDC);
       _oDC.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
       self.oRezHeaderAccuracy2.draw(_oDC);
       self.oRezHeaderAccuracy3.draw(_oDC);
       self.oRezHeaderAccuracy4.draw(_oDC);
-      break;
-
-    case Pos.QUALITY_NOT_AVAILABLE:
-    default:
+    }
+    else {
       _oDC.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
       self.oRezHeaderAccuracy1.draw(_oDC);
       self.oRezHeaderAccuracy2.draw(_oDC);
       self.oRezHeaderAccuracy3.draw(_oDC);
       self.oRezHeaderAccuracy4.draw(_oDC);
-      break;
-
     }
 
     // ... SpO2 Status
-    if ($.oMySettings.bGeneralOxDisplay && LangUtils.notNaN($.oMyProcessing.iAgeOx) && LangUtils.notNaN($.oMyProcessing.iOx)
-        && ($.oMySettings.bOxMeasure?($.oMyAltimeter.fAltitudeActual >= $.oMySettings.iOxElevation):true)) {
-      if (($.oMyProcessing.iAgeOx <= 6 * 60) && ($.oMyProcessing.iOx >= 95)) {
-        self.iColorOxStatus = Gfx.COLOR_DK_GREEN;
-      }
-      else if (($.oMyProcessing.iAgeOx >= 20 * 60) || ($.oMyProcessing.iOx <= 90)) {
-        if ($.oMyProcessing.iOx <= $.oMySettings.iOxCritical) {
-          self.iColorOxStatus = Time.now().value() % 2 ? Gfx.COLOR_RED : Gfx.COLOR_TRANSPARENT;
-        } else {
-          self.iColorOxStatus = Gfx.COLOR_RED;
-        }
-      }
-      else if (($.oMyProcessing.iAgeOx > 6 * 60) || ($.oMyProcessing.iOx > 90)) {
-        self.iColorOxStatus = Gfx.COLOR_YELLOW;
-      }
-      _oDC.setColor(self.iColorOxStatus, Gfx.COLOR_TRANSPARENT);
-      self.oRezOxStatus.draw(_oDC);
+    if ($.oMySettings.bGeneralOxDisplay && ($.oMySettings.bOxMeasure?(LangUtils.notNaN($.oMyProcessing.fAltitude) ? ($.oMyProcessing.fAltitude >= $.oMySettings.iOxElevation):false): true)) {
+      _oDC.setColor($.oMyProcessing.iColorOxStatus, Gfx.COLOR_TRANSPARENT);
+      _oDC.fillRectangle((Sys.getDeviceSettings().screenWidth * 0.72).toNumber(), (Sys.getDeviceSettings().screenWidth * 0.089).toNumber(), 
+                        (Sys.getDeviceSettings().screenWidth * 0.0577).toNumber(), (Sys.getDeviceSettings().screenWidth * 0.0231).toNumber());
     }
   }
 

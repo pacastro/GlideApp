@@ -75,12 +75,12 @@ var oMyTimeStart as Time.Moment = Time.now();
 var iMyLogIndex as Number = -1;
 
 // Chart
-var oChartModelAlt = new MyChartModel();
-var oChartModelAsc = new MyChartModel();
-var oChartModelCrt = new MyChartModel();
-var oChartModelSpd = new MyChartModel();
-var oChartModelHR = new MyChartModel();
-var oChartModelg = new MyChartModel();
+var oChartModelAlt = new MyChartModel(null);
+var oChartModelAsc = new MyChartModel(null);
+var oChartModelCrt = new MyChartModel(null);
+var oChartModelSpd = new MyChartModel(null);
+var oChartModelHR = new MyChartModel(null);
+var oChartModelg = new MyChartModel(null);
 
 var bChartReset = false;
 var bRangeChange = false;
@@ -105,6 +105,10 @@ var iViewGenOxIdx = 1;
 var bViewTimer = false;
 var oTimeLastTimer = new Time.Moment(Time.now().value() + 60 * 60);
 
+// ... Layer
+var auxLayer as Ui.View?;
+var dotsLayer as Ui.View?;
+
 //
 // CONSTANTS
 //
@@ -120,7 +124,6 @@ const MY_NOVALUE_LEN3 = "---";
 const MY_NOVALUE_LEN4 = "----";
 const MY_NOVALUE_LEN6 = "--.----";
 
-
 //
 // CLASS
 //
@@ -131,9 +134,6 @@ class MyApp extends App.AppBase {
   //
 
   // Timers
-  // ... UI update
-  private var oUpdateTimer as Timer.Timer?;
-  private var iUpdateLastEpoch as Number = 0;
   // ... tones
   private var oTonesTimer as Timer.Timer?;
   private var iTonesTick as Number = 1000;
@@ -170,35 +170,19 @@ class MyApp extends App.AppBase {
     self.loadSettings();
 
     // Enable sensor events
-    Sensor.setEnabledSensors([] as Array<Sensor.SensorType>);  // ... we need just the acceleration
-    // Sensor.setEnabledSensors([Sensor.SENSOR_ONBOARD_HEARTRATE, Sensor.SENSOR_ONBOARD_PULSE_OXIMETRY]);
+    // Sensor.setEnabledSensors([] as Array<Sensor.SensorType>);  // ... we need just the acceleration
+    Sensor.setEnabledSensors([Sensor.SENSOR_ONBOARD_HEARTRATE]);
     Sensor.enableSensorEvents(method(:onSensorEvent));
     
     // Enable position events
     self.enablePositioning();
 
-    // Start UI update timer (every multiple of 5 seconds, to save energy)
-    // NOTE: in normal circumstances, UI update will be triggered by position events (every ~1 second)
-    self.oUpdateTimer = new Timer.Timer();
-    // var iUpdateTimerDelay = (60-Sys.getClockTime().sec)%5;
-    // Sys.println(Sys.getClockTime().sec + "  iUpD  " + iUpdateTimerDelay);
-    // if(iUpdateTimerDelay > 0) {
-    //   (self.oUpdateTimer as Timer.Timer).start(method(:onUpdateTimer_init), 1000*iUpdateTimerDelay, false);
-    // }
-    // else {
-      (self.oUpdateTimer as Timer.Timer).start(method(:onUpdateTimer), 5000, true);
-    // }
   }
 
   function onStop(state) {
     //Sys.println("DEBUG: MyApp.onStop()");
 
     // Stop timers
-    // ... UI update
-    if(self.oUpdateTimer != null) {
-      (self.oUpdateTimer as Timer.Timer).stop();
-      self.oUpdateTimer = null;
-    }
     // ... tones
     if(self.oTonesTimer != null) {
       (self.oTonesTimer as Timer.Timer).stop();
@@ -207,6 +191,9 @@ class MyApp extends App.AppBase {
 
     // Disable position events
     Pos.enableLocationEvents(Pos.LOCATION_DISABLE, method(:onLocationEvent));
+
+    // Disable pulse_oximetry
+    Sensor.disableSensorType(Sensor.SENSOR_ONBOARD_PULSE_OXIMETRY);
 
     // Disable sensor events
     Sensor.enableSensorEvents(null);
@@ -222,11 +209,7 @@ class MyApp extends App.AppBase {
     // Sys.println("DEBUG: MyApp.onSettingsChanged()");
     self.loadSettings();
     self.updateUi(Time.now().value());
-    if($.oMyProcessing.bIsPrevious == 5) {
-      Ui.switchToView(new MyViewTimers(), new MyViewTimersDelegate(), Ui.SLIDE_IMMEDIATE);
-    }
   }
-
 
   //
   // FUNCTIONS: self
@@ -283,7 +266,7 @@ class MyApp extends App.AppBase {
     }
 
     // Chart
-    if((($.oMyActivity != null) || !($.oMySettings.bChartShow)) && ($.oMyProcessing.fAltitude != null)) {
+    if((($.oMyActivity != null) || !($.oMySettings.bChartShow)) && ($.oMyProcessing.fAltitude != null) && (bActStop ? bActPause : true)) {
       oChartModelAlt.new_value(_oInfo.altitude);
       oChartModelAsc.new_value(($.oMyActivity != null)?$.oMyActivity.fGlobalAscent:0);
       oChartModelCrt.new_value($.oMyProcessing.fVariometer_filtered);
@@ -301,8 +284,10 @@ class MyApp extends App.AppBase {
       oChartModelg.reset();
       bChartReset = false;
     }
-  }
 
+    // UI update
+    self.updateUi(iEpoch);
+  }
 
   function enablePositioning() as Void {
     var callback = method(:onLocationEvent);
@@ -349,7 +334,6 @@ class MyApp extends App.AppBase {
     Pos.enableLocationEvents(Pos.LOCATION_CONTINUOUS, callback);
   }
 
-
   function onLocationEvent(_oInfo as Pos.Info) as Void {
     //Sys.println("DEBUG: MyApp.onLocationEvent()");
     var oTimeNow = Time.now();
@@ -381,24 +365,6 @@ class MyApp extends App.AppBase {
         }
       }
     }
-
-    // UI update
-    self.updateUi(iEpoch);
-  }
-
-  // function onUpdateTimer_init() as Void {
-  //   //Sys.println("DEBUG: MyApp.onUpdateTimer_init()");
-  //   self.onUpdateTimer();
-  //   self.oUpdateTimer = new Timer.Timer();
-  //   (self.oUpdateTimer as Timer.Timer).start(method(:onUpdateTimer), 5000, true);
-  // }
-
-  function onUpdateTimer() as Void {
-    // Sys.println("DEBUG: MyApp.onUpdateTimer()");
-    var iEpoch = Time.now().value();
-    if(iEpoch-self.iUpdateLastEpoch > 1) {
-      self.updateUi(iEpoch);
-    }
   }
 
   function onTonesTimer() as Void {
@@ -424,7 +390,6 @@ class MyApp extends App.AppBase {
     // Update UI
     if($.oMyView != null) {
       ($.oMyView as MyView).updateUi();
-      self.iUpdateLastEpoch = _iEpoch;
     }
 
     // if((oProgBarTime!=null)&&Time.now().subtract(oProgBarTime).value()>=1) {
@@ -583,5 +548,4 @@ class MyApp extends App.AppBase {
     $.iScaleBarSize = iMaxBarSize;
     $.sScaleBarUnit = fMaxBarScale.format("%.0f") + sUnit;
   }
-
 }

@@ -85,9 +85,13 @@ class MyViewMap extends Ui.MapTrackView {
     // Color
     private var iColorText = $.oMySettings.iGeneralBackgroundColor ? Gfx.COLOR_WHITE : Gfx.COLOR_BLACK;
 
+    // ... Polyline
+    // private var oPolyTrack as Ui.MapPolyline?;
+    // private var myTarget as Pos.Location?;
+
     //! Constructor
     public function initialize() {
-        $.oMyProcessing.bIsPrevious = 4;
+        $.oMyProcessing.iIsCurrent = 4;
         if($.oMyActivity != null) { $.oTimeLastTimer = Time.now();}  // view ET timer
         // MapView.initialize();
         MapTrackView.initialize();
@@ -95,10 +99,10 @@ class MyViewMap extends Ui.MapTrackView {
         // set the current mode for the map to be preview
         setMapMode(Ui.MAP_MODE_PREVIEW);
 
-        // set Popyline style
-        $.oMyProcessing.oPolyTrack.setColor(Gfx.COLOR_GREEN);
-        $.oMyProcessing.oPolyTrack.setWidth((Sys.getDeviceSettings().screenHeight/100).toNumber());
-        MapView.clear();
+        // set Popyline
+        // self.oPolyTrack = new Ui.MapPolyline();
+        // self.oPolyTrack.setColor(Gfx.COLOR_GREEN);
+        // self.oPolyTrack.setWidth((Sys.getDeviceSettings().screenHeight/100).toNumber());
 
         // create the bounding box for the map area
         var lat = App.Properties.getValue("userLastLat") as Float;
@@ -139,6 +143,18 @@ class MyViewMap extends Ui.MapTrackView {
         }
         iLayoutValueXright = Sys.getDeviceSettings().screenWidth - iLayoutValueXleft;
         iLayoutValueYbottom = Sys.getDeviceSettings().screenHeight - iLayoutValueYtop;
+
+        // if(($.oMyPositionLocation!=null) && ($.oMyActivity != null) && ($.oMySettings.bMapTrack)) { 
+        //     self.myTarget = new Pos.Location({
+        //         :latitude => -23.476,
+        //         :longitude => -70.608,
+        //         :format => :degrees
+        //     });
+        //     self.oPolyTrack.clear();
+        //     self.oPolyTrack.addLocation(self.myTarget);
+        //     self.oPolyTrack.addLocation($.oMyPositionLocation);
+        //     MapView.setPolyline(self.oPolyTrack);
+        // }
     }
 
     //! Called when this View is brought to the foreground. Restore
@@ -167,6 +183,9 @@ class MyViewMap extends Ui.MapTrackView {
         // ... colors
         self.iColorText = $.oMySettings.iGeneralBackgroundColor ? Gfx.COLOR_BLACK : Gfx.COLOR_WHITE;
 
+        // Layer
+        auxLayer = new AuxLayer(true, false, false);
+
         // Unmute tones
         (App.getApp() as MyApp).unmuteTones();
     }
@@ -187,9 +206,6 @@ class MyViewMap extends Ui.MapTrackView {
 
     function updateLayout(_bUpdateTime) {
         //Sys.println("DEBUG: MyViewHeader.updateLayout()");
-        if(($.oMyActivity != null) && ($.oMySettings.bMapTrack)) { 
-            MapView.setPolyline($.oMyProcessing.oPolyTrack); 
-        }
         if($.oMySettings.bMapHeader) {
             // Set colors
             // ... background
@@ -319,8 +335,10 @@ class MyViewMap extends Ui.MapTrackView {
     }
 
     function onHide() {
-    // Mute tones
-    (App.getApp() as MyApp).muteTones();
+        auxLayer.onHide();
+        
+        // Mute tones
+        (App.getApp() as MyApp).muteTones();
     }
 }
 

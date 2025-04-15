@@ -53,7 +53,7 @@ class MyViewInfo extends MyViewHeader {
   var oValue = null;
   var aData as ANumbers? = [0];
 
-  var oChartModelTemp as MyChartModelEstatic?;
+  var oChartModelTemp as MyChartModel?;
 
   // Resources
   // ... fonts
@@ -61,30 +61,24 @@ class MyViewInfo extends MyViewHeader {
 
   // Layout-specific
   private var iLayoutCenter as Number = (Sys.getDeviceSettings().screenWidth * 0.5).toNumber();
-  // private var iLayoutClipY as Number = (Sys.getDeviceSettings().screenHeight * 0.13).toNumber();
   private var iLayoutClipW as Number = Sys.getDeviceSettings().screenWidth;
-  // private var iLayoutClipH as Number = (Sys.getDeviceSettings().screenHeight * 0.742).toNumber();
   private var iLayoutValueXleft as Number = (Sys.getDeviceSettings().screenWidth * 0.165).toNumber();
-  // private var iLayoutValueXright as Number = Sys.getDeviceSettings().screenWidth - iLayoutValueXleft;
   private var iLayoutValueYtop as Number = (Sys.getDeviceSettings().screenHeight * 0.125).toNumber();
-  // private var iLayoutValueYcenter as Number = (Sys.getDeviceSettings().screenHeight * 0.476).toNumber();
   private var iLayoutValueYbottom as Number = Sys.getDeviceSettings().screenHeight - iLayoutValueYtop;
   private var iDotRadius as Number = (Sys.getDeviceSettings().screenWidth * 0.03).toNumber();
-
-
 
   //
   // FUNCTIONS: MyViewHeader (override/implement)
   //
 
   function initialize() {
-    $.oMyProcessing.bIsPrevious = 0;
+    $.oMyProcessing.iIsCurrent = 0;
     MyViewHeader.initialize();
 
   }
 
   function prepare() {
-    //Sys.println("DEBUG: MyViewVarioplot.prepare()");
+    //Sys.println("DEBUG: MyViewInfo.prepare()");
     MyViewHeader.prepare();
 
     // Load resources
@@ -95,28 +89,27 @@ class MyViewInfo extends MyViewHeader {
     (App.getApp() as MyApp).unmuteTones();
 
     // Weather
-    var wValue = $.oMyPositionLocation!=null ? Weather.getHourlyForecast() : null as Array<HourlyForecast>;
-    if(wValue!=null) {
-      aData = new [wValue.size() + 1];
-      for (var i = 0; i < wValue.size(); i++) {
-        aData[i+1] = wValue[i].temperature;
+    if(Toybox has :Weather) {
+      var wValue = $.oMyPositionLocation!=null ? Weather.getHourlyForecast() : null as Array<HourlyForecast>;
+      if(wValue!=null) {
+        aData = new [wValue.size() + 1];
+        for (var i = 0; i < wValue.size(); i++) {
+          aData[i+1] = wValue[i].temperature;
+        }
+        oValue = $.oMyPositionLocation!=null?Weather.getCurrentConditions():null;
+        if(oValue!=null) {
+          aData[0] = oValue.temperature;
+        }
       }
-      oValue = $.oMyPositionLocation!=null?Weather.getCurrentConditions():null;
-      if(oValue!=null) {
-        aData[0] = oValue.temperature;
-      }
-      
     }
-    oChartModelTemp = new MyChartModelEstatic(aData);
+    oChartModelTemp = new MyChartModel(aData);
 
     // for (var i = 0; i < oChartModelTemp.get_values().size(); i++) {
-    //   Sys.println(i + "> " + oChartModelTemp.get_values()[i]);
+    // Sys.println(i + "> " + oChartModelTemp.get_values()[i]);
     // }
   }
 
   function onUpdate(_oDC as Gfx.Dc) as Void {
-    // Sys.println("DEBUG: MyViewVarioplot.onUpdate()");
-
     // Update layout
     MyViewHeader.updateLayout(false);
     View.onUpdate(_oDC);
@@ -125,9 +118,8 @@ class MyViewInfo extends MyViewHeader {
 
   }
 
-
   function drawValues(_oDC as Gfx.Dc) as Void {
-    // Sys.println("DEBUG: MyViewVarioplot.drawValues()");
+    // Sys.println("DEBUG: MyViewInfo.drawValues()");
 
     var deltaT = 1800; // default 30 min in seconds
 
@@ -171,10 +163,12 @@ class MyViewInfo extends MyViewHeader {
     _oDC.drawText(self.iLayoutCenter, self.iLayoutValueYtop + iFontPlotHeight, Gfx.FONT_XTINY, Lang.format("Lon : $1$°", [sValue]), Gfx.TEXT_JUSTIFY_CENTER);
 
     // ... sunrise
-    oValue = $.oMyPositionLocation!=null?Weather.getSunrise($.oMyPositionLocation, Time.now()):null;
+    sValue = Gregorian.info(Time.now(), Time.FORMAT_SHORT);
+    if((Toybox has :Weather) && (Weather has :getSunrise)) { oValue = $.oMyPositionLocation!=null?Weather.getSunrise($.oMyPositionLocation, Time.now()):null; }
+    else { oValue = $.oMyPositionLocation!=null? (new Time.Moment((self.twiLight(sValue, fLat, fLon, :sunrise) * 60 * 60))) : null; }
     if(LangUtils.notNaN(oValue)) {
       sValue = Gregorian.info(oValue, Time.FORMAT_SHORT);
-      deltaT = fLat.abs() > 60 ? (self.twiLight(sValue, 60, fLon) * 60) : (self.twiLight(sValue, fLat, fLon) * 60);
+      deltaT = fLat.abs() > 60 ? (self.twiLight(sValue, 60, fLon, :tl) * 60) : (self.twiLight(sValue, fLat, fLon, :tl) * 60);
       sValue2 = Gregorian.info(oValue.subtract(new Time.Duration(deltaT)), Time.FORMAT_SHORT);
     }
     else {
@@ -190,7 +184,9 @@ class MyViewInfo extends MyViewHeader {
                                               ]), Gfx.TEXT_JUSTIFY_CENTER);
 
     // ... sunset
-    oValue = $.oMyPositionLocation!=null?Weather.getSunset($.oMyPositionLocation, Time.now()):null;
+    sValue = Gregorian.info(Time.now(), Time.FORMAT_SHORT);
+    if((Toybox has :Weather) && (Weather has :getSunrise)) { oValue = $.oMyPositionLocation!=null?Weather.getSunset($.oMyPositionLocation, Time.now()):null; }
+    else { oValue = $.oMyPositionLocation!=null? (new Time.Moment((self.twiLight(sValue, fLat, fLon, :sunset) * 60 * 60))) : null; }
     if(LangUtils.notNaN(oValue)) {
       sValue = Gregorian.info(oValue, Time.FORMAT_SHORT);
       sValue2 = Gregorian.info(oValue.add(new Time.Duration(deltaT)), Time.FORMAT_SHORT);
@@ -235,26 +231,27 @@ class MyViewInfo extends MyViewHeader {
     _oDC.setColor(self.iColorText, Gfx.COLOR_TRANSPARENT);
     // Weather
     // ... current
-    oValue = $.oMyPositionLocation!=null?Weather.getCurrentConditions():null;
-    if(LangUtils.notNaN(oValue)) {
-      fValue = oValue.condition;
-      sValue = (oValue.windSpeed * $.oMySettings.fUnitWindSpeedCoefficient).format("%.0f");
-      if((aData.size() == 1) || (aData[0] != oValue.temperature)) {
-        self.prepare();
+    if(Toybox has :Weather) { 
+      oValue = $.oMyPositionLocation!=null?Weather.getCurrentConditions():null;
+      if(LangUtils.notNaN(oValue)) {
+        fValue = oValue.condition;
+        sValue = (oValue.windSpeed * $.oMySettings.fUnitWindSpeedCoefficient).format("%.0f");
+        if((aData.size() == 1) || (aData[0] != oValue.temperature)) {
+          self.prepare();
+        }
       }
+      else {
+        sValue = $.MY_NOVALUE_LEN2;
+      }
+      _oDC.drawText(self.iLayoutCenter, self.iLayoutValueYtop + iFontPlotHeight*6, Gfx.FONT_XTINY, 
+                    Lang.format("$1$°C H$2$/L$3$  $4$$5$/$6$°", [oValue!=null?oValue.temperature.format("%.0f"):sValue, 
+                                                    oValue!=null?oValue.highTemperature.format("%.0f"):sValue, 
+                                                    oValue!=null?oValue.lowTemperature.format("%.0f"):sValue,
+                                                    sValue,
+                                                    oValue!=null?$.oMySettings.sUnitWindSpeed:"",
+                                                    oValue!=null?oValue.windBearing.format("%.0f"):sValue,
+                                                    ]), Gfx.TEXT_JUSTIFY_CENTER);
     }
-    else {
-      sValue = $.MY_NOVALUE_LEN2;
-    }
-    _oDC.drawText(self.iLayoutCenter, self.iLayoutValueYtop + iFontPlotHeight*6, Gfx.FONT_XTINY, 
-                  Lang.format("$1$°C H$2$/L$3$  $4$$5$/$6$°", [oValue!=null?oValue.temperature.format("%.0f"):sValue, 
-                                                  oValue!=null?oValue.highTemperature.format("%.0f"):sValue, 
-                                                  oValue!=null?oValue.lowTemperature.format("%.0f"):sValue,
-                                                  sValue,
-                                                  oValue!=null?$.oMySettings.sUnitWindSpeed:"",
-                                                  oValue!=null?oValue.windBearing.format("%.0f"):sValue,
-                                                  ]), Gfx.TEXT_JUSTIFY_CENTER);
-
   
     _oDC.setColor(self.iColorTextGr, Gfx.COLOR_TRANSPARENT);
     _oDC.drawText(self.iLayoutCenter, self.iLayoutValueYtop + iFontPlotHeight*(3-fdeltaY), Gfx.FONT_XTINY, "<rise - set>", Gfx.TEXT_JUSTIFY_CENTER);
@@ -289,14 +286,15 @@ class MyViewInfo extends MyViewHeader {
 
   }
 
-  function twiLight(_oValue, _fLat, _fLon) {
+  function twiLight(_oValue, _fLat, _fLon, _calc as Symbol) {
     // first calculate the day of the year
     var N1 = Math.floor(275 * _oValue.month / 9);
     var N2 = Math.floor((_oValue.month + 9) / 12);
     var N3 = (1 + Math.floor((_oValue.year - 4 * Math.floor(_oValue.year / 4) + 2) / 3));
     var N = N1 - (N2 * N3) + _oValue.day -30;
     // calculate the Sun's mean anomaly  
-    var M = (0.9856 * (N + ((6 - (_fLon / 15)) / 24))) - 3.289;
+    var t = N + (((_calc == :sunset ? 18 : 6) - (_fLon / 15)) / 24);
+    var M = (0.9856 * t) - 3.289;
     // calculate the Sun's true longitude
     var L = (M + (1.916 * Math.sin(Math.toRadians(M))) + (0.020 * Math.sin(2 * Math.toRadians(M))) + 282.634) ;
     L = L < 0 ? L + 360 : L > 360 ? L - 360 : L;
@@ -311,8 +309,14 @@ class MyViewInfo extends MyViewHeader {
     var cosH1 = (Math.cos(Math.toRadians(90.833)) - (sinDec * Math.sin(Math.toRadians(_fLat)))) / (cosDec * Math.cos(Math.toRadians(_fLat)));
     var cosH2 = (Math.cos(Math.toRadians(96)) - (sinDec * Math.sin(Math.toRadians(_fLat)))) / (cosDec * Math.cos(Math.toRadians(_fLat)));
     // calculate H and difference between sunrise (H1) & begining civil twilight (H2) to hours and then minutes
-    var T = Math.round((Math.toDegrees(Math.acos(cosH2)) - Math.toDegrees(Math.acos(cosH1))) / 15 * 60);
-    return T.toNumber();
+    if(_calc == :tl) {
+      var T = Math.round((Math.toDegrees(Math.acos(cosH2)) - Math.toDegrees(Math.acos(cosH1))) / 15 * 60);
+      return T.toNumber();
+    } else {
+      var T = (_calc == :sunrise ? (360 - Math.toDegrees(Math.acos(cosH1))) : Math.toDegrees(Math.acos(cosH1))) / 15 + RA - (0.06571 * t) - 6.622 - _fLon / 15;
+      T = T < 0 ? T + 24 : T > 24 ? T - 24 : T;
+      return (T);
+    }
   }
 
   function onHide() {
@@ -332,7 +336,7 @@ class MyViewInfoDelegate extends Ui.BehaviorDelegate {
   }
 
   function onMenu() {
-    //Sys.println("DEBUG: MyViewVarioplotDelegate.onMenu()");
+    //Sys.println("DEBUG: MyViewInfoDelegate.onMenu()");
     Ui.pushView(new MyMenu2Generic(:menuSettings, 0),
                 new MyMenu2GenericDelegate(:menuSettings),
                 Ui.SLIDE_RIGHT);
@@ -340,7 +344,7 @@ class MyViewInfoDelegate extends Ui.BehaviorDelegate {
   }
 
   function onSelect() {
-    //Sys.println("DEBUG: MyViewVarioplotDelegate.onSelect()");
+    //Sys.println("DEBUG: MyViewInfoDelegate.onSelect()");
     if($.oMyActivity == null) {
       Ui.pushView(new Ui.Confirmation(Ui.loadResource(Rez.Strings.titleActivityStart) + "?"),
                   new MyMenuGenericConfirmDelegate(:contextActivity, :actionStart, false),
@@ -355,7 +359,7 @@ class MyViewInfoDelegate extends Ui.BehaviorDelegate {
   }
 
   function onBack() {
-    //Sys.println("DEBUG: MyViewVarioplotDelegate.onBack()");
+    //Sys.println("DEBUG: MyViewInfoDelegate.onBack()");
     Ui.switchToView(new MyViewGeneral(),
                     new MyViewGeneralDelegate(),
                     Ui.SLIDE_IMMEDIATE);
@@ -363,7 +367,7 @@ class MyViewInfoDelegate extends Ui.BehaviorDelegate {
   }
 
   function onPreviousPage() {
-    //Sys.println("DEBUG: MyViewVarioplotDelegate.onPreviousPage()");
+    //Sys.println("DEBUG: MyViewInfoDelegate.onPreviousPage()");
     Ui.switchToView(new MyViewGeneral(),
                     new MyViewGeneralDelegate(),
                     Ui.SLIDE_IMMEDIATE);
@@ -371,7 +375,7 @@ class MyViewInfoDelegate extends Ui.BehaviorDelegate {
   }
 
   function onNextPage() {
-    //Sys.println("DEBUG: MyViewVarioplotDelegate.onNextPage()");
+    //Sys.println("DEBUG: MyViewInfoDelegate.onNextPage()");
     Ui.switchToView(new MyViewGeneral(),
                     new MyViewGeneralDelegate(),
                     Ui.SLIDE_IMMEDIATE);

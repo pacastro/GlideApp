@@ -118,10 +118,10 @@ class MyMenuGenericConfirmDelegate extends Ui.ConfirmationDelegate {
           if($.oMyActivity != null) {
             ($.oMyActivity as MyActivity).stop(true);
             $.oMyActivity = null;
-            // Ui.popView(Ui.SLIDE_IMMEDIATE);
-            // Ui.popView(Ui.SLIDE_IMMEDIATE);
-            // Ui.switchToView(new MyViewLog(), new MyViewLogDelegate(), Ui.SLIDE_BLINK);
-            // Ui.pushView(new MyViewLog(), null, Ui.SLIDE_BLINK);
+            Ui.popView(Ui.SLIDE_IMMEDIATE);
+            Ui.popView(Ui.SLIDE_IMMEDIATE);
+            Ui.switchToView(new MyViewTimers(), new MyViewTimersDelegate(), Ui.SLIDE_RIGHT);
+            Ui.pushView(new MyViewTimers(), null, Ui.SLIDE_RIGHT);
           }
         }
         else if(action == :actionDiscard) {

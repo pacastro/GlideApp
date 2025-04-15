@@ -228,6 +228,7 @@ class MyActivity {
       Attn.playTone(Attn.TONE_START);
     }
     bActStop = false;
+    bActPause = false;
     bActStart = true;
     oDispTime = Time.now();
     bChartReset = true;

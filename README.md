@@ -16,6 +16,8 @@ GlideApp is a BACKUP source of information and should ALWAYS be paired with
 specialized variometer equipment! Watch sensors are simply not precise enough
 and THIS APP SHOULD NOT BE USED AS A PRIMARY FLIGHT INSTRUMENT!
 
+![view1](./docs/ga1_2.png)
+
 1. Dashboards
 
 Multiple views/dashboards are available.
@@ -81,9 +83,12 @@ Please refer to the USAGE file.
 
 ## Supported watches
 
-I am using variable frequencytones for the vario, Blood Oxygen Saturation readings and
-Garmin weather info, which are only supported for SDK 3.3.0 and above. This restricts 
-the watches I can support.
+I am using variable frequencytones for the vario, which are only supported for 
+SDK 3.1.0 and above. GliderApp also uses Blood Oxygen, Weather and getSunrise & 
+getSunset functions, wich are respectively supported by SDK 3.2.0 & SDK 3.3.0 
+and above. Functuonality of these functions over the base supported SDK (3.1) 
+will be automatically enabled/disabled for devices that meet/not meet the 
+required API level. 
 
 ## Not a programmer
 

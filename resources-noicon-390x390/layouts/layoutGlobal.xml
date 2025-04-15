@@ -35,8 +35,11 @@
   </layout>
 
   <layout id="DeleteConfirmationPage">
-    <bitmap id="confirmIcon" personality="confirmation_icon__hint_keep confirmation_loc__hint_keep" />
-    <bitmap id="deleteIcon" personality="confirmation_icon__hint_delete confirmation_loc__hint_delete" />
-    <text-area text="@Strings.titleConfirmDiscard" personality="confirmation_color_dark__body confirmation_size__body confirmation_loc__body confirmation_font__body" />
+    <!-- Confirm -->
+    <!-- <bitmap id="confirmIcon" personality="confirmation_icon__hint_keep confirmation_loc__hint_keep" /> -->
+    <!-- Delete -->
+    <!-- <bitmap id="deleteIcon" personality="confirmation_icon__hint_delete confirmation_loc__hint_delete" /> -->
+    <!-- Prompt body -->
+    <!-- <text-area text="@Strings.titleConfirmDiscard" personality="confirmation_color_dark__body confirmation_size__body confirmation_loc__body confirmation_font__body" /> -->
   </layout>
 </layouts>

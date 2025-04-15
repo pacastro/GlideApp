@@ -252,7 +252,7 @@
         </settingConfig>
     </setting>
 
-     <setting propertyKey="@Properties.userUnitHeading" title="@Strings.titleUnitHeading">
+    <setting propertyKey="@Properties.userUnitHeading" title="@Strings.titleUnitHeading">
         <settingConfig type="list">
             <listEntry value="0">°</listEntry>
             <listEntry value="1">txt</listEntry>

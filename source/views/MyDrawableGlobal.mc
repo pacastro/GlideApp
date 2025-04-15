@@ -111,21 +111,13 @@ class MyDrawableGlobal extends Ui.Drawable {
     }
 
     // ... Display Start/Pause/Stop anim
-    if (($.oMyActivity == null) && ([3, 4, 6].indexOf($.oMyProcessing.bIsPrevious) < 0) && ($.oMyProcessing.iAccuracy > Position.QUALITY_LAST_KNOWN)) {
-      var icentX = _oDC.getWidth()/2;
-      var icentY = _oDC.getHeight()/2;
-      _oDC.setColor(Gfx.COLOR_DK_GREEN, Gfx.COLOR_TRANSPARENT);
-      _oDC.setPenWidth(_oDC.getWidth()*(bActStop?0.07f:0.03f));
-      _oDC.drawArc(icentX, icentY, icentX, Gfx.ARC_COUNTER_CLOCKWISE, 21, 39);
-    }
-
-    if ((($.oMyActivity != null) && ((bActStart) || (bActPause))) || (bActStop)) {
-      var dTimer = Time.now().subtract(oDispTime);
+    if(_oDC has :setAntiAlias) { _oDC.setAntiAlias(true); }
+    if ((($.oMyActivity != null) && (bActStart || bActPause)) || bActStop) {
       var iRadius = (_oDC.getWidth()*0.15f).toNumber();
       var icentX = (_oDC.getWidth()/2).toNumber();
       var icentY = (_oDC.getHeight()/2).toNumber();
       
-      if (dTimer.value() <= 1) {
+      if (Time.now().subtract(oDispTime).value() <= 1) {
         if (bActStart) {
           // Draw start arrow
           var aistart = [
@@ -156,14 +148,18 @@ class MyDrawableGlobal extends Ui.Drawable {
       _oDC.setPenWidth(_oDC.getWidth()*0.04f);
       _oDC.drawCircle(icentX, icentY, icentX);
       
-      if (dTimer.value() > 2) {
+      if ((Time.now().subtract(oDispTime).value() > 2) && !bActStop) {
         bActStart = false;
         bActPause = false;
-        // bActStop = false;
       }
     }
-  }
 
+    if (($.oMyActivity == null) && ([3, 4, 6].indexOf($.oMyProcessing.iIsCurrent) < 0) && ($.oMyProcessing.iAccuracy > 1) || ((bActStop ? !bActPause : false) && $.oMyProcessing.iIsCurrent == 5)) {
+      _oDC.setColor(((bActStop ? !bActPause : false) ? $.oMyProcessing.iIsCurrent != 5 : true) ? Gfx.COLOR_DK_GREEN : Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
+      _oDC.setPenWidth((_oDC.getWidth()*0.018).toNumber());
+      _oDC.drawArc(_oDC.getWidth()/2, _oDC.getWidth()/2, (_oDC.getWidth()/2*0.965).toNumber(), Gfx.ARC_COUNTER_CLOCKWISE, 20, 40);
+    }
+  }
 
   //
   // FUNCTIONS: self

@@ -30,15 +30,11 @@
     <shape type="rectangle" x="0" y="90" width="fill" height="2" color="Gfx.COLOR_LT_GRAY" />
     <shape type="rectangle" x="0" y="180" width="fill" height="2" color="Gfx.COLOR_LT_GRAY" />
     <shape type="rectangle" x="180" y="2" width="2" height="88" color="Gfx.COLOR_LT_GRAY" />
-    <shape type="rectangle" x="132" y="92" width="2" height="88" color="Gfx.COLOR_LT_GRAY" />
-    <shape type="rectangle" x="228" y="92" width="2" height="88" color="Gfx.COLOR_LT_GRAY" />
     <shape type="rectangle" x="180" y="183" width="2" height="88" color="Gfx.COLOR_LT_GRAY" />
   </drawable-list>
-  <drawable-list id="drawFieldsBordersChart" x="0" y="44" width="fill" height="272" >
-    <shape type="rectangle" x="0" y="90" width="fill" height="2" color="Gfx.COLOR_LT_GRAY" />
-    <shape type="rectangle" x="0" y="180" width="fill" height="2" color="Gfx.COLOR_LT_GRAY" />
-    <shape type="rectangle" x="180" y="2" width="2" height="88" color="Gfx.COLOR_LT_GRAY" />
-    <shape type="rectangle" x="180" y="183" width="2" height="88" color="Gfx.COLOR_LT_GRAY" />
+  <drawable-list id="drawCenterBorders" x="0" y="44" width="fill" height="272" >
+    <shape type="rectangle" x="132" y="92" width="2" height="88" color="Gfx.COLOR_LT_GRAY" />
+    <shape type="rectangle" x="228" y="92" width="2" height="88" color="Gfx.COLOR_LT_GRAY" />
   </drawable-list>
   <drawable-list id="drawGlobalAlertLeft" x="0" y="145" width="132" height="86" >
     <shape type="rectangle" x="0" y="0" width="fill" height="fill" />
@@ -99,9 +95,6 @@
     <shape type="rectangle" x="10" y="10" width="10" height="10" color="Gfx.COLOR_LT_GRAY" />
   </drawable-list>
 
-  <drawable-list id="drawOxStatus" x="260" y="32" width="20" height="8" >
-    <shape type="rectangle" x="0" y="0" width="fill" height="fill" />
-  </drawable-list>
   <drawable-list id="drawFieldsBackgroundOx" x="0" y="135" width="fill" height="180" >
     <shape type="rectangle" x="0" y="0" width="fill" height="fill" />
   </drawable-list>

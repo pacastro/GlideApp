@@ -1,3 +1,19 @@
+* 2.3:
+  - Added SpO2 Status indicator to variometer view
+  - Added carousel page indicator (shows current page position among all available pages)
+  - On activity save, app goes to Timers page for reviewing last activity statistics, cycling
+    automatically through all chart variables (if enabled) every 5 seconds
+    Select button offers actions: done, back, clear (see Usage for details), in this review 
+    mode Back button no longer cycles through chart variables (if enabled), it exits app
+  - Removed track flight path option in Map view, not working as expected in real devices and 
+    Map view has its own inbuilt path tracking
+  - Updated for Approach S50 and Venu watches
+  - Lowered compatability to SDK 3.1 watches, higher Api functuonality will be disabled:
+    - no Pulse Oximetry, no weather info on watches without those features
+    - new compatible watches: D2 Air, D2 Delta PX-S, Descent Mk1, Forerunner 645 music,
+      Fenix 5-5S-5X Plus (5x Plus has pulse oximetry), Vivoactive 3 music
+  - Small optimizations and fixed minor bugs
+
 * 2.2:
   - New Variometer design (see Usage for more details):
     - White strip (or black for white background) with range labels 
@@ -44,10 +60,12 @@
   - Fixed minor bugs
 
 * 1.3:
-  - Moved SpO2 color status indicator to Header (top right corner) so its available in all views with header
-  - Update to not consider paused time in the Timers/Log flight time, ET in footer still considers paused time
+  - Moved SpO2 color status indicator to Header (top right corner) so its available in all 
+    views with header
+  - Update to not consider paused time in the Timers/Log flight time, ET in footer still 
+    considers paused time
   - Updated for Epix (Gen 2), Descent Mk2-3, Approach S70, Venu 2-3 and Vivoactive 4-5 watches 
-  (see USAGE file for non-5 button watches)
+    (see USAGE file for non-5 button watches)
   - New App icon for smaller and bigger screen devices
   - Fixed color issues when using white background 
   - Fixed minor bugs
@@ -58,7 +76,8 @@
   - VarioPlot enhancements (code from Yannick Dutertre My Vario APP, contributed by Lenart Kos):
     - Ability to set heading up or north up (default behavior)
     - Display compass/direction of North if heading up
-    - Added Thermalling statistics computed and displayed in VarioPlot (time in thermal, altitude gain)
+    - Added Thermalling statistics computed and displayed in VarioPlot (time in thermal, altitude 
+      gain)
     - Added Wind arrow to wind info
   - Added Wind arrow to General view, in heading up mode (once wind direction is computed)
   - Added Wind Speed settable unit
@@ -80,4 +99,5 @@
   - Added Elapsed Time display in footer for 10 seconds when view page is changed
   - Added Vario Plot zoom range settings (1000m/px to 1m/px)
   - Modified some default settings for glider flight use-case
-  - Direction unit setup separated for Wind and Heading (in degrees, or as direction sector such as NW)
+  - Direction unit setup separated for Wind and Heading (in degrees, or as direction sector 
+    such as NW)

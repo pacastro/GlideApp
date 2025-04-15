@@ -225,11 +225,9 @@ class MySettings {
       _iValue = 0;
     }
     self.iVariometerRange = _iValue;
-    switch(self.iVariometerRange) {
-    case 0: self.fVariometerRange = 3.0f; break;
-    case 1: self.fVariometerRange = 5.0f; break;
-    case 2: self.fVariometerRange = 10.0f; break;
-    }
+    if(self.iVariometerRange == 0) { self.fVariometerRange = 3.0f; }
+    else if(self.iVariometerRange == 1) { self.fVariometerRange = 5.0f; }
+    else if(self.iVariometerRange == 2) { self.fVariometerRange = 10.0f; }
   }
 
   function loadVariometerAvgTime() as Number {
@@ -247,12 +245,10 @@ class MySettings {
       _iValue = 0;
     }
     self.iVariometerAvgTime = _iValue;
-    switch(self.iVariometerAvgTime) {
-    case 0: self.fVariometerAvgTime = 0; break;
-    case 1: self.fVariometerAvgTime = 10; break;
-    case 2: self.fVariometerAvgTime = 20; break;
-    case 3: self.fVariometerAvgTime = 30; break;
-    }
+    if(self.iVariometerAvgTime == 0) { self.fVariometerAvgTime = 0; }
+    else if(self.iVariometerAvgTime == 1) { self.fVariometerAvgTime = 10; }
+    else if(self.iVariometerAvgTime == 2) { self.fVariometerAvgTime = 20; }
+    else if(self.iVariometerAvgTime == 3) { self.fVariometerAvgTime = 30; }
   }
 
   function loadVariometerAvgLast() as Boolean {
@@ -314,18 +310,16 @@ class MySettings {
       _iValue = 0;
     }
     self.iVariometerPlotZoom = _iValue;
-    switch(self.iVariometerPlotZoom) {
-    case 0: self.fVariometerPlotZoom = 0.0000308666667f; self.fVariometerPlotScale = 1000.0f; break;  // 1000m/px
-    case 1: self.fVariometerPlotZoom = 0.0000617333333f; self.fVariometerPlotScale = 500.0f; break;  // 500m/px
-    case 2: self.fVariometerPlotZoom = 0.0001543333333f; self.fVariometerPlotScale = 200.0f; break;  // 200m/px
-    case 3: self.fVariometerPlotZoom = 0.0003086666667f; self.fVariometerPlotScale = 100.0f; break;  // 100m/px
-    case 4: self.fVariometerPlotZoom = 0.0006173333333f; self.fVariometerPlotScale = 50.0f; break;  // 50m/px
-    case 5: self.fVariometerPlotZoom = 0.0015433333333f; self.fVariometerPlotScale = 20.0f; break;  // 20m/px
-    case 6: self.fVariometerPlotZoom = 0.0030866666667f; self.fVariometerPlotScale = 10.0f; break;  // 10m/px
-    case 7: self.fVariometerPlotZoom = 0.0061733333333f; self.fVariometerPlotScale = 5.0f; break;  // 5m/px
-    case 8: self.fVariometerPlotZoom = 0.0154333333333f; self.fVariometerPlotScale = 2.0f; break;  // 2m/px
-    case 9: self.fVariometerPlotZoom = 0.0308666666667f; self.fVariometerPlotScale = 1.0f; break;  // 1m/px
-    }
+    if(self.iVariometerPlotZoom == 0) { self.fVariometerPlotZoom = 0.0000308666667f; self.fVariometerPlotScale = 1000.0f; }  // 1000m/px
+    else if(self.iVariometerPlotZoom == 1) { self.fVariometerPlotZoom = 0.0000617333333f; self.fVariometerPlotScale = 500.0f; } // 500m/px
+    else if(self.iVariometerPlotZoom == 2) { self.fVariometerPlotZoom = 0.0001543333333f; self.fVariometerPlotScale = 200.0f; } // 200m/px
+    else if(self.iVariometerPlotZoom == 3) { self.fVariometerPlotZoom = 0.0003086666667f; self.fVariometerPlotScale = 100.0f; }  // 100m/px
+    else if(self.iVariometerPlotZoom == 4) { self.fVariometerPlotZoom = 0.0006173333333f; self.fVariometerPlotScale = 50.0f; }  // 50m/px
+    else if(self.iVariometerPlotZoom == 5) { self.fVariometerPlotZoom = 0.0015433333333f; self.fVariometerPlotScale = 20.0f; }  // 20m/px
+    else if(self.iVariometerPlotZoom == 6) { self.fVariometerPlotZoom = 0.0030866666667f; self.fVariometerPlotScale = 10.0f; }  // 10m/px
+    else if(self.iVariometerPlotZoom == 7) { self.fVariometerPlotZoom = 0.0061733333333f; self.fVariometerPlotScale = 5.0f; } // 5m/px
+    else if(self.iVariometerPlotZoom == 8) { self.fVariometerPlotZoom = 0.0154333333333f; self.fVariometerPlotScale = 2.0f; } // 2m/px
+    else if(self.iVariometerPlotZoom == 9) { self.fVariometerPlotZoom = 0.0308666666667f; self.fVariometerPlotScale = 1.0f; }  // 1m/px
   }
 
   function loadVariometerdE() as Boolean {
@@ -376,12 +370,10 @@ class MySettings {
       _iValue = 0;
     }
     self.iVariometerSmoothing = _iValue;
-    switch(self.iVariometerSmoothing) {
-    case 0: self.fVariometerSmoothing = 0.2f; self.fVariometerSmoothingName = "Low"; break;
-    case 1: self.fVariometerSmoothing = 0.5f; self.fVariometerSmoothingName = "Medium"; break;
-    case 2: self.fVariometerSmoothing = 0.7f; self.fVariometerSmoothingName = "High"; break;
-    case 3: self.fVariometerSmoothing = 1.0f; self.fVariometerSmoothingName = "Ultra"; break;
-    }
+    if(self.iVariometerSmoothing == 0) { self.fVariometerSmoothing = 0.2f; self.fVariometerSmoothingName = "Low"; }
+    else if(self.iVariometerSmoothing == 1) { self.fVariometerSmoothing = 0.5f; self.fVariometerSmoothingName = "Medium"; }
+    else if(self.iVariometerSmoothing == 2) { self.fVariometerSmoothing = 0.7f; self.fVariometerSmoothingName = "High"; }
+    else if(self.iVariometerSmoothing == 3) { self.fVariometerSmoothing = 1.0f; self.fVariometerSmoothingName = "Ultra"; }
   }
 
   function loadSoundsVariometerTones() as Boolean {
@@ -421,14 +413,12 @@ class MySettings {
       _iValue = 0;
     }
     self.iMinimumClimb = _iValue;
-    switch(self.iMinimumClimb) {
-    case 0: self.fMinimumClimb = 0.0f; break;
-    case 1: self.fMinimumClimb = 0.1f; break;
-    case 2: self.fMinimumClimb = 0.2f; break;
-    case 3: self.fMinimumClimb = 0.3f; break;
-    case 4: self.fMinimumClimb = 0.4f; break;
-    case 5: self.fMinimumClimb = 0.5f; break;
-    }
+    if(self.iMinimumClimb == 0) { self.fMinimumClimb = 0.0f; }
+    else if(self.iMinimumClimb == 1) { self.fMinimumClimb = 0.1f; }
+    else if(self.iMinimumClimb == 2) { self.fMinimumClimb = 0.2f; }
+    else if(self.iMinimumClimb == 3) { self.fMinimumClimb = 0.3f; }
+    else if(self.iMinimumClimb == 4) { self.fMinimumClimb = 0.4f; }
+    else if(self.iMinimumClimb == 5) { self.fMinimumClimb = 0.5f; }
   }
 
   function loadMinimumSink() as Number { 
@@ -446,14 +436,12 @@ class MySettings {
       _iValue = 0;
     }
     self.iMinimumSink = _iValue;
-    switch(self.iMinimumSink) {
-    case 0: self.fMinimumSink = -1.0f; break;
-    case 1: self.fMinimumSink = -2.0f; break;
-    case 2: self.fMinimumSink = -3.0f; break;
-    case 3: self.fMinimumSink = -4.0f; break;
-    case 4: self.fMinimumSink = -6.0f; break;
-    case 5: self.fMinimumSink = -10.0f; break;
-    }
+    if(self.iMinimumSink == 0) { self.fMinimumSink = -1.0f; }
+    else if(self.iMinimumSink == 1) { self.fMinimumSink = -2.0f; }
+    else if(self.iMinimumSink == 2) { self.fMinimumSink = -3.0f; }
+    else if(self.iMinimumSink == 3) { self.fMinimumSink = -4.0f; }
+    else if(self.iMinimumSink == 4) { self.fMinimumSink = -6.0f; }
+    else if(self.iMinimumSink == 5) { self.fMinimumSink = -10.0f; }
   }
 
   function loadActivityAutoStart() as Boolean {
@@ -672,13 +660,13 @@ class MySettings {
 
   function loadGeneralOxDisplay() as Boolean {
     var bValue = App.Properties.getValue("userGeneralOxDisplay") as Boolean?;
-    return bValue != null ? bValue : true;
+    return bValue != null ? ($.oMyProcessing.bOxSensor ? bValue : false) : $.oMyProcessing.bOxSensor;
   }
   function saveGeneralOxDisplay(_bValue as Boolean) as Void {
-    App.Properties.setValue("userGeneralOxDisplay", _bValue as App.PropertyValueType);
+    App.Properties.setValue("userGeneralOxDisplay", ($.oMyProcessing.bOxSensor ? _bValue : false) as App.PropertyValueType);
   }
   function setGeneralOxDisplay(_bValue as Boolean) as Void {
-    self.bGeneralOxDisplay = _bValue;
+    self.bGeneralOxDisplay = ($.oMyProcessing.bOxSensor ? _bValue : false);
   }
 
   function loadGeneralVarioDisplay() as Boolean {

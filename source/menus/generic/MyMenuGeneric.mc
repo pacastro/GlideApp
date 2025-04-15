@@ -141,7 +141,7 @@ class MyMenu2Generic extends Ui.Menu2 {
       Menu2.setTitle(Rez.Strings.titleSettingsMap);
       Menu2.addItem(new Ui.ToggleMenuItem(Rez.Strings.titleMapHeader, null, :menuMapHeader, $.oMySettings.bMapHeader, {:alignment=>WatchUi.MenuItem.MENU_ITEM_LABEL_ALIGN_RIGHT}));
       Menu2.addItem(new Ui.ToggleMenuItem(Rez.Strings.titleMapData, null, :menuMapData, $.oMySettings.bMapData, {:alignment=>WatchUi.MenuItem.MENU_ITEM_LABEL_ALIGN_RIGHT}));
-      Menu2.addItem(new Ui.ToggleMenuItem(Rez.Strings.titleMapTrack, null, :menuMapTrack, $.oMySettings.bMapTrack, {:alignment=>WatchUi.MenuItem.MENU_ITEM_LABEL_ALIGN_RIGHT}));
+      // Menu2.addItem(new Ui.ToggleMenuItem(Rez.Strings.titleMapTrack, null, :menuMapTrack, $.oMySettings.bMapTrack, {:alignment=>WatchUi.MenuItem.MENU_ITEM_LABEL_ALIGN_RIGHT}));
     }
 
     else if(menu == :menuSettingsOx) {
@@ -245,7 +245,7 @@ class MyMenu2GenericDelegate extends Ui.Menu2InputDelegate {
       else if(itemId == :menuGeneralChartDisplay) {
         $.oMySettings.saveGeneralChartDisplay(item.isEnabled());
         $.oMySettings.setGeneralChartDisplay($.oMySettings.loadGeneralChartDisplay());
-        if($.oMyProcessing.bIsPrevious == 5) {
+        if($.oMyProcessing.iIsCurrent == 5) {
           Ui.popView(Ui.SLIDE_IMMEDIATE);
           Ui.popView(Ui.SLIDE_IMMEDIATE);
           Ui.switchToView(new MyViewTimers(), new MyViewTimersDelegate(), Ui.SLIDE_IMMEDIATE);
@@ -271,13 +271,13 @@ class MyMenu2GenericDelegate extends Ui.Menu2InputDelegate {
     }
     else if(self.menu == :menuAltimeterCalibration) {
       if(itemId == :menuAltimeterCalibrationQNH) {
-        Ui.pushView(new MyPickerGenericPressure(:contextSettings, :itemAltimeterCalibration),
-                    new MyPickerGenericPressureDelegate(:contextSettings, :itemAltimeterCalibration, self.menu),
+        Ui.pushView(new MyPickerGeneric(:contextSettings, :itemAltimeterCalibration, :pressure),
+                    new MyPickerGenericDelegate(:contextSettings, :itemAltimeterCalibration, self.menu, :pressure),
                     Ui.SLIDE_LEFT);
       }
       else if(itemId == :menuAltimeterCalibrationElevation) {
-        Ui.pushView(new MyPickerGenericElevation(:contextSettings, :itemAltimeterCalibration),
-                    new MyPickerGenericElevationDelegate(:contextSettings, :itemAltimeterCalibration, self.menu),
+        Ui.pushView(new MyPickerGeneric(:contextSettings, :itemAltimeterCalibration, :elevation),
+                    new MyPickerGenericDelegate(:contextSettings, :itemAltimeterCalibration, self.menu, :elevation),
                     Ui.SLIDE_LEFT);
       }
     }
@@ -331,8 +331,8 @@ class MyMenu2GenericDelegate extends Ui.Menu2InputDelegate {
         $.oMySettings.setActivityAutoStart(item.isEnabled());
       }
       else if(itemId == :menuActivityAutoSpeedStart) {
-        Ui.pushView(new MyPickerGenericSpeed(:contextSettings, :itemActivityAutoSpeedStart),
-                    new MyPickerGenericSpeedDelegate(:contextSettings, :itemActivityAutoSpeedStart, self.menu),
+        Ui.pushView(new MyPickerGeneric(:contextSettings, :itemActivityAutoSpeedStart, :speed),
+                    new MyPickerGenericDelegate(:contextSettings, :itemActivityAutoSpeedStart, self.menu, :speed),
                     Ui.SLIDE_LEFT);
       }
     }
@@ -385,8 +385,8 @@ class MyMenu2GenericDelegate extends Ui.Menu2InputDelegate {
         $.oMySettings.setOxMeasure(item.isEnabled());
       }
       else if(itemId == :menuOxElevation) {
-        Ui.pushView(new MyPickerGenericElevation(:contextOx, itemId),
-                    new MyPickerGenericElevationDelegate(:contextOx, itemId, self.menu),
+        Ui.pushView(new MyPickerGeneric(:contextOx, itemId, :elevation),
+                    new MyPickerGenericDelegate(:contextOx, itemId, self.menu, :elevation),
                     Ui.SLIDE_LEFT);
       }
       else if(itemId == :menuOxCritical) {
@@ -421,12 +421,12 @@ class MyMenu2GenericDelegate extends Ui.Menu2InputDelegate {
       }
       else if(itemId == :menuActivitySave) {
         Ui.pushView(new Ui.Confirmation(Ui.loadResource(Rez.Strings.titleActivitySave) + "?"),
-                    new MyMenuGenericConfirmDelegate(:contextActivity, :actionSave, true),
+                    new MyMenuGenericConfirmDelegate(:contextActivity, :actionSave, false),
                     Ui.SLIDE_IMMEDIATE);
       }
       else if(itemId == :menuActivityDiscard) {
         Ui.pushView((self has :NoExclude)?(new MyMenuConfirmDiscard()) : (new Ui.Confirmation(Ui.loadResource(Rez.Strings.titleActivityDiscard) + "?")),
-                    (self has :NoExclude)?(new MyMenuConfirmDiscardDelegate(:actionDiscard, true)) : (new MyMenuGenericConfirmDelegate(:contextActivity, :actionDiscard, false)),
+                    (self has :NoExclude)?(new MyMenuConfirmDiscardDelegate(:actionDiscard, true)) : (new MyMenuGenericConfirmDelegate(:contextActivity, :actionDiscard, true)),
                     Ui.SLIDE_IMMEDIATE);
       }
     }

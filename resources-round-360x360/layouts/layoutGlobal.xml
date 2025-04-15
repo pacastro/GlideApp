@@ -34,36 +34,6 @@
     <label id="valueFooter" x="180" y="314" color="Gfx.COLOR_WHITE" justification="Gfx.TEXT_JUSTIFY_CENTER" font="Gfx.FONT_TINY" />
   </layout>
 
-  <layout id="layoutGlobalChart">
-    <drawable class="MyDrawableHeader" />
-    <drawable class="MyDrawableGlobal" />
-    <drawable id="drawContentBorders" />
-    <drawable id="drawFieldsBordersChart" />
-    <!-- Header -->
-    <label id="valueBatteryLevel" x="129" y="16" color="Gfx.COLOR_WHITE" justification="Gfx.TEXT_JUSTIFY_CENTER" font="@Fonts.fontStatus" />
-    <label id="valueActivityStatus" x="231" y="16" color="Gfx.COLOR_LT_GRAY" justification="Gfx.TEXT_JUSTIFY_CENTER" font="@Fonts.fontStatus" />
-    <!-- Fields -->
-    <label id="labelTopLeft" x="59" y="46" color="Gfx.COLOR_DK_GRAY" justification="Gfx.TEXT_JUSTIFY_LEFT" font="@Fonts.fontLabel" />
-    <label id="unitTopLeft" x="173" y="46" color="Gfx.COLOR_DK_GRAY" justification="Gfx.TEXT_JUSTIFY_RIGHT" font="@Fonts.fontUnit" />
-    <label id="valueTopLeft" x="101" y="59" color="Gfx.COLOR_WHITE" justification="Gfx.TEXT_JUSTIFY_CENTER" font="Gfx.FONT_LARGE" />
-    <label id="labelTopRight" x="188" y="46" color="Gfx.COLOR_DK_GRAY" justification="Gfx.TEXT_JUSTIFY_LEFT" font="@Fonts.fontLabel" />
-    <label id="unitTopRight" x="307" y="46" color="Gfx.COLOR_DK_GRAY" justification="Gfx.TEXT_JUSTIFY_RIGHT" font="@Fonts.fontUnit" />
-    <label id="valueTopRight" x="258" y="59" color="Gfx.COLOR_WHITE" justification="Gfx.TEXT_JUSTIFY_CENTER" font="Gfx.FONT_LARGE" />
-    <label id="labelLeft" x="8" y="136" color="Gfx.COLOR_DK_GRAY" justification="Gfx.TEXT_JUSTIFY_LEFT" font="@Fonts.fontLabel" />
-    <label id="unitLeft" x="127" y="136" color="Gfx.COLOR_DK_GRAY" justification="Gfx.TEXT_JUSTIFY_RIGHT" font="@Fonts.fontUnit" />
-    <label id="labelCenter" x="180" y="136" color="Gfx.COLOR_DK_GRAY" justification="Gfx.TEXT_JUSTIFY_CENTER" font="@Fonts.fontLabel" />
-    <label id="labelBottomLeft" x="16" y="226" color="Gfx.COLOR_DK_GRAY" justification="Gfx.TEXT_JUSTIFY_LEFT" font="@Fonts.fontLabel" />
-    <label id="unitBottomLeft" x="174" y="226" color="Gfx.COLOR_DK_GRAY" justification="Gfx.TEXT_JUSTIFY_RIGHT" font="@Fonts.fontUnit" />
-    <label id="valueBottomLeft" x="109" y="248" color="Gfx.COLOR_WHITE" justification="Gfx.TEXT_JUSTIFY_CENTER" font="Gfx.FONT_LARGE" />
-    <label id="labelBottomRight" x="186" y="226" color="Gfx.COLOR_DK_GRAY" justification="Gfx.TEXT_JUSTIFY_LEFT" font="@Fonts.fontLabel" />
-    <label id="unitBottomRight" x="344" y="226" color="Gfx.COLOR_DK_GRAY" justification="Gfx.TEXT_JUSTIFY_RIGHT" font="@Fonts.fontUnit" />
-    <label id="valueBottomRight" x="251" y="248" color="Gfx.COLOR_WHITE" justification="Gfx.TEXT_JUSTIFY_CENTER" font="Gfx.FONT_LARGE" />
-    <!-- Footer -->
-    <label id="valueFooter" x="180" y="314" color="Gfx.COLOR_WHITE" justification="Gfx.TEXT_JUSTIFY_CENTER" font="Gfx.FONT_TINY" />
-    <!-- Hint -->
-    <bitmap id="rightBottom" personality="system_icon_dark__hint_button_right_bottom system_loc__hint_button_right_bottom" />
-  </layout>
-
   <layout id="DeleteConfirmationPage">
     <bitmap id="confirmIcon" personality="confirmation_icon__hint_keep confirmation_loc__hint_keep" />
     <bitmap id="deleteIcon" personality="confirmation_icon__hint_delete confirmation_loc__hint_delete" />

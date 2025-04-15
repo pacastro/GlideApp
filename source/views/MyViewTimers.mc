@@ -57,7 +57,7 @@ class MyViewTimers extends MyViewGlobal {
 
   function initialize() {
     //Populate last view
-    $.oMyProcessing.bIsPrevious = 5;
+    $.oMyProcessing.iIsCurrent = 5;
     MyViewGlobal.initialize();
 
     // Internals
@@ -108,22 +108,24 @@ class MyViewTimers extends MyViewGlobal {
     (View.findDrawableById("labelBottomRight") as Ui.Text).setText(Ui.loadResource(Rez.Strings.labelElapsed) as String);
     (View.findDrawableById("unitBottomRight") as Ui.Text).setText("hh:mm");
 
+    // Layer
+    auxLayer = new AuxLayer(false, $.oMySettings.bGeneralChartDisplay && (bActStop ? bActPause : true), false);
+
     // Unmute tones
 
   }
 
   function onUpdate(_oDC as Gfx.Dc) as Void {
-    //Sys.println("DEBUG: MyViewVarioplot.onUpdate()");
+    // Sys.println("DEBUG: MyViewTimers.onUpdate()");
 
     // Update layout
     MyViewGlobal.onUpdate(_oDC);
     if($.oMySettings.bGeneralChartDisplay) { self.drawChart(_oDC); }
-    self.updateLayout(true);
     
   }
 
   function updateLayout(_b) {
-    //Sys.println("DEBUG: MyViewGlobal.updateLayout()");
+    // Sys.println("DEBUG: MyViewTimers.updateLayout()");
     MyViewGlobal.updateLayout(true);
 
     // Fields
@@ -148,10 +150,12 @@ class MyViewTimers extends MyViewGlobal {
     var fValue;
     var sValue;
 
+    var d = bActStop ? App.Storage.getValue(format("storLog$1$", [$.iMyLogIndex.format("%02d")])) as Dictionary? : null;
+    
     // ... distance
     (self.oRezValueTopLeft as Ui.Text).setColor(bRecording ? self.iColorText : self.iColorTextGr);
-    if($.oMyActivity != null) {
-      fValue = ($.oMyActivity as MyActivity).fGlobalDistance * $.oMySettings.fUnitDistanceCoefficient;
+    if($.oMyActivity != null || (bActStop && LangUtils.notNaN(d))) {
+      fValue = (bActStop ? d["distance"] : $.oMyActivity.fGlobalDistance) * $.oMySettings.fUnitDistanceCoefficient;
       sValue = fValue.format("%.1f");
     }
     else {
@@ -161,8 +165,8 @@ class MyViewTimers extends MyViewGlobal {
 
     // ... ascent
     (self.oRezValueTopRight as Ui.Text).setColor(bRecording ? self.iColorText : self.iColorTextGr);
-    if($.oMyActivity != null) {
-      fValue = $.oMyActivity.fGlobalAscent * $.oMySettings.fUnitElevationCoefficient;
+    if($.oMyActivity != null || (bActStop && LangUtils.notNaN(d))) {
+      fValue = (bActStop ? d["ascent"] : $.oMyActivity.fGlobalAscent) * $.oMySettings.fUnitElevationCoefficient;
       sValue = fValue.format("%.0f");
     }
     else {
@@ -209,8 +213,8 @@ class MyViewTimers extends MyViewGlobal {
 
     // ... recording: start
     (self.oRezValueBottomLeft as Ui.Text).setColor(bRecording ? self.iColorText : self.iColorTextGr);
-    if($.oMyActivity != null) {
-      sValue = LangUtils.formatTime(($.oMyActivity as MyActivity).oTimeStart, $.oMySettings.bUnitTimeUTC, false);
+    if($.oMyActivity != null || (bActStop && LangUtils.notNaN(d))) {
+      sValue = LangUtils.formatTime(bActStop ? new Time.Moment(d["timeStart"]) : $.oMyActivity.oTimeStart, $.oMySettings.bUnitTimeUTC, false);
     }
     else {
       sValue = $.MY_NOVALUE_LEN3;
@@ -220,56 +224,56 @@ class MyViewTimers extends MyViewGlobal {
     // ... recording: elapsed
     (self.oRezValueBottomRight as Ui.Text).setColor(bRecording ? self.iColorText : self.iColorTextGr);
     sValue = $.MY_NOVALUE_LEN3;
-    if($.oMyActivity != null) {
-      if($.oMyActivity.isRecording()) {
+    if($.oMyActivity != null || bActStop) {
+      if(!bActStop && $.oMyActivity.isRecording()) {
         sValue = LangUtils.formatElapsedTime($.oMyActivity.oTimeStart, oTimeNow.subtract($.oMyActivity.oTimePauseTot), false);
       }
-      else if(($.oMyActivity.oTimeStop != null)&&($.oMyActivity.oTimePauseTot != null)) {
-        sValue = LangUtils.formatElapsedTime($.oMyActivity.oTimeStart, $.oMyActivity.oTimeStop.subtract($.oMyActivity.oTimePauseTot), false);
+      if(LangUtils.notNaN(d) || ($.oMyActivity.oTimeStop != null)&&($.oMyActivity.oTimePauseTot != null)) {
+        sValue = LangUtils.formatElapsedTime(bActStop ? new Time.Moment(d["timeStart"]) : $.oMyActivity.oTimeStart, 
+                                            bActStop ? (new Time.Moment(d["timeStop"])).subtract(new Time.Duration(d["timePause"])) : $.oMyActivity.oTimeStop.subtract($.oMyActivity.oTimePauseTot), false);
       }
     }
     (self.oRezValueBottomRight as Ui.Text).setText(sValue);
   }
 
   function drawChart(_oDC as Gfx.Dc) as Void {
+    // Sys.println("DEBUG: MyViewTimers.drawChart()");
     var iX1 = (_oDC.getWidth()*0.018f).toNumber();
     var iX2 = _oDC.getWidth() - iX1;
     var iY1 = (_oDC.getHeight()*0.375f).toNumber();
     var iY2 = (_oDC.getHeight()*0.627f).toNumber();
 
     var model = oChartModelAlt;
-    switch($.oMySettings.loadChartDisplay()) {
-    default: 
-    case 0:
+    var iChartIdx = $.oMySettings.loadChartDisplay();
+    if(iChartIdx == 0) {
       range_min_size = 30;
       coef = $.oMySettings.fUnitElevationCoefficient;
       model = oChartModelAlt;
-      break;
-    case 1:
+    }
+    else if(iChartIdx == 1) {
       range_min_size = 10;
       coef = $.oMySettings.fUnitElevationCoefficient;
       model = oChartModelAsc;
-      break;
-    case 2:
+    }
+    else if(iChartIdx == 2) {
       range_min_size = 0.5;
       coef = $.oMySettings.fUnitVerticalSpeedCoefficient;
       model = oChartModelCrt;
-      break;
-    case 3:
+    }
+    else if(iChartIdx == 3) {
       range_min_size = 20;
       coef = $.oMySettings.fUnitHorizontalSpeedCoefficient;
       model = oChartModelSpd;
-      break;
-    case 4:
+    }
+    else if(iChartIdx == 4) {
       range_min_size = 10;
       coef = 1;
       model = oChartModelHR;
-      break;
-    case 5:
+    }
+    else if(iChartIdx == 5) {
       range_min_size = 0.5;
       coef = 1;
       model = oChartModelg;
-      break;
     }
 
     var chart = new MyChart(model);
@@ -280,6 +284,12 @@ class MyViewTimers extends MyViewGlobal {
     if(($.oMySettings.bChartValue)&&($.oMySettings.loadChartDisplay()!=1)) {
       _oDC.setColor(iColorTextGr, Gfx.COLOR_TRANSPARENT);
       _oDC.drawText((iX1+iX2)/2, (iY1+iY2)/2, Gfx.FONT_TINY, fmt_num(model.get_current()), Gfx.TEXT_JUSTIFY_CENTER|Gfx.TEXT_JUSTIFY_VCENTER);
+    }
+
+     if((bActStop ? !bActPause : false) && (Time.now().value() % 5 == 0)) {
+      iChartIdx = (iChartIdx+1) % 6;
+      $.oMySettings.saveChartDisplay(iChartIdx as Number);
+      $.oMySettings.setChartDisplay(iChartIdx as Number);
     }
   }
 
@@ -292,8 +302,9 @@ class MyViewTimers extends MyViewGlobal {
   }
 
   function onHide() {
-    //Sys.println("DEBUG: MyViewGlobal.onHide()");
+    //Sys.println("DEBUG: MyViewTimers.onHide()");
     MyViewGlobal.onHide();
+    auxLayer.onHide();
 
     // Mute tones
     (App.getApp() as MyApp).muteTones();

@@ -58,7 +58,6 @@ class MyViewLog extends MyViewGlobal {
   //
   // VARIABLES
   //
-  (:icon) var NoExclude as Symbol = :NoExclude;
   // Resources (cache)
   // ... fields (units)
   private var oRezUnitLeft as Ui.Text?;
@@ -67,8 +66,6 @@ class MyViewLog extends MyViewGlobal {
   // ... strings
   private var sTitle as String = "Log";
   private var sUnitElevation_fmt as String = "[m]";
-  // // ... Layer
-  public var hintLayer as Ui.View?;
 
   // Internals
   // ... fields
@@ -86,7 +83,7 @@ class MyViewLog extends MyViewGlobal {
 
   function initialize() {
     //Populate last view
-    $.oMyProcessing.bIsPrevious = 6;
+    $.oMyProcessing.iIsCurrent = 6;
     MyViewGlobal.initialize();
 
     // Current view/log index
@@ -141,8 +138,8 @@ class MyViewLog extends MyViewGlobal {
     (self.oRezValueFooter as Ui.Text).setColor(Gfx.COLOR_DK_GRAY);
     (self.oRezValueFooter as Ui.Text).setText(Ui.loadResource(Rez.Strings.titleViewLog) as String);
 
-    // ... Layer hint buttons
-    if((self has :NoExclude) && ($.iMyViewLogIndex >= 0)) { hintLayer = new HintLayer(true, true); }
+    // ... Layer
+    auxLayer = new AuxLayer(true, true, false);
   }
 
   function onUpdate(_oDC as Gfx.Dc) as Void {
@@ -326,6 +323,13 @@ class MyViewLog extends MyViewGlobal {
     // Done
     self.dictLog = d;
   }
+
+  function onHide() {
+    //Sys.println("DEBUG: MyViewGeneral.onHide()");
+    MyViewGlobal.onHide();
+
+    auxLayer.onHide();
+  }
 }
 
 class MyViewLogDelegate extends MyViewGlobalDelegate {
@@ -340,7 +344,7 @@ class MyViewLogDelegate extends MyViewGlobalDelegate {
       $.iMyViewLogIndex = $.iMyLogIndex;
     }
     else {
-      $.iMyViewLogIndex = ($.iMyViewLogIndex + 1) % $.MY_STORAGE_SLOTS;
+      $.iMyViewLogIndex = $.iMyViewLogIndex > $.iMyLogIndex ? 0 : ($.iMyViewLogIndex + 1) % $.MY_STORAGE_SLOTS;
     }
     Ui.requestUpdate();
     return true;
@@ -352,7 +356,7 @@ class MyViewLogDelegate extends MyViewGlobalDelegate {
       $.iMyViewLogIndex = $.iMyLogIndex;
     }
     else {
-      $.iMyViewLogIndex = ($.iMyViewLogIndex - 1 + $.MY_STORAGE_SLOTS) % $.MY_STORAGE_SLOTS;
+      $.iMyViewLogIndex = $.iMyViewLogIndex == 0 ? $.iMyLogIndex + 1 : ($.iMyViewLogIndex - 1) % $.MY_STORAGE_SLOTS;
     }
     Ui.requestUpdate();
     return true;
@@ -368,7 +372,7 @@ class MyViewLogDelegate extends MyViewGlobalDelegate {
 
   function onNextPage() {
     //Sys.println("DEBUG: MyViewLogDelegate.onNextPage()");
-    iViewGenOxIdx = 1;
+    iViewGenOxIdx = $.oMySettings.bGeneralOxDisplay ? 1 : 0;
     Ui.switchToView(new MyViewGeneral(),
                     new MyViewGeneralDelegate(),
                     Ui.SLIDE_IMMEDIATE);

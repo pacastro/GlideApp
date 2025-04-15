@@ -1,2 +1,3 @@
 bin
-*.DS_Store
+Pics
+.DS_Store

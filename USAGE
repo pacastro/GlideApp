@@ -11,12 +11,11 @@ Usage instructions
          *independently* from the help this application can offer.
 
   In particular, this application relies on barometric pressure to derive
-  the altitude and MUST NOT BE USED IN A PRESSURIZED AIRCRAFT.
+  the altitude and WILL NOT WORK IN A PRESSURIZED AIRCRAFT.
 
   WARNING: This app is intended only as an in-flight aid and should not be
   used as a primary information source. This app contains a barometric
-  altimeter, it will not function in a pressurized aircraft and should
-  not be used in a pressurized aircraft.
+  altimeter, it will not function in a pressurized aircraft.
 
   WARNING: Blood Oxygen Saturation readings (SpO2) is intended only as an 
   in-flight aid, smartwatch sensors still have shortcomings that can limit
@@ -168,12 +167,12 @@ the range strip (tracking altitude variation only dAlt). You can also select
 (see Settings) to display a secondary needle for kinetic energy (speed) compensated 
 variations (dE), compensating pure altitude variations with exchance of speed into 
 altitde (kinetic into potential energy) and vice versa. An efficiency of 90% is used 
-for energy conversions alonside with GPS derived ground speed.. so this is an 
-aproximation to a real Total Energy variometer.
+for energy conversions alongside with GPS derived ground speed.. so this is an 
+aproximation to a real Total Energy variometer as no real air speed can be used.
 
-Additionally a green T bug indicator is also displayed graphically 
-showing the average vertical speed for the last thermal or the average for the last
-n seconds (average time selected).
+Additionally a green T bug indicator is also displayed graphically showing the 
+average vertical speed for the last thermal or the average for the last n seconds 
+(average time selected).
 
 There is a secondary inner strip that shows the min and max acceleration (g) 
 readings, the min-max range is shown in yellow. The current g load is shown with a 
@@ -268,6 +267,19 @@ Chart display is on by default, can be turned off in settings General tab. When 
 display is on, a new Chart tab in Settings is available where you can configure the
 different options (see Chart in Setup below for more details).
 
+On activity save, the view automatically goes to Timers page for the user to review last 
+activity statistics, the chart cycles automatically through all variables (if enabled) 
+every 5 seconds. 
+
+In review mode Select button offers actions: 
+  - done - exits the app 
+  - back - goes back to normal app mode maintaining last activity data in Timers view 
+  - clear - goes back to normal app mode claering last activity data in Timers view 
+  
+Back button no longer cycles through chart variables (if enabled) in this review mode, 
+it exits the app. Using Select button and back or clear options brings back the back 
+button normal functionality. 
+
 Log View
 --------
 
@@ -303,20 +315,32 @@ Controlling your activity recording status (start, pause, resume, save, discard)
 is achieved by pressing the SELECT button.
 
 GlideApp adds custom fields to the recorded FIT file:
- - Blood Oxygen Saturation (SpO2, 0 value when no valid reading)
- - Barometric Altitude
- - Vertical Speed
- - Acceleration (g)
- - Rate of Turn
+  - Blood Oxygen Saturation (SpO2, 0 value when no valid reading)
+  - Barometric Altitude
+  - Vertical Speed
+  - Acceleration (g)
+  - Rate of Turn
 (which will be plotted in Garmin Connect IF your installed the application
  through the Garmin ConnectIQ store)
 
 For the entire recording session, Garmin Connect will also show the following details:
- - Distance: non-thermalling distance
- - Ascent: cumulative altitude gain and elapsed time spent ascending
- - Minimum Altitude: value and time
- - Maximum Altitude: value and time
+  - Distance: non-thermalling distance
+  - Ascent: cumulative altitude gain and elapsed time spent ascending
+  - Minimum Altitude: value and time
+  - Maximum Altitude: value and time
 
+On activity save, the view automatically goes to Timers page for the user to review last 
+activity statistics, the chart cycles automatically through all variables (if enabled) 
+every 5 seconds. 
+
+In review mode Select button offers actions: 
+  - done - exits the app 
+  - back - goes back to normal app mode maintaining last activity data in Timers view 
+  - clear - goes back to normal app mode claering last activity data in Timers view 
+  
+In this review mode Back button no longer cycles through chart variables (if enabled), 
+it exits the app. Using Select button and back or clear options restores the back 
+button normal functionality. 
 
 !!!! ABOUT ALTITUDE RECORDING !!!!
 

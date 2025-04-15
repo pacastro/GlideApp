@@ -242,8 +242,13 @@ class MyChartModel {
     var min_i;
     var max_i;
 
-    function initialize() {
-        set_range_minutes(min_range_minutes);
+    function initialize(_data) {
+        if(_data == null) { set_range_minutes(min_range_minutes); }
+        else {
+            values = _data;
+            values_size = values.size();
+            update_stats();
+        }
     }
 
     function reset() {
@@ -397,67 +402,3 @@ class MyChartModel {
         }
     }
 }
-
-class MyChartModelEstatic {
-
-    var values_size;
-    var values as AFloats?;
-
-    var min;
-    var max;
-    var min_i;
-    var max_i;
-
-    function initialize(_data) {
-        values = _data;
-        values_size = values.size();
-
-        update_stats();
-    }
-
-    function get_values() {
-        return values;
-    }
-
-    function get_min() {
-        return min;
-    }
-
-    function get_max() {
-        return max;
-    }
-
-    function get_min_i() {
-        return min_i;
-    }
-
-    function get_max_i() {
-        return max_i;
-    }
-
-    function get_min_max_interesting() {
-        return max != -99999999 and min != max;
-    }
-
-    function update_stats() {
-        min = 99999999;
-        max = -99999999;
-        min_i = values.size();
-        max_i = values.size();
-
-        for (var i = 0; i < values.size(); i++) {
-            var item = values[i];
-            if (item != null) {
-                if (item < min) {
-                    min_i = i;
-                    min = item;
-                }
-                if (item > max) {
-                    max_i = i;
-                    max = item;
-                }
-            }
-        }
-    }
-}
-
