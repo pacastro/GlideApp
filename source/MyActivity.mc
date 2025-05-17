@@ -134,8 +134,8 @@ class MyActivity {
     // SPORT_FLYING = 20 (since API 3.2)
     oSession = AR.createSession({
         :name => "GlideApp",
-        :sport => 20 as Activity.Sport,
-        :subSport => Activity.SUB_SPORT_GENERIC});
+        :sport => 20 as Activity.Sport,         // ... Activity.SPORT_FLYING
+        :subSport => 0 as Activity.SubSport});  // ... Activity.SUB_SPORT_GENERIC
 
     // FIT fields
 

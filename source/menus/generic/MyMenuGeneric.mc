@@ -85,6 +85,7 @@ class MyMenu2Generic extends Ui.Menu2 {
       }
       Menu2.addItem(new Ui.ToggleMenuItem(Rez.Strings.titleGeneralChartDisplay, null, :menuGeneralChartDisplay, $.oMySettings.bGeneralChartDisplay, {:alignment=>WatchUi.MenuItem.MENU_ITEM_LABEL_ALIGN_RIGHT}));
       Menu2.addItem(new Ui.ToggleMenuItem(Rez.Strings.titleGeneralETDisplay, null, :menuGeneralETDisplay, $.oMySettings.bGeneralETDisplay, {:alignment=>WatchUi.MenuItem.MENU_ITEM_LABEL_ALIGN_RIGHT}));
+      Menu2.addItem(new Ui.MenuItem(Rez.Strings.titleStorageClearLastLog, null, :menuStorageClearLastLog, {}));
       Menu2.addItem(new Ui.MenuItem(Rez.Strings.titleStorageClearLogs, null, :menuStorageClearLogs, {}));
     }
 
@@ -129,12 +130,15 @@ class MyMenu2Generic extends Ui.Menu2 {
     }
 
     else if(menu == :menuSettingsChart) {
+      var n = 0;
+      for(var i = 0; i < 6; i++) { n += App.Properties.getValue("userChartVars").toUtf8Array()[i] == 49 ? 1 : 0; }
       Menu2.setTitle(Rez.Strings.titleSettingsChart);
       Menu2.addItem(new Ui.ToggleMenuItem(Rez.Strings.titleChartMinMax, null, :menuChartMinMax, $.oMySettings.bChartMinMax, {:alignment=>WatchUi.MenuItem.MENU_ITEM_LABEL_ALIGN_RIGHT}));
       Menu2.addItem(new Ui.ToggleMenuItem(Rez.Strings.titleChartValue, null, :menuChartValue, $.oMySettings.bChartValue, {:alignment=>WatchUi.MenuItem.MENU_ITEM_LABEL_ALIGN_RIGHT}));
       Menu2.addItem(new Ui.ToggleMenuItem(Rez.Strings.titleChartShow, {:enabled=>"activity recording", :disabled=>"always on"}, :menuChartShow, $.oMySettings.bChartShow, {:alignment=>WatchUi.MenuItem.MENU_ITEM_LABEL_ALIGN_RIGHT}));
       Menu2.addItem(new Ui.ToggleMenuItem(Rez.Strings.titleChartRange, {:enabled=>"4 hrs", :disabled=>"30 min (chart reset)"}, :menuChartRange, $.oMySettings.bChartRange, {:alignment=>WatchUi.MenuItem.MENU_ITEM_LABEL_ALIGN_RIGHT}));
       Menu2.addItem(new Ui.MenuItem(Rez.Strings.titleChartDisplay, $.oMySettings.sChartDisplay, :menuChartDisplay, {}));
+      Menu2.addItem(new Ui.MenuItem(Rez.Strings.titleChartVars, format("$1$/6", [n]), :menuChartVars, {}));
     }
 
     else if(menu == :menuSettingsMap) {
@@ -154,11 +158,11 @@ class MyMenu2Generic extends Ui.Menu2 {
 
     else if(menu == :menuSettingsUnits) {
       Menu2.setTitle(Rez.Strings.titleSettingsUnits);
-      Menu2.addItem(new Ui.MenuItem(Rez.Strings.titleUnitDistance, $.oMySettings.sUnitDistance, :menuUnitDistance, {}));
-      Menu2.addItem(new Ui.MenuItem(Rez.Strings.titleUnitElevation, $.oMySettings.sUnitElevation, :menuUnitElevation, {}));
-      Menu2.addItem(new Ui.MenuItem(Rez.Strings.titleUnitPressure, $.oMySettings.sUnitPressure, :menuUnitPressure, {}));
+      Menu2.addItem(new Ui.MenuItem(Rez.Strings.titleUnitDistance, format("$1$$2$", [$.oMySettings.sUnitDistance, ($.oMySettings.iUnitDistance < 0 ? "  (auto)" : "")]), :menuUnitDistance, {}));
+      Menu2.addItem(new Ui.MenuItem(Rez.Strings.titleUnitElevation, format("$1$$2$", [$.oMySettings.sUnitElevation, ($.oMySettings.iUnitElevation < 0 ? "  (auto)" : "")]), :menuUnitElevation, {}));
+      Menu2.addItem(new Ui.MenuItem(Rez.Strings.titleUnitPressure, format("$1$$2$", [$.oMySettings.sUnitPressure, ($.oMySettings.iUnitPressure < 0 ? "  (auto)" : "")]), :menuUnitPressure, {}));
       Menu2.addItem(new Ui.MenuItem(Rez.Strings.titleUnitRateOfTurn, $.oMySettings.sUnitRateOfTurn, :menuUnitRateOfTurn, {}));
-      Menu2.addItem(new Ui.MenuItem(Rez.Strings.titleUnitWindSpeed, $.oMySettings.sUnitWindSpeed, :menuUnitWindSpeed, {}));
+      Menu2.addItem(new Ui.MenuItem(Rez.Strings.titleUnitWindSpeed, format("$1$$2$", [$.oMySettings.sUnitWindSpeed, ($.oMySettings.iUnitWindSpeed < 0 ? "  (auto)" : "")]), :menuUnitWindSpeed, {}));
       Menu2.addItem(new Ui.MenuItem(Rez.Strings.titleUnitDirection, $.oMySettings.sUnitDirection, :menuUnitDirection, {}));   
       Menu2.addItem(new Ui.MenuItem(Rez.Strings.titleUnitHeading, $.oMySettings.sUnitHeading, :menuUnitHeading, {}));    
       Menu2.addItem(new Ui.MenuItem(Rez.Strings.titleUnitTimeUTC, $.oMySettings.sUnitTime, :menuUnitTimeUTC, {})); 
@@ -198,29 +202,29 @@ class MyMenu2GenericDelegate extends Ui.Menu2InputDelegate {
   //
 
   private var menu as Symbol = :menuNone;
+  private var check as Boolean = false;
   (:icon) var NoExclude as Symbol = :NoExclude;
 
   //
   // FUNCTIONS: Ui.MenuInputDelegate (override/implement)
   //
 
-  function initialize(_menu as Symbol) {
+  function initialize(_menu as Symbol, _check as Boolean) {
     Menu2InputDelegate.initialize();
     self.menu = _menu;
+    self.check = _check;
   }
 
-  function onSelect(_item as Ui.MenuItem) {
-    var item = _item as Ui.ToggleMenuItem;
-    var itemId = _item.getId() as Symbol;
+  function onSelect(_item) {
+    var item = self.check ? _item as Ui.CheckboxMenuItem : _item as Ui.ToggleMenuItem;
+    var itemId = self.check ? item.getId() as Number : _item.getId() as Symbol;
     if(self.menu == :menuSettings) {
       if(itemId == :menuInfo) {
         Ui.popView(Ui.SLIDE_IMMEDIATE);
-        Ui.switchToView(new MyViewInfo(), new MyViewInfoDelegate(), Ui.SLIDE_IMMEDIATE);
+        Ui.switchToView(new MyViewInfo(), new MyViewInfoDelegate(), Ui.SLIDE_LEFT);
       }
       else {
-        Ui.pushView(new MyMenu2Generic(itemId, 0),
-                    new MyMenu2GenericDelegate(itemId),
-                    Ui.SLIDE_IMMEDIATE);
+        Ui.pushView(new MyMenu2Generic(itemId, 0), new MyMenu2GenericDelegate(itemId, false), Ui.SLIDE_LEFT);
       }
     }
 
@@ -232,20 +236,17 @@ class MyMenu2GenericDelegate extends Ui.Menu2InputDelegate {
       }
       else if(itemId == :menuGeneralOxDisplay) {
         $.oMySettings.saveGeneralOxDisplay(item.isEnabled());
-        $.oMySettings.setGeneralOxDisplay(item.isEnabled());
       }
       else if(itemId == :menuGeneralVarioDisplay) {
         $.oMySettings.saveGeneralVarioDisplay(item.isEnabled());
-        $.oMySettings.setGeneralVarioDisplay(item.isEnabled());
       }
       else if(itemId == :menuGeneralMapDisplay) {
         $.oMySettings.saveGeneralMapDisplay(item.isEnabled());
-        $.oMySettings.setGeneralMapDisplay(item.isEnabled());
       }
       else if(itemId == :menuGeneralChartDisplay) {
         $.oMySettings.saveGeneralChartDisplay(item.isEnabled());
-        $.oMySettings.setGeneralChartDisplay($.oMySettings.loadGeneralChartDisplay());
         if($.oMyProcessing.iIsCurrent == 5) {
+          if(App.Properties.getValue("userChartVars").toNumber() == 0) { App.Properties.setValue("userChartVars", "100000"); chartRun(-1); }
           Ui.popView(Ui.SLIDE_IMMEDIATE);
           Ui.popView(Ui.SLIDE_IMMEDIATE);
           Ui.switchToView(new MyViewTimers(), new MyViewTimersDelegate(), Ui.SLIDE_IMMEDIATE);
@@ -253,7 +254,11 @@ class MyMenu2GenericDelegate extends Ui.Menu2InputDelegate {
       }
       else if(itemId == :menuGeneralETDisplay) {
         $.oMySettings.saveGeneralETDisplay(item.isEnabled());
-        $.oMySettings.setGeneralETDisplay(item.isEnabled());
+      }
+      else if(itemId == :menuStorageClearLastLog) {
+        Ui.pushView((self has :NoExclude)?(new MyMenuConfirmDiscard()) : (new Ui.Confirmation(Ui.loadResource(Rez.Strings.titleActivityDiscard) + "?")),
+                    (self has :NoExclude)?(new MyMenuConfirmDiscardDelegate(:actionClearLastLog, false)) : (new MyMenuGenericConfirmDelegate(:contextStorage, :actionClearLastLog, false)),
+                    Ui.SLIDE_IMMEDIATE);
       }
       else if(itemId == :menuStorageClearLogs) {
         Ui.pushView((self has :NoExclude)?(new MyMenuConfirmDiscard()) : (new Ui.Confirmation(Ui.loadResource(Rez.Strings.titleActivityDiscard) + "?")),
@@ -265,7 +270,7 @@ class MyMenu2GenericDelegate extends Ui.Menu2InputDelegate {
     else if(self.menu == :menuSettingsAltimeter) {
       if(itemId == :menuAltimeterCalibration) {
         Ui.pushView(new MyMenu2Generic(:menuAltimeterCalibration, 0),
-                    new MyMenu2GenericDelegate(:menuAltimeterCalibration),
+                    new MyMenu2GenericDelegate(:menuAltimeterCalibration, false),
                     Ui.SLIDE_IMMEDIATE);
       }
     }
@@ -283,21 +288,32 @@ class MyMenu2GenericDelegate extends Ui.Menu2InputDelegate {
     }
 
     else if(self.menu == :menuSettingsVariometer) {
-      if(itemId == :menuVariometerAvgLast) {
+      if(itemId == :menuVariometerRange) {
+        var iUnitIdx = ($.oMySettings.loadVariometerRange() + 1) % 3;
+        $.oMySettings.saveVariometerRange(iUnitIdx as Number);
+        Ui.switchToView(new MyMenu2Generic(:menuSettingsVariometer, 0), new MyMenu2GenericDelegate(:menuSettingsVariometer, false), Ui.SLIDE_IMMEDIATE);
+      }
+      else if(itemId == :menuVariometerSmoothing) {
+        var iUnitIdx = ($.oMySettings.loadVariometerSmoothing() + 1) % 4;
+        $.oMySettings.saveVariometerSmoothing(iUnitIdx as Number);
+        Ui.switchToView(new MyMenu2Generic(:menuSettingsVariometer, 1), new MyMenu2GenericDelegate(:menuSettingsVariometer, false), Ui.SLIDE_IMMEDIATE);
+      }
+      else if(itemId == :menuVariometerAvgTime) {
+        var iUnitIdx = ($.oMySettings.loadVariometerAvgTime() + 1) % 4;
+        $.oMySettings.saveVariometerAvgTime(iUnitIdx as Number);
+        Ui.switchToView(new MyMenu2Generic(:menuSettingsVariometer, 2), new MyMenu2GenericDelegate(:menuSettingsVariometer, false), Ui.SLIDE_IMMEDIATE);
+      }
+      else if(itemId == :menuVariometerAvgLast) {
         $.oMySettings.saveVariometerAvgLast(item.isEnabled());
-        $.oMySettings.setVariometerAvgLast(item.isEnabled());
       }
       else if(itemId == :menuVariometerdE) {
         $.oMySettings.saveVariometerdE(item.isEnabled());
-        $.oMySettings.setVariometerdE(item.isEnabled());
       }
       else if(itemId == :menuVariometerAutoThermal) {
         $.oMySettings.saveVariometerAutoThermal(item.isEnabled());
-        $.oMySettings.setVariometerAutoThermal(item.isEnabled());
       }
       else if(itemId == :menuVariometerThermalDetect) {
         $.oMySettings.saveVariometerThermalDetect(item.isEnabled());
-        $.oMySettings.setVariometerThermalDetect(item.isEnabled());
       }
       else if(itemId == :menuVariometerPlotOrientation) {
         $.oMySettings.saveVariometerPlotOrientation(item.isEnabled()?0:1);
@@ -340,49 +356,60 @@ class MyMenu2GenericDelegate extends Ui.Menu2InputDelegate {
     else if(self.menu == :menuSettingsChart) {
       if(itemId == :menuChartMinMax) {
         $.oMySettings.saveChartMinMax(item.isEnabled());
-        $.oMySettings.setChartMinMax(item.isEnabled());
       }
       else if(itemId == :menuChartValue) {
         $.oMySettings.saveChartValue(item.isEnabled());
-        $.oMySettings.setChartValue(item.isEnabled());
       }
       else if(itemId == :menuChartShow) {
         $.oMySettings.saveChartShow(item.isEnabled());
-        $.oMySettings.setChartShow(item.isEnabled());
       }
       else if(itemId == :menuChartRange) {
         $.oMySettings.saveChartRange(item.isEnabled());
-        $.oMySettings.setChartRange(item.isEnabled());
         bRangeChange = true;
         // if(!_item.isEnabled()) { bChartReset = true; }
       }
-      else if(itemId == :menuChartDisplay) {
-        Ui.pushView(new MyPickerGenericSettings(:contextChart, itemId),
-                    new MyPickerGenericSettingsDelegate(:contextChart, itemId, self.menu),
-                    Ui.SLIDE_LEFT);
+      else if((itemId == :menuChartDisplay) && (App.Properties.getValue("userChartVars").toNumber() != 0)) {
+        var iUnitIdx = ($.oMySettings.loadChartDisplay() + 1) % 6;
+        while(!chartRun(iUnitIdx)) { iUnitIdx = (iUnitIdx+1) % 6; }
+        $.oMySettings.saveChartDisplay(iUnitIdx as Number);
+        Ui.switchToView(new MyMenu2Generic(:menuSettingsChart, 4), new MyMenu2GenericDelegate(:menuSettingsChart, false), Ui.SLIDE_IMMEDIATE);
       }
+      else if(itemId == :menuChartVars) {
+        var Check = new WatchUi.CheckboxMenu({:title=>Rez.Strings.titleChartVars});
+        var sRead = App.Properties.getValue("userChartVars");
+        Check.addItem(new CheckboxMenuItem("Altitude", null, 0, sRead.substring(0,1).toNumber() == 1 ? true : false, {}));
+        Check.addItem(new CheckboxMenuItem("Ascent", null, 1, sRead.substring(1,2).toNumber() == 1 ? true : false, {}));
+        Check.addItem(new CheckboxMenuItem("Vert Speed", null, 2, sRead.substring(2,3).toNumber() == 1 ? true : false, {}));
+        Check.addItem(new CheckboxMenuItem("Speed", null, 3, sRead.substring(3,4).toNumber() == 1 ? true : false, {}));
+        Check.addItem(new CheckboxMenuItem("Heart Rate", null, 4, sRead.substring(4,5).toNumber() == 1 ? true : false, {}));
+        Check.addItem(new CheckboxMenuItem("g load", null, 5, sRead.substring(5,6).toNumber() == 1 ? true : false, {}));
+        Ui.pushView(Check, new MyMenu2GenericDelegate(:checkChartVars, true), Ui.SLIDE_LEFT);
+      }
+    }
+
+    else if(self.menu == :checkChartVars) {
+      var nAdjust = Math.pow(10,5-itemId).toNumber() * (item.isChecked() ? 1 : -1);
+      App.Properties.setValue("userChartVars", (App.Properties.getValue("userChartVars").toNumber() + nAdjust).format("%06i"));
+      $.oMySettings.setChartDisplay($.oMySettings.loadChartDisplay());
+      chartRun(-1);
     }
 
     else if(self.menu == :menuSettingsMap) {
       if(itemId == :menuMapHeader) {
         $.oMySettings.saveMapHeader(item.isEnabled());
-        $.oMySettings.setMapHeader(item.isEnabled());
         bMHChange = true;
       }
       else if(itemId == :menuMapData) {
         $.oMySettings.saveMapData(item.isEnabled());
-        $.oMySettings.setMapData(item.isEnabled());
       }
       else if(itemId == :menuMapTrack) {
         $.oMySettings.saveMapTrack(item.isEnabled());
-        $.oMySettings.setMapTrack(item.isEnabled());
       }
     }
 
     else if(self.menu == :menuSettingsOx) {
       if(itemId == :menuOxMeasure) {
         $.oMySettings.saveOxMeasure(item.isEnabled());
-        $.oMySettings.setOxMeasure(item.isEnabled());
       }
       else if(itemId == :menuOxElevation) {
         Ui.pushView(new MyPickerGeneric(:contextOx, itemId, :elevation),
@@ -396,14 +423,51 @@ class MyMenu2GenericDelegate extends Ui.Menu2InputDelegate {
     }
       else if(itemId == :menuOxVibrate) {
         $.oMySettings.saveOxVibrate(item.isEnabled());
-        $.oMySettings.setOxVibrate(item.isEnabled());
       }
     }
 
     else if(self.menu == :menuSettingsUnits) {
-        Ui.pushView(new MyPickerGenericSettings(:contextUnit, itemId),
-                    new MyPickerGenericSettingsDelegate(:contextUnit, itemId, self.menu),
-                    Ui.SLIDE_LEFT);
+      var iUnitIdx = 0;
+      if(itemId == :menuUnitDistance) {
+        iUnitIdx = ((($.oMySettings.loadUnitDistance() + 1) + 1) % 4) - 1;
+        $.oMySettings.saveUnitDistance(iUnitIdx as Number);
+        iUnitIdx = 0;
+      }
+      else if(itemId == :menuUnitElevation) {
+        iUnitIdx = ((($.oMySettings.loadUnitElevation() + 1) + 1) % 3) - 1;
+        $.oMySettings.saveUnitElevation(iUnitIdx as Number);
+        iUnitIdx = 1;
+      }
+      else if(itemId == :menuUnitPressure) {
+        iUnitIdx = ((($.oMySettings.loadUnitPressure() + 1) + 1) % 3) - 1;
+        $.oMySettings.saveUnitPressure(iUnitIdx as Number);
+        iUnitIdx = 2;
+      }
+      else if(itemId == :menuUnitRateOfTurn) {
+        iUnitIdx = ($.oMySettings.loadUnitRateOfTurn() + 1) % 2;
+        $.oMySettings.saveUnitRateOfTurn(iUnitIdx as Number);
+        iUnitIdx = 3;
+      }
+      else if(itemId == :menuUnitWindSpeed) {
+        iUnitIdx = ((($.oMySettings.loadUnitWindSpeed() + 1) + 1) % 5) - 1;
+        $.oMySettings.saveUnitWindSpeed(iUnitIdx as Number);
+        iUnitIdx = 4;
+      }
+      else if(itemId == :menuUnitDirection) {
+        iUnitIdx = ($.oMySettings.loadUnitDirection() + 1) % 2;
+        $.oMySettings.saveUnitDirection(iUnitIdx as Number);
+        iUnitIdx = 5;
+      }
+      else if(itemId == :menuUnitHeading) {
+        iUnitIdx = ($.oMySettings.loadUnitHeading() + 1) % 2;
+        $.oMySettings.saveUnitHeading(iUnitIdx as Number);
+        iUnitIdx = 6;
+      }
+      else if(itemId == :menuUnitTimeUTC) {
+        $.oMySettings.saveUnitTimeUTC(!$.oMySettings.loadUnitTimeUTC() as Boolean);
+        iUnitIdx = 7;
+      }
+      Ui.switchToView(new MyMenu2Generic(:menuSettingsUnits, iUnitIdx), new MyMenu2GenericDelegate(:menuSettingsUnits, false), Ui.SLIDE_IMMEDIATE);
     }
 
     else if(self.menu == :menuActivity) {
@@ -430,6 +494,15 @@ class MyMenu2GenericDelegate extends Ui.Menu2InputDelegate {
                     Ui.SLIDE_IMMEDIATE);
       }
     }
+  }
+
+  function onDone() {
+    Ui.popView(Ui.SLIDE_RIGHT);
+    if(self.menu == :checkChartVars) { Ui.switchToView(new MyMenu2Generic(:menuSettingsChart, 5), new MyMenu2GenericDelegate(:menuSettingsChart, false), Ui.SLIDE_RIGHT); }
+  }
+  function onBack() {
+    Ui.popView(Ui.SLIDE_RIGHT);
+    if(self.menu == :checkChartVars) { Ui.switchToView(new MyMenu2Generic(:menuSettingsChart, 5), new MyMenu2GenericDelegate(:menuSettingsChart, false), Ui.SLIDE_RIGHT); }
   }
 }
 

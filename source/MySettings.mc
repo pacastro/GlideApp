@@ -527,6 +527,7 @@ class MySettings {
     if(_iValue.toNumber() < 0 or _iValue.toNumber() > 5) {
       _iValue = 0;
     }
+    while(!chartRun(_iValue)&&(App.Properties.getValue("userChartVars").toNumber() > 0)) { _iValue = (_iValue+1) % 6; }
     if(_iValue == 0) { 
       self.sChartDisplay = "Altitude";
       self.sChartUnitDisplay = sUnitElevation;

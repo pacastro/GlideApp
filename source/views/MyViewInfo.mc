@@ -171,9 +171,7 @@ class MyViewInfo extends MyViewHeader {
       deltaT = fLat.abs() > 60 ? (self.twiLight(sValue, 60, fLon, :tl) * 60) : (self.twiLight(sValue, fLat, fLon, :tl) * 60);
       sValue2 = Gregorian.info(oValue.subtract(new Time.Duration(deltaT)), Time.FORMAT_SHORT);
     }
-    else {
-      sValue = $.MY_NOVALUE_LEN2;
-    }
+    else { sValue = $.MY_NOVALUE_LEN2; }
     _oDC.drawText(self.iLayoutCenter*0.5, self.iLayoutValueYtop + iFontPlotHeight*(3-fdeltaY), Gfx.FONT_XTINY, 
                   Lang.format("$1$$2$$3$  ", [oValue==null?sValue:sValue.hour.format("%02d"), ":", 
                                               oValue==null?sValue:sValue.min.format("%02d")
@@ -191,9 +189,7 @@ class MyViewInfo extends MyViewHeader {
       sValue = Gregorian.info(oValue, Time.FORMAT_SHORT);
       sValue2 = Gregorian.info(oValue.add(new Time.Duration(deltaT)), Time.FORMAT_SHORT);
     }
-    else {
-      sValue = $.MY_NOVALUE_LEN2;
-    }
+    else { sValue = $.MY_NOVALUE_LEN2; }
     _oDC.drawText(self.iLayoutCenter*1.5, self.iLayoutValueYtop + iFontPlotHeight*(3-fdeltaY), Gfx.FONT_XTINY, 
                   Lang.format("  $1$$2$$3$", [oValue==null?sValue:sValue.hour.format("%02d"), ":", 
                                               oValue==null?sValue:sValue.min.format("%02d")
@@ -236,13 +232,9 @@ class MyViewInfo extends MyViewHeader {
       if(LangUtils.notNaN(oValue)) {
         fValue = oValue.condition;
         sValue = (oValue.windSpeed * $.oMySettings.fUnitWindSpeedCoefficient).format("%.0f");
-        if((aData.size() == 1) || (aData[0] != oValue.temperature)) {
-          self.prepare();
-        }
+        if((aData.size() == 1) || (aData[0] != oValue.temperature)) { self.prepare(); }
       }
-      else {
-        sValue = $.MY_NOVALUE_LEN2;
-      }
+      else { sValue = $.MY_NOVALUE_LEN2; }
       _oDC.drawText(self.iLayoutCenter, self.iLayoutValueYtop + iFontPlotHeight*6, Gfx.FONT_XTINY, 
                     Lang.format("$1$°C H$2$/L$3$  $4$$5$/$6$°", [oValue!=null?oValue.temperature.format("%.0f"):sValue, 
                                                     oValue!=null?oValue.highTemperature.format("%.0f"):sValue, 
@@ -338,8 +330,8 @@ class MyViewInfoDelegate extends Ui.BehaviorDelegate {
   function onMenu() {
     //Sys.println("DEBUG: MyViewInfoDelegate.onMenu()");
     Ui.pushView(new MyMenu2Generic(:menuSettings, 0),
-                new MyMenu2GenericDelegate(:menuSettings),
-                Ui.SLIDE_RIGHT);
+                new MyMenu2GenericDelegate(:menuSettings, false),
+                Ui.SLIDE_LEFT);
     return true;
   }
 
@@ -352,7 +344,7 @@ class MyViewInfoDelegate extends Ui.BehaviorDelegate {
     }
     else {
       Ui.pushView(new MyMenu2Generic(:menuActivity, 0),
-                  new MyMenu2GenericDelegate(:menuActivity),
+                  new MyMenu2GenericDelegate(:menuActivity, false),
                   Ui.SLIDE_BLINK);
     }
     return true;

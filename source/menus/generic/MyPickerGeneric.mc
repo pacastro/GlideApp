@@ -46,7 +46,6 @@ class MyPickerGeneric extends PickerGeneric {
 
   function initialize(_context as Symbol, _item as Symbol, _type as Symbol) {
     if(_context == :contextSettings) {
-
       if(_item == :itemActivityAutoSpeedStart) {
         PickerGeneric.initialize(Ui.loadResource(Rez.Strings.titleActivityAutoSpeedStart) as String,
                                 $.oMySettings.loadActivityAutoSpeedStart(),
@@ -69,7 +68,6 @@ class MyPickerGeneric extends PickerGeneric {
       }
     }
     else if(_context == :contextOx) {
-
       if(_item == :menuOxElevation) {
         PickerGeneric.initialize(Ui.loadResource(Rez.Strings.titleOxElevation) as String,
                                           $.oMySettings.iOxElevation.toFloat(),
@@ -93,7 +91,6 @@ class MyPickerGenericDelegate extends Ui.PickerDelegate {
   private var type as Symbol = :typetNone;
   private var focus as Number = 0;
 
-
   //
   // FUNCTIONS: Ui.PickerDelegate (override/implement)
   //
@@ -116,37 +113,26 @@ class MyPickerGenericDelegate extends Ui.PickerDelegate {
         if(oDeviceSettings has :distanceUnits and oDeviceSettings.distanceUnits != null) {
           iUnit = oDeviceSettings.distanceUnits;
         }
-        else {
-          iUnit = Sys.UNIT_METRIC;
-        }
+        else { iUnit = Sys.UNIT_METRIC; }
       }
 
       // Assemble components
       var fValue = _amValues[1]*1000.0f + _amValues[2]*100.0f + _amValues[3]*10.0f + _amValues[4];
-      if(_amValues[0] != null) {
-        fValue *= _amValues[0];
-      }
+      if(_amValues[0] != null) { fValue *= _amValues[0]; }
 
       // Use user-specified speed unit (NB: SI units are always used internally)
-      if(iUnit == 2) {
-        fValue /= 19.4384449244f;  // kt (* 10) -> m/s
-      }
-      else if(iUnit == Sys.UNIT_STATUTE) {
-        fValue /= 22.3693629205f;  // mph (* 10) -> m/s
-      }
-      else {
-        fValue /= 36.0f;  // km/h (* 10) -> m/s
-      }
+      if(iUnit == 2) { fValue /= 19.4384449244f; }  // kt (* 10) -> m/s
+      else if(iUnit == Sys.UNIT_STATUTE) { fValue /= 22.3693629205f; }  // mph (* 10) -> m/s
+      else { fValue /= 36.0f; }  // km/h (* 10) -> m/s
 
       if(self.context == :contextSettings) {
-
         if(self.item == :itemActivityAutoSpeedStart) {
           $.oMySettings.saveActivityAutoSpeedStart(fValue);
           focus = 1;
         }
       }
       Ui.popView(Ui.SLIDE_IMMEDIATE);
-      Ui.switchToView(new MyMenu2Generic(self.parent, focus), new MyMenu2GenericDelegate(self.parent), WatchUi.SLIDE_RIGHT);
+      Ui.switchToView(new MyMenu2Generic(self.parent, focus), new MyMenu2GenericDelegate(self.parent, false), WatchUi.SLIDE_RIGHT);
     }
 
     else if(type == :elevation) {
@@ -156,22 +142,15 @@ class MyPickerGenericDelegate extends Ui.PickerDelegate {
         if(oDeviceSettings has :elevationUnits and oDeviceSettings.elevationUnits != null) {
           iUnit = oDeviceSettings.elevationUnits;
         }
-        else {
-          iUnit = System.UNIT_METRIC;
-        }
+        else { iUnit = System.UNIT_METRIC; }
       }
       // Assemble components
       var fValue = _amValues[1]*1000.0f + _amValues[2]*100.0f + _amValues[3]*10.0f + _amValues[4];
-      if(_amValues[0] != null) {
-        fValue *= _amValues[0];
-      }
+      if(_amValues[0] != null) { fValue *= _amValues[0]; }
       // Use user-specified elevation unit (NB: metric units are always used internally)
-      if(iUnit == System.UNIT_STATUTE) {
-        fValue *= 0.3048f;  // ft -> m
-      }
+      if(iUnit == System.UNIT_STATUTE) { fValue *= 0.3048f; }  // ft -> m
       
       if(self.context == :contextSettings) {
-
         if(self.item == :itemAltimeterCalibration) {
           $.oMyAltimeter.setAltitudeActual(fValue);
           $.oMySettings.saveAltimeterCalibrationQNH($.oMyAltimeter.fQNH);
@@ -179,15 +158,13 @@ class MyPickerGenericDelegate extends Ui.PickerDelegate {
         }
       }
       else if(self.context == :contextOx) {
-
         if(self.item == :menuOxElevation) {
           $.oMySettings.saveOxElevation(fValue.toNumber());
-
           focus = 1;
         }
       }
       Ui.popView(Ui.SLIDE_IMMEDIATE);
-      Ui.switchToView(new MyMenu2Generic(self.parent, focus), new MyMenu2GenericDelegate(self.parent), WatchUi.SLIDE_RIGHT);
+      Ui.switchToView(new MyMenu2Generic(self.parent, focus), new MyMenu2GenericDelegate(self.parent, false), WatchUi.SLIDE_RIGHT);
     }
 
     else if(type == :pressure) {
@@ -197,35 +174,25 @@ class MyPickerGenericDelegate extends Ui.PickerDelegate {
         if(oDeviceSettings has :distanceUnits and oDeviceSettings.distanceUnits != null) {
           iUnit = oDeviceSettings.distanceUnits;
         }
-        else {
-          iUnit = Sys.UNIT_METRIC;
-        }
+        else { iUnit = Sys.UNIT_METRIC; }
       }
 
       // Assemble components
       var fValue = _amValues[1]*1000.0f + _amValues[2]*100.0f + _amValues[3]*10.0f + _amValues[4];
-      if(_amValues[0] != null) {
-        fValue *= _amValues[0];
-      }
+      if(_amValues[0] != null) { fValue *= _amValues[0]; }
 
       // Use user-specified pressure unit (NB: metric units are always used internally)
-      if(iUnit == Sys.UNIT_STATUTE) {
-        fValue /= 0.2953f;  // inHg (* 1000) -> Pa
-      }
-      else {
-        fValue *= 10.0f;  // mb (* 10) -> Pa
-      }
+      if(iUnit == Sys.UNIT_STATUTE) { fValue /= 0.2953f; }  // inHg (* 1000) -> Pa
+      else { fValue *= 10.0f; }  // mb (* 10) -> Pa
 
       if(self.context == :contextSettings) {
-
         if(self.item == :itemAltimeterCalibration) {
           $.oMyAltimeter.setQNH(fValue);
           $.oMySettings.saveAltimeterCalibrationQNH($.oMyAltimeter.fQNH);
         }
-
       }
       Ui.popView(Ui.SLIDE_IMMEDIATE);
-      Ui.switchToView(new MyMenu2Generic(self.parent, focus), new MyMenu2GenericDelegate(self.parent), WatchUi.SLIDE_RIGHT);
+      Ui.switchToView(new MyMenu2Generic(self.parent, focus), new MyMenu2GenericDelegate(self.parent, false), WatchUi.SLIDE_RIGHT);
     }
     return true;
   }

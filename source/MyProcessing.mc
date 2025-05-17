@@ -275,7 +275,7 @@ class MyProcessing {
           }
         }
       }
-      else {
+      else if(self.bOxSensor) {
         Sensor.disableSensorType(Sensor.SENSOR_ONBOARD_PULSE_OXIMETRY);
       }
     } else if(self.bOxSensor) {

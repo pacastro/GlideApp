@@ -504,8 +504,8 @@ class MyViewVarioplotDelegate extends Ui.BehaviorDelegate {
   function onMenu() {
     //Sys.println("DEBUG: MyViewVarioplotDelegate.onMenu()");
       Ui.pushView(new MyMenu2Generic(:menuSettings, 2),
-                  new MyMenu2GenericDelegate(:menuSettings),
-                  Ui.SLIDE_RIGHT);
+                  new MyMenu2GenericDelegate(:menuSettings, false),
+                  Ui.SLIDE_LEFT);
     return true;
   }
 

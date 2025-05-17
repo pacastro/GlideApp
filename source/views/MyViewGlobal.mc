@@ -97,8 +97,8 @@ class MyViewGlobalDelegate extends Ui.BehaviorDelegate {
     var focus = ($.oMySettings.bGeneralMapDisplay ? [0, 0, 2, 0, 0, 0, ($.oMySettings.bGeneralChartDisplay ? 5 : 0)] 
                                                   : [0, 0, 2, 0, 0, ($.oMySettings.bGeneralChartDisplay ? 5 : 0)]).indexOf($.oMyProcessing.iIsCurrent);
     Ui.pushView(new MyMenu2Generic(:menuSettings, focus < 0 ? 0 : focus),
-                new MyMenu2GenericDelegate(:menuSettings),
-                Ui.SLIDE_RIGHT);
+                new MyMenu2GenericDelegate(:menuSettings, false),
+                Ui.SLIDE_LEFT);
     return true;
   }
 
@@ -127,7 +127,7 @@ class MyViewGlobalDelegate extends Ui.BehaviorDelegate {
     }
     else {
       Ui.pushView(new MyMenu2Generic(:menuActivity, 0),
-                  new MyMenu2GenericDelegate(:menuActivity),
+                  new MyMenu2GenericDelegate(:menuActivity, false),
                   Ui.SLIDE_BLINK);
     }
     return true;
@@ -136,8 +136,8 @@ class MyViewGlobalDelegate extends Ui.BehaviorDelegate {
   function onBack() {
     //Sys.println("DEBUG: MyViewHeaderDelegate.onBack()");
     if(($.oMyProcessing.iIsCurrent == 5)&&($.oMySettings.bGeneralChartDisplay)&&(bActStop ? bActPause : true)) {
-      var iChartIdx = $.oMySettings.loadChartDisplay();
-      iChartIdx = (iChartIdx+1) % 6;
+      var iChartIdx = ($.oMySettings.loadChartDisplay() + 1) % 6;
+      while(!chartRun(iChartIdx)) { iChartIdx = (iChartIdx+1) % 6; }
       $.oMySettings.saveChartDisplay(iChartIdx as Number);
       $.oMySettings.setChartDisplay(iChartIdx as Number);
       Ui.requestUpdate();

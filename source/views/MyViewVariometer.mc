@@ -143,14 +143,16 @@ class MyViewVariometer extends MyView {
     }
 
     // ...  Min Max g load
-    var iAngleMax = Math.round(135.0f * oChartModelg.get_max() * (bUnitm ? 1/$.oMySettings.fVariometerRange : 1/($.oMySettings.fVariometerRange == 3.0f ? 5.0f : [3.0f, 5.0f, 10.0f].indexOf($.oMySettings.fVariometerRange)*10.0f)));
-    var iAngleMin = Math.round(135.0f * oChartModelg.get_min() * (bUnitm ? 1/$.oMySettings.fVariometerRange : 1/($.oMySettings.fVariometerRange == 3.0f ? 5.0f : [3.0f, 5.0f, 10.0f].indexOf($.oMySettings.fVariometerRange)*10.0f)));
-    if(iAngleMax > 140) { iAngleMax = 140; }
-    if(iAngleMin < -140) { iAngleMin = -140; }
-    _oDC.setPenWidth(self.iLayoutValueR - self.iLayoutCacheR);
-    _oDC.setColor(Gfx.COLOR_YELLOW, Gfx.COLOR_TRANSPARENT);
-    _oDC.drawArc(self.iLayoutCenter, self.iLayoutCenter, (self.iLayoutValueR + self.iLayoutCacheR) / 2, Gfx.ARC_CLOCKWISE, 181-iAngleMin, 180-iAngleMax);
-
+    if(chartRun(5)) {
+      var iAngleMax = Math.round(135.0f * oChartModelg.get_max() * (bUnitm ? 1/$.oMySettings.fVariometerRange : 1/($.oMySettings.fVariometerRange == 3.0f ? 5.0f : [3.0f, 5.0f, 10.0f].indexOf($.oMySettings.fVariometerRange)*10.0f)));
+      var iAngleMin = Math.round(135.0f * oChartModelg.get_min() * (bUnitm ? 1/$.oMySettings.fVariometerRange : 1/($.oMySettings.fVariometerRange == 3.0f ? 5.0f : [3.0f, 5.0f, 10.0f].indexOf($.oMySettings.fVariometerRange)*10.0f)));
+      if(iAngleMax > 140) { iAngleMax = 140; }
+      if(iAngleMin < -140) { iAngleMin = -140; }
+      _oDC.setPenWidth(self.iLayoutValueR - self.iLayoutCacheR);
+      _oDC.setColor(Gfx.COLOR_YELLOW, Gfx.COLOR_TRANSPARENT);
+      _oDC.drawArc(self.iLayoutCenter, self.iLayoutCenter, (self.iLayoutValueR + self.iLayoutCacheR) / 2, Gfx.ARC_CLOCKWISE, 181-iAngleMin, 180-iAngleMax);
+    }
+    
     // ... g diamond
     var fValue = $.oMyProcessing.fAcceleration;
     var iAngle;

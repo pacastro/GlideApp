@@ -238,6 +238,12 @@ class MyViewTimers extends MyViewGlobal {
 
   function drawChart(_oDC as Gfx.Dc) as Void {
     // Sys.println("DEBUG: MyViewTimers.drawChart()");
+    if(App.Properties.getValue("userChartVars").toNumber() == 0) {
+      $.oMySettings.bGeneralChartDisplay = false;
+      App.Properties.setValue("userGeneralChartDisplay", false);
+      Ui.switchToView(new MyViewTimers(), new MyViewTimersDelegate(), Ui.SLIDE_IMMEDIATE);
+      return;
+    }
     var iX1 = (_oDC.getWidth()*0.018f).toNumber();
     var iX2 = _oDC.getWidth() - iX1;
     var iY1 = (_oDC.getHeight()*0.375f).toNumber();
@@ -245,6 +251,7 @@ class MyViewTimers extends MyViewGlobal {
 
     var model = oChartModelAlt;
     var iChartIdx = $.oMySettings.loadChartDisplay();
+    while(!chartRun(iChartIdx)) { iChartIdx = (iChartIdx+1) % 6; }
     if(iChartIdx == 0) {
       range_min_size = 30;
       coef = $.oMySettings.fUnitElevationCoefficient;
@@ -258,7 +265,7 @@ class MyViewTimers extends MyViewGlobal {
     else if(iChartIdx == 2) {
       range_min_size = 0.5;
       coef = $.oMySettings.fUnitVerticalSpeedCoefficient;
-      model = oChartModelCrt;
+      model = oChartModelVsp;
     }
     else if(iChartIdx == 3) {
       range_min_size = 20;
@@ -286,11 +293,12 @@ class MyViewTimers extends MyViewGlobal {
       _oDC.drawText((iX1+iX2)/2, (iY1+iY2)/2, Gfx.FONT_TINY, fmt_num(model.get_current()), Gfx.TEXT_JUSTIFY_CENTER|Gfx.TEXT_JUSTIFY_VCENTER);
     }
 
-     if((bActStop ? !bActPause : false) && (Time.now().value() % 5 == 0)) {
+    if((bActStop ? !bActPause : false) && (Time.now().value() % 5 == 0)) {
       iChartIdx = (iChartIdx+1) % 6;
-      $.oMySettings.saveChartDisplay(iChartIdx as Number);
-      $.oMySettings.setChartDisplay(iChartIdx as Number);
+      while(!chartRun(iChartIdx)) { iChartIdx = (iChartIdx+1) % 6; }
     }
+    $.oMySettings.saveChartDisplay(iChartIdx as Number);
+    $.oMySettings.setChartDisplay(iChartIdx as Number);
   }
 
   function fmt_num(num) {
@@ -302,14 +310,13 @@ class MyViewTimers extends MyViewGlobal {
   }
 
   function onHide() {
-    //Sys.println("DEBUG: MyViewTimers.onHide()");
+    // Sys.println("DEBUG: MyViewTimers.onHide()");
     MyViewGlobal.onHide();
     auxLayer.onHide();
 
     // Mute tones
     (App.getApp() as MyApp).muteTones();
   }
-
 }
 
 class MyViewTimersDelegate extends MyViewGlobalDelegate {
@@ -349,5 +356,4 @@ class MyViewTimersDelegate extends MyViewGlobalDelegate {
     }
     return true;
   }
-
 }

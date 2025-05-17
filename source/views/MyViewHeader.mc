@@ -66,6 +66,7 @@ class MyViewHeader extends MyView {
   //
 
   function initialize() {
+    // Sys.println("DEBUG: MyViewHeader.initialize()");
     if($.oMyActivity != null) { $.oTimeLastTimer = Time.now();}  // view ET timer
     MyView.initialize();
 
@@ -87,15 +88,14 @@ class MyViewHeader extends MyView {
   }
 
   function onUpdate(_oDC) {
-    //Sys.println("DEBUG: MyView.onUpdate()");
+    //Sys.println("DEBUG: MyViewHeader.onUpdate()");
 
     // Update layout
     self.updateLayout(true);
     MyView.onUpdate(_oDC);
 
-    if(!($.oMySettings.bGeneralChartDisplay&&($.oMyProcessing.iIsCurrent == 5))) { self.oRezDrawableCenter.draw(_oDC); }
+    if(!(self.oRezDrawableCenter == null)) { self.oRezDrawableCenter.draw(_oDC); }
   }
-
 
   //
   // FUNCTIONS: MyView (override/implement)

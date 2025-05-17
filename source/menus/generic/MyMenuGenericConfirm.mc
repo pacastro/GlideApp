@@ -42,17 +42,11 @@ using Toybox.System as Sys;
 
 class MyMenuConfirmDiscard extends Ui.View {
 
-  function initialize() {
-    View.initialize();
-  }
+  function initialize() { View.initialize(); }
 
-  function onLayout(_oDC) {
-    View.setLayout(Rez.Layouts.DeleteConfirmationPage(_oDC));
-  }
+  function onLayout(_oDC) { View.setLayout(Rez.Layouts.DeleteConfirmationPage(_oDC)); }
 
-  function onUpdate(_oDC) {
-    View.onUpdate(_oDC);
-  }
+  function onUpdate(_oDC) { View.onUpdate(_oDC); }
 }
 
 class MyMenuConfirmDiscardDelegate extends Ui.InputDelegate {
@@ -73,12 +67,10 @@ class MyMenuConfirmDiscardDelegate extends Ui.InputDelegate {
       if(action == :actionDiscard) {
         ($.oMyActivity as MyActivity).stop(false);
         $.oMyActivity = null;
-      } else if(action == :actionClearLogs) {
-        (App.getApp() as MyApp).clearStorageLogs();
-      }
-      if(self.popout) {
-        Ui.popView(Ui.SLIDE_IMMEDIATE);
-      }
+      } 
+      else if(action == :actionClearLastLog) { (App.getApp() as MyApp).clearStorageLogs(false); } 
+      else if(action == :actionClearLogs) { (App.getApp() as MyApp).clearStorageLogs(true); }
+      if(self.popout) {  Ui.popView(Ui.SLIDE_IMMEDIATE); }
       Ui.switchToView(new Ui.ProgressBar("Discarding...", null), new ResetProgressDelegate(), Ui.SLIDE_IMMEDIATE);
       return true;
     } 
@@ -134,16 +126,12 @@ class MyMenuGenericConfirmDelegate extends Ui.ConfirmationDelegate {
         }
       }
       else if(context == :contextStorage) {
-        if(action == :actionClearLogs) {
-          (App.getApp() as MyApp).clearStorageLogs();
-          Ui.switchToView(new Ui.ProgressBar("Discarding...", null), new ResetProgressDelegate(), Ui.SLIDE_IMMEDIATE);
-          Ui.pushView(new Ui.ProgressBar("Discarding...", null), null, Ui.SLIDE_IMMEDIATE);
-          
-        }
+        if(action == :actionClearLastLog) { (App.getApp() as MyApp).clearStorageLogs(false);  } 
+        else if(action == :actionClearLogs) { (App.getApp() as MyApp).clearStorageLogs(true); }
+        Ui.switchToView(new Ui.ProgressBar("Discarding...", null), new ResetProgressDelegate(), Ui.SLIDE_IMMEDIATE);
+        Ui.pushView(new Ui.ProgressBar("Discarding...", null), null, Ui.SLIDE_IMMEDIATE);
       }
-      if(self.popout) {
-        Ui.popView(Ui.SLIDE_IMMEDIATE);
-      }
+      if(self.popout) { Ui.popView(Ui.SLIDE_IMMEDIATE); }
       return true;
     }
     return false;

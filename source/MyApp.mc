@@ -75,12 +75,12 @@ var oMyTimeStart as Time.Moment = Time.now();
 var iMyLogIndex as Number = -1;
 
 // Chart
-var oChartModelAlt = new MyChartModel(null);
-var oChartModelAsc = new MyChartModel(null);
-var oChartModelCrt = new MyChartModel(null);
-var oChartModelSpd = new MyChartModel(null);
-var oChartModelHR = new MyChartModel(null);
-var oChartModelg = new MyChartModel(null);
+var oChartModelAlt as MyChartModel?;
+var oChartModelAsc as MyChartModel?;
+var oChartModelVsp as MyChartModel?;
+var oChartModelSpd as MyChartModel?;
+var oChartModelHR as MyChartModel?;
+var oChartModelg as MyChartModel?;
 
 var bChartReset = false;
 var bRangeChange = false;
@@ -150,7 +150,7 @@ class MyApp extends App.AppBase {
 
   function initialize() {
     AppBase.initialize();
-
+    chartRun(-1);
     // Log
     // ... last entry index
     var iLogIndex = App.Storage.getValue("storLogIndex") as Number?;
@@ -193,7 +193,7 @@ class MyApp extends App.AppBase {
     Pos.enableLocationEvents(Pos.LOCATION_DISABLE, method(:onLocationEvent));
 
     // Disable pulse_oximetry
-    Sensor.disableSensorType(Sensor.SENSOR_ONBOARD_PULSE_OXIMETRY);
+    if($.oMyProcessing.bOxSensor) { Sensor.disableSensorType(Sensor.SENSOR_ONBOARD_PULSE_OXIMETRY); }
 
     // Disable sensor events
     Sensor.enableSensorEvents(null);
@@ -267,21 +267,21 @@ class MyApp extends App.AppBase {
 
     // Chart
     if((($.oMyActivity != null) || !($.oMySettings.bChartShow)) && ($.oMyProcessing.fAltitude != null) && (bActStop ? bActPause : true)) {
-      oChartModelAlt.new_value(_oInfo.altitude);
-      oChartModelAsc.new_value(($.oMyActivity != null)?$.oMyActivity.fGlobalAscent:0);
-      oChartModelCrt.new_value($.oMyProcessing.fVariometer_filtered);
-      oChartModelSpd.new_value($.oMyProcessing.fGroundSpeed);
-      oChartModelHR.new_value($.oMyProcessing.iHR);
-      oChartModelg.new_value($.oMyProcessing.fAcceleration);
+      if(chartRun(0)) { oChartModelAlt.new_value(_oInfo.altitude); }
+      if(chartRun(1)) { oChartModelAsc.new_value(($.oMyActivity != null)?$.oMyActivity.fGlobalAscent:0); }
+      if(chartRun(2)) { oChartModelVsp.new_value($.oMyProcessing.fVariometer_filtered); }
+      if(chartRun(3)) { oChartModelSpd.new_value($.oMyProcessing.fGroundSpeed); }
+      if(chartRun(4)) { oChartModelHR.new_value($.oMyProcessing.iHR); }
+      if(chartRun(5)) { oChartModelg.new_value($.oMyProcessing.fAcceleration); }
     }
 
     if(bChartReset) {
-      oChartModelAlt.reset();
-      oChartModelAsc.reset();
-      oChartModelCrt.reset();
-      oChartModelSpd.reset();
-      oChartModelHR.reset();
-      oChartModelg.reset();
+      if(chartRun(0)) { oChartModelAlt.reset(); }
+      if(chartRun(1)) { oChartModelAsc.reset(); }
+      if(chartRun(2)) { oChartModelVsp.reset(); }
+      if(chartRun(3)) { oChartModelSpd.reset(); }
+      if(chartRun(4)) { oChartModelHR.reset(); }
+      if(chartRun(5)) { oChartModelg.reset(); }
       bChartReset = false;
     }
 
@@ -478,16 +478,22 @@ class MyApp extends App.AppBase {
     }
   }
 
-  function clearStorageLogs() as Void {
+  function clearStorageLogs(_cAll as Boolean) as Void {
     //Sys.println("DEBUG: MyApp.clearStorageLogs()");
-    for(var n=0; n<$.MY_STORAGE_SLOTS; n++) {
-      var s = n.format("%02d");
-      App.Storage.deleteValue(format("storLog$1$", [s]));
-    }
-    App.Storage.deleteValue("storLogIndex");
-    $.iMyLogIndex = -1;
-    if(Toybox.Attention has :playTone) {
-        Attn.playTone(Attn.TONE_RESET);
+    if(_cAll) {
+      for(var n=0; n<$.MY_STORAGE_SLOTS; n++) {
+        var s = n.format("%02d");
+        App.Storage.deleteValue(format("storLog$1$", [s]));
+      }
+      App.Storage.deleteValue("storLogIndex");
+      $.iMyLogIndex = -1;
+      if(Toybox.Attention has :playTone) {
+          Attn.playTone(Attn.TONE_RESET);
+      }
+    } else {
+      App.Storage.deleteValue(format("storLog$1$", [$.iMyLogIndex.format("%02d")]));
+      $.iMyLogIndex = ($.iMyLogIndex - 1) % $.MY_STORAGE_SLOTS;
+      App.Storage.setValue("storLogIndex", $.iMyLogIndex as App.PropertyValueType);
     }
   }
 
@@ -548,4 +554,18 @@ class MyApp extends App.AppBase {
     $.iScaleBarSize = iMaxBarSize;
     $.sScaleBarUnit = fMaxBarScale.format("%.0f") + sUnit;
   }
+}
+
+function chartRun(_var as Number) as Boolean {
+  if(_var < 0) {
+    oChartModelAlt = chartRun(0) ? new MyChartModel(null) : null;
+    oChartModelAsc = chartRun(1) ? new MyChartModel(null) : null;
+    oChartModelVsp = chartRun(2) ? new MyChartModel(null) : null;
+    oChartModelSpd = chartRun(3) ? new MyChartModel(null) : null;
+    oChartModelHR = chartRun(4) ? new MyChartModel(null) : null;
+    oChartModelg = chartRun(5) ? new MyChartModel(null) : null;
+    return true;
+  }
+  else if(App.Properties.getValue("userChartVars").substring(_var, _var+1).toNumber() == 1) { return true; }
+  return false;
 }

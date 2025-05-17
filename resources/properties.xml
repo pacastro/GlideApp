@@ -28,6 +28,7 @@
   <property id="userChartShow" type="boolean">true</property>
   <property id="userChartRange" type="boolean">true</property>
   <property id="userChartDisplay" type="number">0</property> 
+  <property id="userChartVars" type="string">111111</property> 
   <!-- ... map -->
   <property id="userMapHeader" type="boolean">true</property>
   <property id="userMapData" type="boolean">true</property>

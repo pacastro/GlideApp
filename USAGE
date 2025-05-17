@@ -380,6 +380,8 @@ The application allows you to specify the following settings:
   - ElapsedTime always in footer
     ElapsedTime in footer for 10 sec (then local/utc time) only on view change (default), 
     or always (no local/utc time) - default is off
+  - Delete last log:
+    delete last log entry
   - Clear logs:
     delete all logs
 
@@ -451,6 +453,9 @@ The application allows you to specify the following settings:
     Display last 4 hrs or last 30 m of data
   - Displayed var:
     Variable to be displayed (Altitude/Ascent/ClimbRate/Speed/HeartRate/Accel)
+  - Active vars:
+    Select variables to be active in GlideApp (all variables will appear in Displayed var
+    options, but only active variables will be registered and displayed)
 
 * Map (available when General/Map display is on)
   - Show Header/Footer:

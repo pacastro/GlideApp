@@ -1,7 +1,7 @@
 <!-- -*- mode:xml; tab-width:2; c-basic-offset:2; intent-tabs-mode:nil; -*- ex: set tabstop=2 expandtab: -->
 <strings>
   <string id="AppName">Glide</string>
-  <string id="AppVersion">2.3</string>
+  <string id="AppVersion">2.4</string>
   <!-- Properties -->
   <string id="titleVersion">Version</string>
   <string id="titleLicense">License</string>
@@ -46,6 +46,7 @@
   <string id="titleChartShow">Show on</string>
   <string id="titleChartRange">Display last</string>
   <string id="titleChartDisplay">Displayed var</string>
+  <string id="titleChartVars">Active vars</string>
   <!-- Menu (settings:map) -->
   <string id="titleSettingsMap">Map</string>
   <string id="titleMapHeader">Show Header/Footer</string>
@@ -65,7 +66,6 @@
   <string id="titleGeneralMapDisplay">Map view Display</string>
   <string id="titleGeneralChartDisplay">Chart in Timers</string>
   <string id="titleGeneralETDisplay">ElapsedTime always in footer?</string>
-  <string id="titleStorageClearLogs">Clear Logs</string>
   <string id="titleConfirmDiscard">Confirm discard?</string>
   <!-- Menu (settings:units) -->
   <string id="titleSettingsUnits">Units</string>
@@ -84,6 +84,8 @@
   <string id="titleStorageLoad">Load</string>
   <string id="titleStorageSave">Save</string>
   <string id="titleStorageDelete">Delete</string>
+  <string id="titleStorageClearLastLog">Delete Last Log</string>
+  <string id="titleStorageClearLogs">Clear Logs</string>
   <!-- Menu (info) -->
   <string id="titleInfo">Info</string>
   <!-- Menu (about) -->

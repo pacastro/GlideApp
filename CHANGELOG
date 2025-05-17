@@ -1,3 +1,11 @@
+* 2.4:
+  - Added Delete Last log option for deleting only the last entry 
+  - Active Chart variables in app can be selected in watch "Settings/Chart/Active vars" menu
+  - Greatly simpliplied and faster settings change for: some variometer variables, chart 
+    displayed var and all units
+  - Updated for Forerunner 570 & 970 and Vivoactive 6
+  - Fixed minor bugs
+
 * 2.3:
   - Added SpO2 Status indicator to variometer view
   - Added carousel page indicator (shows current page position among all available pages)

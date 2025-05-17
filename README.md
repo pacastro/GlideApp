@@ -16,7 +16,7 @@ GlideApp is a BACKUP source of information and should ALWAYS be paired with
 specialized variometer equipment! Watch sensors are simply not precise enough
 and THIS APP SHOULD NOT BE USED AS A PRIMARY FLIGHT INSTRUMENT!
 
-![view1](./docs/ga1_2.png)
+![view1](./docs/ga1_4.png)
 
 1. Dashboards
 
