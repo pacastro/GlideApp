@@ -83,6 +83,11 @@ class MyViewGlobal extends MyViewHeader {
     self.oRezValueRight = View.findDrawableById("valueRight") as Ui.Text;
     self.oRezValueBottomLeft = View.findDrawableById("valueBottomLeft") as Ui.Text;
     self.oRezValueBottomRight = View.findDrawableById("valueBottomRight") as Ui.Text;
+
+    // Only set the action menu indicator if the device supports it
+    if (View has :setActionMenuIndicator) {
+        setActionMenuIndicator({:enabled=>true});
+    }
   }
 }
 
@@ -101,6 +106,10 @@ class MyViewGlobalDelegate extends Ui.BehaviorDelegate {
                 Ui.SLIDE_LEFT);
     return true;
   }
+
+  function onActionMenu() {
+		return onMenu();
+	}
 
   function onSelect() {
     //Sys.println("DEBUG: MyViewHeaderDelegate.onSelect()");

@@ -37,8 +37,11 @@ import Toybox.Lang;
 
 // Quirks
 // BUG: as Array<Array<NativeType>>: no viable alternative at input
+typedef NumNull as Numeric or Null;
+
 typedef AStrings as Array<String>;
 typedef ANumbers as Array<Number>;
 typedef AFloats as Array<Float>;
 typedef ANumerics as Array<Numeric>;
 typedef ADecimals as Array<Decimal>;
+typedef ANumNull as Array<NumNull>;

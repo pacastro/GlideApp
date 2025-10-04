@@ -230,7 +230,7 @@ class MyChartModel {
     var min_range_minutes = 7.5;
     var max_range_minutes1 = 240;
     var max_range_minutes2 = 30;
-    var values as AFloats?;
+    var values as ANumNull?;
     var range_mult;
     var range_mult_max;
     var range_expand = true;

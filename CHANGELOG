@@ -1,3 +1,9 @@
+* 2.41:
+  - Added swipe left action for Settings Menu display on Vivoactive 6 (and Venu 4)
+    works on screens displaying the default action menu indicator for this watches
+    (vertical bar in the righ-center side of screen)
+  - Updated for Fenix 8 Pro and Venu 4
+
 * 2.4:
   - Added Delete Last log option for deleting only the last entry 
   - Active Chart variables in app can be selected in watch "Settings/Chart/Active vars" menu
